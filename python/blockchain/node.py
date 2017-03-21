@@ -1,6 +1,5 @@
 import threading
 import asyncio
-import websockets
 import time
 
 from blockchain.chain import Chain
@@ -10,7 +9,7 @@ from blockchain.block import Block
 class Node():
     def __init__(self, port):
         self._port = port
-        self._nodes = []
+        self._nodes = set()
 
         self._chain = Chain()
         self._loaf_pool = {}
@@ -47,16 +46,9 @@ class Node():
         # forward loaf
         pass
 
-    async def _handler(self, websocket, path):
-        name = await websocket.recv()
-        print("< {}".format(name))
-
-        greeting = "Hello {}!".format(name)
-        await websocket.send(greeting)
-        print("> {}".format(greeting))
-
     def _runner(self, event_loop):
         asyncio.set_event_loop(event_loop)
-        start_server = websockets.serve(self._handler, '0.0.0.0', self._port)
-        asyncio.get_event_loop().run_until_complete(start_server)
-        asyncio.get_event_loop().run_forever()
+#        start_server = websockets.serve(self._handler, '0.0.0.0', self._port)
+#        asyncio.get_event_loop().run_until_complete(start_server)
+#        asyncio.get_event_loop().run_forever()
+
