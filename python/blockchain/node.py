@@ -4,26 +4,26 @@ import loaf
 class Node():
     def __init__(self):
         return True
-    
+
     def add_block(block):
-    	pass
+        pass
     def broadcast_loaf(loaf):
-    	pass
+        pass
 
     def attach_block_validator():
-    	pass
+        pass
     def attach_loaf_validator():
-    	pass
+        pass
     def attach_consensus():
-    	pass
+        pass
 
     def connect_node():
-    	pass
+        pass
     def query_length():
-    	pass
+        pass
     def request_blocks():
-    	pass
+        pass
     def received_block(block):
-    	pass
+        pass
     def received_loaf(loaf):
-    	pass
+        pass
