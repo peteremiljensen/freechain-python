@@ -1,3 +1,4 @@
+import sys
 from blockchain.loaf import *
 from blockchain.block import *
 
@@ -7,4 +8,30 @@ class Chain():
         self._chain = [genesis_block]
 
     def add_block(self, block):
-        return True
+        if block.validate() == False:
+            return False
+        if self._chain[-1].get_hash() == block.get_previous_block_hash():
+            self._chain.append(block)
+            return True
+        else:
+            return False
+
+    def get_length(self):
+        return len(self._chain)
+
+    def mine_block(self, loafs):
+        timestamp = str(datetime.datetime.now())
+        previous_block_hash = self._chain[-1].get_hash()
+        nounce = 0
+        block = None
+        while True:
+            block = Block(loafs, previous_block_hash, timestamp, nounce)
+            if block.get_hash()[:5] == '00000':
+                return block
+            nounce += 1
+
+    def json(self):
+        return json.dumps(self._chain,
+                          sort_keys=True,
+                          cls=BlockEncoder).encode('utf-8')
+

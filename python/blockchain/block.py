@@ -24,7 +24,7 @@ class Block:
     def get_hash(self):
         return self._block['hash']
 
-    def get_previous_block_hash():
+    def get_previous_block_hash(self):
         return self._block['previous_block_hash']
 
     def calculate_hash(self):
@@ -40,7 +40,7 @@ class Block:
                 return False
         hash_calc = self.calculate_hash()
         return self._block['hash'] == hash_calc and \
-            hash_calc[:4] == '0000'
+            hash_calc[:5] == '00000'
 
     @staticmethod
     def create_block_from_json(json_string):
@@ -50,3 +50,9 @@ class Block:
             loafs.append(Loaf.create_loaf_from_json(json.dumps(l)))
         return Block(loafs, dump['previous_block_hash'], dump['timestamp'],
                      dump['nounce'], dump['hash'])
+
+class BlockEncoder(LoafEncoder):
+    def default(self, obj):
+        if isinstance(obj, Block):
+            return obj._block
+        return LoafEncoder.default(self, obj)
