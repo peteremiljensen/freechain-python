@@ -8,6 +8,7 @@ class Node():
         self._address = address
         self._port = port
         self._nodes = []
+        self._loaf_pool = {}
 
     def broadcast_loaf(loaf):
         pass
