@@ -16,6 +16,9 @@ class Chain():
         else:
             return False
 
+    def get_block(self, height):
+        return self._chain[height]
+
     def get_length(self):
         return len(self._chain)
 
