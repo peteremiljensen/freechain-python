@@ -1,6 +1,7 @@
 import hashlib
 import datetime
 import json
+
 from blockchain.loaf import *
 
 class Block:
