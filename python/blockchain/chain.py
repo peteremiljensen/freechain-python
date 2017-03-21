@@ -8,7 +8,7 @@ class Chain():
         self._chain = [genesis_block]
 
     def add_block(self, block):
-        if not block.validate() and \
+        if block.validate() and \
            self._chain[-1].get_hash() == block.get_previous_block_hash():
             self._chain.append(block)
             return True
