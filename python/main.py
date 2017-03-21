@@ -7,11 +7,13 @@ from blockchain.block import Block
 
 def main():
     chain = Chain()
-    new_block = chain.mine_block([Loaf({"Which": 0}), Loaf({"Which": 1})])
-    if chain.add_block(new_block):
-        print (chain.json())
-    else:
-        print ("Error adding block")
+    for i in range(5):
+        new_block = chain.mine_block([Loaf({"Which": 0}), Loaf({"Which": 1})])
+        if chain.add_block(new_block):
+            print ("Added block")
+        else:
+            print ("Error adding block")
+    print (chain.json())
 
 if __name__ == '__main__':
     main()
