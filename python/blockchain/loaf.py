@@ -9,10 +9,15 @@ class Loaf():
         self._loaf['id'] = id
         self._loaf['data'] = data
         self._loaf['timestamp'] = str(datetime.datetime.now())
-        hash = json.dumps(self._loaf, sort_keys=True).encode('utf-8')
-        self._loaf['hash'] = hashlib.sha256()
+        dump = self.json()
+        self._loaf['hash'] = hashlib.sha256(dump).hexdigest()
 
     def json(self):
-        json.dumps(self._loaf)
+        return json.dumps(self._loaf, sort_keys=True).encode('utf-8')
+
+    @staticmethod
+    def create_loaf_from_json(json):
+        
+        return True
 
 
