@@ -4,10 +4,11 @@ import json
 from blockchain.loaf import *
 
 class Block:
-    def __init__(self, loafs, previous_block, timestamp, nounce, hash=None):
+    def __init__(self, loafs, previous_block_hash,
+                 timestamp, nounce, hash=None):
         self._block = {}
         self._block['loafs'] = loafs
-        self._block['previous_block'] = previous_block
+        self._block['previous_block_hash'] = previous_block_hash
         self._block['timestamp'] = timestamp
         self._block['nounce'] = nounce
         if hash == None:
@@ -22,6 +23,9 @@ class Block:
 
     def get_hash(self):
         return self._block['hash']
+
+    def get_previous_block_hash():
+        return self._block['previous_block_hash']
 
     def calculate_hash(self):
         hash_tmp = self._block['hash']
@@ -44,5 +48,5 @@ class Block:
         loafs = []
         for l in dump['loafs']:
             loafs.append(Loaf.create_loaf_from_json(json.dumps(l)))
-        return Block(loafs, dump['previous_block'], dump['timestamp'],
+        return Block(loafs, dump['previous_block_hash'], dump['timestamp'],
                      dump['nounce'], dump['hash'])
