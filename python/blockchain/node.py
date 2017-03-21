@@ -4,11 +4,13 @@ import block
 import loaf
 
 class Node():
-    def __init__(self):
+    def __init__(self, address, port):
+        self._address = address
+        self._port = port
+
         self._blockchain = []
         self._loafs = []
         self._nodes = []
-        return True
 
     def add_block(block):
         self._blockchain.append(block)
