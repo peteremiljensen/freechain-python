@@ -1,7 +1,7 @@
 import hashlib
 import datetime
 import json
-from blockchain.loaf import LoafEncoder
+from blockchain.loaf import *
 
 class Block:
     def __init__(self, loafs, previous_block, timestamp, nounce, hash=None):
@@ -41,5 +41,8 @@ class Block:
     @staticmethod
     def create_block_from_json(json_string):
         dump = json.loads(json_string)
-        return Loaf(dump['loafs'], dump['previous_block'], dump['timestamp'],
-                    dump['nounce'], dump['hash'])
+        loafs = []
+        for l in dump['loafs']:
+            loafs.append(Loaf.create_loaf_from_json(json.dumps(l)))
+        return Block(loafs, dump['previous_block'], dump['timestamp'],
+                     dump['nounce'], dump['hash'])
