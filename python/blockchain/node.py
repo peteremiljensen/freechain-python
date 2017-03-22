@@ -1,14 +1,12 @@
 from threading import Thread
 import asyncio
+import websockets
 
 from blockchain.chain import Chain
 from blockchain.loaf import Loaf
 from blockchain.block import Block
-from blockchain.protocol import *
 
 class Node():
-    _singleton = None
-
     def __init__(self, port):
         self._port = port
         self._nodes = set()
@@ -49,22 +47,4 @@ class Node():
 
     def _start_server_thread(self, loop):
         asyncio.set_event_loop(loop)
-        factory = WebSocketServerFactory(u"ws://127.0.0.1:9000")
-        factory.protocol = ServerProtocol
-
-        coro = loop.create_server(factory, '0.0.0.0', self._port)
-        server = loop.run_until_complete(coro)
-
-        try:
-            loop.run_forever()
-        except KeyboardInterrupt:
-            pass
-        finally:
-            server.close()
-            loop.close()
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._singleton:
-            cls._singleton = super(OneOnly, cls)
-        return cls._singleton
-
+        pass
