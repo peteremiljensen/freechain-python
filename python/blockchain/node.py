@@ -1,4 +1,3 @@
-import threading
 import asyncio
 import time
 
@@ -14,10 +13,6 @@ class Node():
         self._chain = Chain()
         self._loaf_pool = {}
 
-        loop = asyncio.get_event_loop()
-        self._thread = threading.Thread(target=self._runner,
-                                        args=(loop,),
-                                        daemon=True)
 
     def start(self):
         self._thread.start()
@@ -45,10 +40,4 @@ class Node():
         # check if new
         # forward loaf
         pass
-
-    def _runner(self, event_loop):
-        asyncio.set_event_loop(event_loop)
-#        start_server = websockets.serve(self._handler, '0.0.0.0', self._port)
-#        asyncio.get_event_loop().run_until_complete(start_server)
-#        asyncio.get_event_loop().run_forever()
 
