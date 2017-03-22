@@ -1,5 +1,4 @@
 import asyncio
-import time
 
 from blockchain.chain import Chain
 from blockchain.loaf import Loaf
@@ -12,7 +11,6 @@ class Node():
 
         self._chain = Chain()
         self._loaf_pool = {}
-
 
     def start(self):
         self._thread.start()
