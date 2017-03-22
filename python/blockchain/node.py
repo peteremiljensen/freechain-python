@@ -1,6 +1,7 @@
 import threading
 import asyncio
 import websockets
+import queue
 
 from blockchain.chain import Chain
 from blockchain.loaf import Loaf
@@ -9,7 +10,9 @@ from blockchain.block import Block
 class Node():
     def __init__(self, port):
         self._port = port
-        self._nodes = set()
+        self._server_nodes = set()
+        self._client_nodes = set()
+        self._queues = {}
 
         self._chain = Chain()
         self._loaf_pool = {}
@@ -47,13 +50,37 @@ class Node():
 
     async def _server(self, websocket, path):
         loop = asyncio.get_event_loop()
-        loop.call_soon_threadsafe(self.broadcast_loaf, 2)
-        name = await websocket.recv()
-        print("< {}".format(name))
+        self._server_nodes.add(websocket)
+        recv_queue = queue.Queue()
+        send_queue = queue.Queue()
+        self._queues[websocket] = (recv_queue, send_queue)
+        try:
+            while True:
+                futures = []
+                send_task = None
+                try:
+                    send_data = send_queue.get_nowait()
+                    send_task = asyncio.ensure_future(websocket.send(send_data))
+                    futures.append(send_task)
+                except queue.Empty:
+                    pass
 
-        greeting = "Hello {}!".format(name)
-        await websocket.send(greeting)
-        print("> {}".format(greeting))
+                recv_task = asyncio.ensure_future(websocket.recv())
+                futures.append(recv_task)
+                done, pending = await asyncio.wait(
+                    futures,
+                    return_when=asyncio.FIRST_COMPLETED)
+
+                if recv_task in done:
+                    recv_data = recv_task.result()
+                    recv_queue.put(recv_data)
+                    print("Recieved data")
+                else:
+                    recv_task.cancel()
+        finally:
+            print ("Unregister")
+            self._server_nodes.remove(websocket)
+            del self._queues[websocket]
 
     def _start_server_thread(self, loop):
         asyncio.set_event_loop(loop)
