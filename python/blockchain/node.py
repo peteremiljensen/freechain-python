@@ -54,11 +54,9 @@ class Node():
                 else:
                     recv_task.cancel()
         except:
-            pass
-
-        print ("Unregister")
-        self._nodes.remove(websocket)
-        del self._queues[websocket]
+            print ("Unregister")
+            self._nodes.remove(websocket)
+            del self._queues[websocket]
 
     def _start_server_thread(self, loop):
         asyncio.set_event_loop(loop)
