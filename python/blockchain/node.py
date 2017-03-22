@@ -1,4 +1,4 @@
-from threading import Thread
+import threading
 import asyncio
 import websockets
 
@@ -14,15 +14,15 @@ class Node():
         self._chain = Chain()
         self._loaf_pool = {}
 
-        loop = asyncio.new_event_loop()
-        self._server_thread = Thread(target=self._start_server_thread,
-                                     args=(loop,), daemon=True)
+        self._loop = asyncio.new_event_loop()
+        self._server_thread = threading.Thread(target=self._start_server_thread,
+                                               args=(self._loop,), daemon=True)
 
     def start(self):
         self._server_thread.start()
 
     def broadcast_loaf(self, loaf):
-        print ("HEJ MED JER ALLE")
+        print ("HEJ MED JER ALLE", loaf)
 
     def connect_node(self):
         # establish connection
@@ -45,6 +45,18 @@ class Node():
         # forward loaf
         pass
 
+    async def _server(self, websocket, path):
+        loop = asyncio.get_event_loop()
+        loop.call_soon_threadsafe(self.broadcast_loaf, 2)
+        name = await websocket.recv()
+        print("< {}".format(name))
+
+        greeting = "Hello {}!".format(name)
+        await websocket.send(greeting)
+        print("> {}".format(greeting))
+
     def _start_server_thread(self, loop):
         asyncio.set_event_loop(loop)
-        pass
+        start_server = websockets.serve(self._server, 'localhost', self._port)
+        loop.run_until_complete(start_server)
+        loop.run_forever()
