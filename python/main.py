@@ -9,7 +9,8 @@ def main():
     node = Node('9000')
     node.start()
     while True:
-        time.sleep(1)
+        input('Client?')
+        node.connect_node('localhost')
 
 if __name__ == '__main__':
     main()
