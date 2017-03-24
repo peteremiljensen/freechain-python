@@ -8,9 +8,9 @@ from blockchain.node import Node
 def main():
     node = Node('9000')
     node.start()
+    ip = input('Connect to: ')
+    node.connect_node(ip)
     while True:
-        ip = input('Connect to: ')
-        node.connect_node(ip)
         data = input('Send data: ')
         node.broadcast(data)
 

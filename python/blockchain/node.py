@@ -54,9 +54,11 @@ class Node():
                 futures.append(recv_task)
                 try:
                     data = send_queue.get_nowait()
-                    send_task = asyncio.ensure_future(websocket.send())
+                    send_task = asyncio.ensure_future(websocket.send(data))
                     futures.append(send_task)
                 except queue.Empty:
+                    send_task = asyncio.ensure_future(asyncio.sleep(0))
+                    futures.append(send_task)
                     pass
 
                 done, pending = await asyncio.wait(
@@ -66,7 +68,6 @@ class Node():
                 if recv_task in done:
                     data = recv_task.result()
                     recv_queue.put(data)
-                    print(data)
                 else:
                     recv_task.cancel()
         except:
@@ -91,7 +92,7 @@ class Node():
             for q in list(self._queues.values()):
                 try:
                     data = q[0].get_nowait()
-                    print('\nData: ', data, '\n')
+                    print('Data: ', data)
                 except queue.Empty:
                     pass
 
