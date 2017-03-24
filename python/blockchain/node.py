@@ -35,13 +35,13 @@ class Node():
             queue[1].put(data)
 
     async def _server(self, websocket, path):
-        await self._protocol(websocket, True)
+        await self._socket(websocket, True)
 
     async def _client(self, ip):
         async with websockets.connect('ws://' + ip + ':9000') as websocket:
-            await self._protocol(websocket, False)
+            await self._socket(websocket, False)
 
-    async def _protocol(self, websocket, server):
+    async def _socket(self, websocket, server):
         self._nodes.add(websocket)
         recv_queue = queue.Queue()
         send_queue = queue.Queue()
