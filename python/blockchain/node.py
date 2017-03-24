@@ -17,18 +17,20 @@ class Node():
         self._chain = Chain()
         self._loaf_pool = {}
 
-        self._loop = asyncio.get_event_loop()
         self._server_thread = threading.Thread(target=self._start_server_thread,
+                                               daemon=True)
+        self._worker_thread = threading.Thread(target=self._worker_thread,
                                                daemon=True)
 
     def start(self):
         self._server_thread.start()
+        self._worker_thread.start()
 
     def connect_node(self, ip):
         threading.Thread(target=self._start_client_thread,
                          args=(ip,), daemon=True).start()
 
-    def send(self, data):
+    def broadcast(self, data):
         for queue in list(self._queues.values()):
             queue[1].put(data)
 
@@ -83,3 +85,12 @@ class Node():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self._client(ip))
+
+    def _worker_thread(self):
+        for queue in list(self._queues.values()):
+            try:
+                data = queue[0].get_nowait()
+                print("\nData: ", data, "\n")
+            except queue.Empty:
+                pass
+

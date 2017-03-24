@@ -9,10 +9,10 @@ def main():
     node = Node('9000')
     node.start()
     while True:
-        ip = input('Client ip: ')
+        ip = input('Connect to: ')
         node.connect_node(ip)
         data = input('Send data: ')
-        node.send(data)
+        node.broadcast(data)
 
 if __name__ == '__main__':
     main()
