@@ -17,6 +17,7 @@ class Node():
         self._chain = Chain()
         self._loaf_pool = {}
 
+        self._loop = asyncio.get_event_loop()
         self._server_thread = threading.Thread(target=self._start_server_thread,
                                                daemon=True)
 
@@ -25,7 +26,11 @@ class Node():
 
     def connect_node(self, ip):
         threading.Thread(target=self._start_client_thread,
-                         args=(ip,), daemon=True)
+                         args=(ip,), daemon=True).start()
+
+    def send(self, data):
+        for queue in list(self._queues.values()):
+            queue[1].put(data)
 
     async def _server(self, websocket, path):
         await self._protocol(websocket, True)
@@ -35,7 +40,6 @@ class Node():
             await self._protocol(websocket, False)
 
     async def _protocol(self, websocket, server):
-        loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = queue.Queue()
         send_queue = queue.Queue()
@@ -70,9 +74,12 @@ class Node():
 
     def _start_server_thread(self):
         loop = asyncio.new_event_loop()
-        start_server = websockets.serve(self._server, 'localhost', self._port)
+        asyncio.set_event_loop(loop)
+        start_server = websockets.serve(self._server, '0.0.0.0', self._port)
         loop.run_until_complete(start_server)
         loop.run_forever()
 
     def _start_client_thread(self, ip):
-        asyncio.new_event_loop().run_until_complete(self._client(ip))
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(self._client(ip))
