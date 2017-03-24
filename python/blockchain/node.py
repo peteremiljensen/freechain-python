@@ -70,7 +70,7 @@ class Node():
                 else:
                     recv_task.cancel()
         except:
-            print ("Unregister")
+            print("Disconnected")
             self._nodes.remove(websocket)
             del self._queues[websocket]
 
@@ -87,10 +87,11 @@ class Node():
         loop.run_until_complete(self._client(ip))
 
     def _worker_thread(self):
-        for queue in list(self._queues.values()):
-            try:
-                data = queue[0].get_nowait()
-                print("\nData: ", data, "\n")
-            except queue.Empty:
-                pass
+        while True:
+            for q in list(self._queues.values()):
+                try:
+                    data = q[0].get_nowait()
+                    print('\nData: ', data, '\n')
+                except queue.Empty:
+                    pass
 
