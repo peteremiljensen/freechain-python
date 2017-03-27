@@ -48,18 +48,17 @@ class Node():
             await self._socket(websocket)
 
     async def _socket(self, websocket):
-        executor = ThreadPoolExecutor(1)
         loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
-        recv_queue = queue.Queue()
-        send_queue = queue.Queue()
+        recv_queue = asyncio.Queue()
+        send_queue = asyncio.Queue()
         self._queues[websocket] = (recv_queue, send_queue)
         try:
             while True:
                 print('while start')
                 print(send_queue)
                 recv_task = asyncio.ensure_future(websocket.recv())
-                send_task = asyncio.ensure_future(loop.run_in_executor(executor, send_queue.get))
+                send_task = asyncio.ensure_future(send_queue.get())
 
                 done, pending = await asyncio.wait(
                     [recv_task, send_task],
@@ -122,6 +121,6 @@ class Node():
                         print('Received error')
                     else:
                         q[1].put(json.dumps({'type': 'error'}))
-                except queue.Empty:
+                except asyncio.queues.QueueEmpty:
                     pass
             time.sleep(0.01)
