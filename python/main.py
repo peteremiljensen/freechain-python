@@ -23,12 +23,6 @@ def main():
             
         else:
             print("Unknown command:", inp[0])
-                
-    #ip = input('Connect to: ')
-    #node.connect_node(ip)
-    #while True:
-    #    data = input('Send data: ')
-    #    node.broadcast(data)
 
 if __name__ == '__main__':
     main()
