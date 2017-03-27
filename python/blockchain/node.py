@@ -3,6 +3,7 @@ import asyncio
 import websockets
 import queue
 import time
+import json
 from concurrent.futures import ThreadPoolExecutor
 
 from blockchain.chain import Chain
@@ -31,7 +32,10 @@ class Node():
         threading.Thread(target=self._start_client_thread,
                          args=(ip,), daemon=True).start()
 
-    def broadcast(self, data):
+    def get_length(self):
+        self._broadcast(json.dumps({'type': 'request',
+                                    'function': 'get_length'}))
+    def _broadcast(self, data):
         for queue in list(self._queues.values()):
             queue[1].put(data)
 
@@ -90,8 +94,23 @@ class Node():
         while True:
             for q in list(self._queues.values()):
                 try:
-                    data = q[0].get_nowait()
-                    print('Data: ', data)
+                    raw_data = q[0].get_nowait()
+                    message = json.loads(raw_data)
+                    if message['type'] == 'request' and \
+                       message['function'] == 'get_length':
+                        chain_length = self._chain.get_length()
+                        response = json.dumps({'type': 'response',
+                                               'function': 'get_length',
+                                               'length': chain_length})
+                        q[1].put(response)
+                    elif message['type'] == 'response' and \
+                         message['function'] == 'get_length':
+                        print('Recieved blockchain length is: ',
+                              message['length'])
+                    elif message['type'] == 'error':
+                        print('Received error')
+                    else:
+                        q[1].put(json.dumps({'type': 'error'}))
                 except queue.Empty:
                     pass
             time.sleep(0.01)
