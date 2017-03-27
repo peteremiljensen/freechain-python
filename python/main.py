@@ -16,19 +16,10 @@ def main():
                 node.connect_node(ip)
             else:
                 print("Invalid input")
-        elif inp[0] == "send":
-            data = ' '.join(inp[1:])
-            node.broadcast(data)
         elif inp[0] == "length":
-            
+            node.get_length()
         else:
             print("Unknown command:", inp[0])
-                
-    #ip = input('Connect to: ')
-    #node.connect_node(ip)
-    #while True:
-    #    data = input('Send data: ')
-    #    node.broadcast(data)
 
 if __name__ == '__main__':
     main()
