@@ -36,14 +36,14 @@ class Node():
             queue[1].put(data)
 
     async def _server(self, websocket, path):
-        await self._socket(websocket, True)
+        await self._socket(websocket)
 
     async def _client(self, ip):
         async with websockets.connect('ws://' + ip + ':9000') as websocket:
-            await self._socket(websocket, False)
+            await self._socket(websocket)
 
-    async def _socket(self, websocket, server):
-        executor = ThreadPoolExecutor(2)
+    async def _socket(self, websocket):
+        executor = ThreadPoolExecutor(1)
         loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = queue.Queue()
