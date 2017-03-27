@@ -57,6 +57,7 @@ class Node():
         try:
             while True:
                 print('while start')
+                print(send_queue)
                 recv_task = asyncio.ensure_future(websocket.recv())
                 send_task = asyncio.ensure_future(loop.run_in_executor(executor, send_queue.get))
 
@@ -112,6 +113,7 @@ class Node():
                                                'function': 'get_length',
                                                'length': chain_length})
                         q[1].put(response)
+                        print(q[1])
                     elif message['type'] == 'response' and \
                          message['function'] == 'get_length':
                         print('Recieved blockchain length is: ',
