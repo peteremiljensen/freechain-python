@@ -64,13 +64,17 @@ class Node():
                     return_when=asyncio.FIRST_COMPLETED)
 
                 if recv_task in done:
+                    print('receiving')
                     data = recv_task.result()
+                    print(data)
                     recv_queue.put(data)
                 else:
                     recv_task.cancel()
 
                 if send_task in done:
+                    print('sending')
                     data = send_task.result()
+                    print(data)
                     await websocket.send(data)
                 else:
                     send_task.cancel()
