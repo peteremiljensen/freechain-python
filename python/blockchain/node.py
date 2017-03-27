@@ -43,7 +43,7 @@ class Node():
         await self._socket(websocket)
 
     async def _client(self, ip):
-        async with websockets.connect('ws://' + ip + ':' + self._port) \
+        async with websockets.connect('ws://' + ip + ':' + str(self._port)) \
                    as websocket:
             await self._socket(websocket)
 
