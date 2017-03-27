@@ -56,12 +56,14 @@ class Node():
         self._queues[websocket] = (recv_queue, send_queue)
         try:
             while True:
+                print('while start')
                 recv_task = asyncio.ensure_future(websocket.recv())
                 send_task = asyncio.ensure_future(loop.run_in_executor(executor, send_queue.get))
 
                 done, pending = await asyncio.wait(
                     [recv_task, send_task],
                     return_when=asyncio.FIRST_COMPLETED)
+                print('while first completed')
 
                 if recv_task in done:
                     print('receiving')
@@ -70,6 +72,7 @@ class Node():
                     recv_queue.put(data)
                 else:
                     recv_task.cancel()
+                    print('recv_task cancelled')
 
                 if send_task in done:
                     print('sending')
@@ -78,6 +81,7 @@ class Node():
                     await websocket.send(data)
                 else:
                     send_task.cancel()
+                    print('send_task cancelled')
         except:
             print("Disconnected")
             self._nodes.remove(websocket)
