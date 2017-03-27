@@ -48,7 +48,7 @@ class Node():
             await self._socket(websocket)
 
     async def _socket(self, websocket):
-        executor = ThreadPoolExecutor(10)
+        executor = ThreadPoolExecutor(1)
         loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = queue.Queue()
