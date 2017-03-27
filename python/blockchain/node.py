@@ -113,5 +113,8 @@ class Node():
                         q[1].put(json.dumps({'type': 'error'}))
                 except queue.Empty:
                     pass
+                except:
+                    print(sys.exc_info()[0])
+                    pass
             time.sleep(0.01)
 
