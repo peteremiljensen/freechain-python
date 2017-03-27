@@ -2,11 +2,12 @@
 
 import datetime
 import time
+import sys
 
 from blockchain.node import Node
 
 def main():
-    node = Node('9000')
+    node = Node(sys.argv[1])
     node.start()
     while True:
         inp = input().split()
