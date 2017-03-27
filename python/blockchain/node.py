@@ -3,6 +3,7 @@ import asyncio
 import websockets
 import queue
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 from blockchain.chain import Chain
 from blockchain.loaf import Loaf
@@ -42,27 +43,19 @@ class Node():
             await self._socket(websocket, False)
 
     async def _socket(self, websocket, server):
+        executor = ThreadPoolExecutor(2)
+        loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = queue.Queue()
         send_queue = queue.Queue()
         self._queues[websocket] = (recv_queue, send_queue)
         try:
             while True:
-                futures = []
-                send_task = None
                 recv_task = asyncio.ensure_future(websocket.recv())
-                futures.append(recv_task)
-                try:
-                    data = send_queue.get_nowait()
-                    send_task = asyncio.ensure_future(websocket.send(data))
-                    futures.append(send_task)
-                except queue.Empty:
-                    send_task = asyncio.ensure_future(asyncio.sleep(0))
-                    futures.append(send_task)
-                    pass
+                send_task = asyncio.ensure_future(loop.run_in_executor(executor, send_queue.get))
 
                 done, pending = await asyncio.wait(
-                    futures,
+                    [recv_task, send_task],
                     return_when=asyncio.FIRST_COMPLETED)
 
                 if recv_task in done:
@@ -70,6 +63,12 @@ class Node():
                     recv_queue.put(data)
                 else:
                     recv_task.cancel()
+
+                if send_task in done:
+                    data = send_task.result()
+                    await websocket.send(data)
+                else:
+                    send_task.cancel()
         except:
             print("Disconnected")
             self._nodes.remove(websocket)
@@ -95,4 +94,5 @@ class Node():
                     print('Data: ', data)
                 except queue.Empty:
                     pass
+            time.sleep(0.01)
 
