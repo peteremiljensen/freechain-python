@@ -33,9 +33,9 @@ class Node():
                          args=(ip,), daemon=True).start()
 
     def get_length(self):
-        self._broadcast(json.dumps({'type': 'request',
+        self.broadcast(json.dumps({'type': 'request',
                                     'function': 'get_length'}))
-    def _broadcast(self, data):
+    def broadcast(self, data):
         for queue in list(self._queues.values()):
             queue[1].put(data)
 
@@ -117,4 +117,3 @@ class Node():
                     print(sys.exc_info()[0])
                     pass
             time.sleep(0.01)
-
