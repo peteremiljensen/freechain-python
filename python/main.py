@@ -9,10 +9,8 @@ from blockchain.node import Node
 
 def info(string):
     return('\033[92m' + string + '\033[0m')
-
 def warning(string):
     return('\033[93m' + string + '\033[0m')
-
 def fail(string):
     return('\033[91m' + string + '\033[0m')
 
@@ -55,6 +53,11 @@ if __name__ == '__main__':
     prompt = Prompt()
     prompt.prompt = '> '
     try:
-        prompt.cmdloop(info('Starting node...'))
+        prompt.cmdloop(info('Starting node on port ' + str(port) + "..."))
     except KeyboardInterrupt:
         prompt.do_quit(None)
+    except SystemExit:
+        pass
+    except:
+        print(fail("*** fatal error"))
+        raise
