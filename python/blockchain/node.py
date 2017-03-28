@@ -2,21 +2,15 @@ import asyncio
 import janus
 import time
 import json
-import sys
 
 from blockchain.network import Network
 from blockchain.chain import *
 from blockchain.loaf import Loaf
 from blockchain.block import Block
 
-from queue import Empty as SyncQueueEmpty
+from blockchain.common import *
 
-def info(string):
-    return('\033[92m' + string + '\033[0m')
-def warning(string):
-    return('\033[93m*** ' + string + '\033[0m')
-def fail(string):
-    return('\033[91m*** ' + string + '\033[0m')
+from queue import Empty as SyncQueueEmpty
 
 class Node():
     def __init__(self, port):
@@ -65,7 +59,7 @@ class Node():
                 except:
                     print(fail("fatal error"))
                     raise
-            time.sleep(0.01)
+            time.sleep(0.05)
 
     def _function_get_length(self, q, message):
         if message['type'] == 'request':
@@ -93,5 +87,5 @@ class Node():
             print(warning('Received loaf could not validate'))
 
     @staticmethod
-    def _json(dic):
-        return json.dumps(dic, cls=BlockEncoder).encode('utf-8')
+    def _json(dictio):
+        return json.dumps(dictio, cls=BlockEncoder).encode('utf-8')

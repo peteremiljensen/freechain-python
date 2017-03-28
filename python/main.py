@@ -5,7 +5,8 @@ import time
 import sys
 from cmd import Cmd
 
-from blockchain.node import *
+from blockchain.node import Node
+from blockchain.common import *
 
 class Prompt(Cmd):
     PRINTS = ['loaf_pool']
