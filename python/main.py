@@ -9,7 +9,7 @@ from blockchain.node import *
 from blockchain.common import *
 
 class Prompt(Cmd):
-    PRINTS = ['loaf_pool']
+    PRINTS = ['loaf_pool', 'blockchain']
 
     def __init__(self):
         super().__init__()
@@ -49,6 +49,9 @@ class Prompt(Cmd):
             if l[0] == self.PRINTS[0]:
                 for loaf in list(self._node._loaf_pool.values()):
                     print(loaf.json())
+            elif l[0] == self.PRINTS[1]:
+                for block in self._node._chain:
+                    print(block.json())
         except:
             print(fail("error printing"))
             raise
