@@ -3,38 +3,44 @@
 import datetime
 import time
 import sys
+from cmd import Cmd
 
 from blockchain.node import Node
 
-if len(sys.argv) == 1:
-    port = 9000
-elif len(sys.argv) == 2:
-    port = sys.argv[1]
-else:
-    print("You must supply 0 or 1 argument")
-    sys.exit()
+class Prompt(Cmd):
+    def __init__(self):
+        super().__init__()
+        self._node = Node(port)
+        self._node.start()
 
-def main():
-    node = Node(port)
-    node.start()
-    while True:
-        inp = input().split()
-        if inp[0] == "connect":
-            if len(inp) == 2:
-                ip = inp[1]
-                node.connect_node(ip)
-                print("Connected to:", ip)
-            else:
-                print("Invalid input")
-        elif inp[0] == "loaf":
-            if len(inp) == 2:
-                data = inp[1]
-            else:
-                print("Invalid input")
-        elif inp[0] == "length":
-            node.get_length()
-        else:
-            print("Unknown command:", inp[0])
+    def do_connect(self, args):
+        l = args.split()
+        if len(l) != 1:
+            print("*** invalid number of arguments")
+            return
+        try:
+            ip = l[0]
+            self._node.connect_node(ip)
+        except:
+            print("*** error connecting to node")
+            raise
+
+    def do_EOF(self, line):
+        return True
+
+    def do_quit(self, args):
+        print("Quitting")
+        raise SystemExit
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) == 1:
+        port = 9000
+    elif len(sys.argv) == 2:
+        port = sys.argv[1]
+    else:
+        print("*** you must supply 0 or 1 argument")
+        sys.exit()
+
+    prompt = Prompt()
+    prompt.prompt = '> '
+    prompt.cmdloop('Starting node...')
