@@ -26,7 +26,7 @@ class Prompt(Cmd):
             raise
 
     def do_EOF(self, line):
-        return True
+        self.do_quit(line)
 
     def do_quit(self, args):
         print("Quitting")
@@ -43,4 +43,7 @@ if __name__ == '__main__':
 
     prompt = Prompt()
     prompt.prompt = '> '
-    prompt.cmdloop('Starting node...')
+    try:
+        prompt.cmdloop('Starting node...')
+    except KeyboardInterrupt:
+        prompt.do_quit(None)
