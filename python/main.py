@@ -67,6 +67,9 @@ class Prompt(Cmd):
         print("Quitting")
         raise SystemExit
 
+    def emptyline(self):
+        return
+
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         port = 9000
