@@ -133,7 +133,10 @@ class Node():
                     elif message['function'] == 'broadcast_loaf':
                         loaf = Loaf.create_loaf_from_dict(message['loaf'])
                         if loaf.validate():
-                            print(info('Received loaf:\n' + str(loaf.json())))
+                            if not loaf.get_hash() in self._loaf_pool:
+                                self._loaf_pool[loaf.get_hash()] = loaf
+                                self.broadcast_loaf(loaf)
+                                print(info('Received loaf and forwarding it'))
                         else:
                             print(warning('Received loaf could not validate'))
 
@@ -147,5 +150,4 @@ class Node():
 
     @staticmethod
     def _json(dic):
-        return json.dumps(dic, sort_keys=True,
-                          cls=BlockEncoder).encode('utf-8')
+        return json.dumps(dic, cls=BlockEncoder).encode('utf-8')
