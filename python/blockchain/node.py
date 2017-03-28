@@ -46,9 +46,11 @@ class Node():
                                    'function': 'get_length'}))
 
     def broadcast_loaf(self, loaf):
-        self._broadcast(self._json({'type': 'request',
-                                    'function': 'broadcast_loaf',
-                                    'loaf': loaf}))
+        if loaf.validate():
+            self._loaf_pool[loaf.get_hash()] = loaf
+            self._broadcast(self._json({'type': 'request',
+                                        'function': 'broadcast_loaf',
+                                        'loaf': loaf}))
     def _broadcast(self, data):
         for queue in list(self._queues.values()):
             queue[1].sync_q.put(data)
