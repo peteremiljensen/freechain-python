@@ -26,6 +26,11 @@ def main():
                 print("Connected to:", ip)
             else:
                 print("Invalid input")
+        elif inp[0] == "loaf":
+            if len(inp) == 2:
+                data = inp[1]
+            else:
+                print("Invalid input")
         elif inp[0] == "length":
             node.get_length()
         else:
