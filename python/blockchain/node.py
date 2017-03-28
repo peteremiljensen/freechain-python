@@ -77,9 +77,9 @@ class Node():
                     message = json.loads(raw_data.decode('utf-8'))
 
                     if message['function'] == FUNCTIONS.GET_LENGTH:
-                        self._function_get_length(q, message)
+                        self._response_get_length(q, message)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
-                        self._function_broadcast_loaf(message)
+                        self._response_broadcast_loaf(message)
 
                     q[0].sync_q.task_done()
                 except SyncQueueEmpty:
@@ -89,7 +89,7 @@ class Node():
                     raise
             time.sleep(0.05)
 
-    def _function_get_length(self, q, message):
+    def _response_get_length(self, q, message):
         if message['type'] == 'request':
             chain_length = self._chain.get_length()
             response = self._json({'type': 'response',
@@ -104,7 +104,7 @@ class Node():
         else:
             q[1].sync_q.put(self._json({'type': 'error'}))
 
-    def _function_broadcast_loaf(self, message):
+    def _response_broadcast_loaf(self, message):
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
         if loaf.validate() and not loaf.get_hash() in self._loaf_pool:
             self._loaf_pool[loaf.get_hash()] = loaf
