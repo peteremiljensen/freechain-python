@@ -16,5 +16,5 @@ class EVENTS_TYPE:
     NEW_CONNECTION = 'new_connection'
 
 class FUNCTIONS:
-    BROADCAST_LOAF = 'request'
+    BROADCAST_LOAF = 'broadcast_loaf'
     GET_LENGTH = 'get_length'
