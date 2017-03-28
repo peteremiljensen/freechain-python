@@ -3,6 +3,7 @@ import janus
 import time
 import json
 
+from blockchain.events import Events
 from blockchain.network import Network
 from blockchain.chain import *
 from blockchain.loaf import Loaf
@@ -19,12 +20,19 @@ class Node():
         self._chain = Chain()
         self._loaf_pool = {}
 
+        self._events_thread = threading.Thread(target=self._start_events_thread,
+                                               daemon=True).start()
         self._worker_thread = threading.Thread(target=self._worker_thread,
                                                daemon=True)
 
     def start(self):
         self._network.start()
         self._worker_thread.start()
+
+        def new_connection_event(websocket):
+            self._get_length(websocket)
+        Events.Instance().register_callback('new_connection',
+                                            new_connection_event)
 
     def connect_node(self, ip):
         self._network.connect_node(ip)
@@ -40,13 +48,23 @@ class Node():
         self._network.send(websocket, self._json({'type': 'request',
                                                   'function': 'get_length'}))
 
+    def _start_events_thread(self):
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            events = Events.Instance()
+            loop.run_until_complete(events.start())
+        except:
+            print(fail('fatal error regarding events'))
+            raise
+
     def _worker_thread(self):
         queues = self._network.get_queues()
         while True:
             for q in list(queues.values()):
                 try:
                     raw_data = q[0].sync_q.get_nowait()
-                    message = json.loads(raw_data.decode('utf-8'))
+                    message = json.loads(raw_data)
 
                     if message['function'] == 'get_length':
                         self._function_get_length(q, message)
@@ -69,8 +87,8 @@ class Node():
                                    'length': chain_length})
             q[1].sync_q.put(response)
         elif message['type'] == 'response':
-            print(info('Recieved blockchain length is: ',
-                       message['length']))
+            print(info('Recieved blockchain length is: '),
+                       message['length'])
         elif message['type'] == 'error':
             print(fail('Error received'))
         else:

@@ -11,17 +11,13 @@ class Network():
         self._port = port
         self._nodes = set()
         self._queues = {}
+        self._events = None
 
         self._server_thread = threading.Thread(target=self._start_server_thread,
                                                daemon=True)
-        self._events_thread = threading.Thread(target=self._start_events_thread,
-                                               daemon=True)
-
-        self._events = None
 
     def start(self):
         self._server_thread.start()
-        self._events_thread.start()
 
     def connect_node(self, ip):
         threading.Thread(target=self._start_client_thread,
@@ -33,7 +29,7 @@ class Network():
 
     def send(self, websocket, data):
         if websocket in self._queues:
-            self._queues[websocket][1].put(data)
+            self._queues[websocket][1].sync_q.put(data)
 
     def get_queues(self):
         return self._queues
@@ -47,7 +43,7 @@ class Network():
             await self._socket(websocket)
 
     async def _socket(self, websocket):
-        event_queues.throw(event, custom_data)
+        Events.Instance().notify('new_connection', websocket)
         loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = janus.Queue(loop=loop)
@@ -97,12 +93,3 @@ class Network():
             print(fail('fatal error'))
             raise
 
-    def _start_events_thread(self):
-        try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            self._events = Events()
-            loop.run_until_complete(self._events.start())
-        except:
-            print(fail('fatal error regarding events'))
-            raise
