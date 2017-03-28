@@ -37,7 +37,7 @@ class Block:
 
     def validate(self):
         for l in self._block['loafs']:
-            if l.validate() == False:
+            if not l.validate():
                 return False
         hash_calc = self.calculate_hash()
         return self._block['hash'] == hash_calc and \
