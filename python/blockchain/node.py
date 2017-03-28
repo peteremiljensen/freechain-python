@@ -56,34 +56,27 @@ class Node():
         self._queues[websocket] = (recv_queue, send_queue)
         try:
             while True:
-                print('while start')
-                print(send_queue)
                 recv_task = asyncio.ensure_future(websocket.recv())
                 send_task = asyncio.ensure_future(send_queue.async_q.get())
 
                 done, pending = await asyncio.wait(
                     [recv_task, send_task],
                     return_when=asyncio.FIRST_COMPLETED)
-                print('while first completed')
 
                 if recv_task in done:
-                    print('receiving')
                     data = recv_task.result()
                     print(data)
                     await recv_queue.async_q.put(data)
                 else:
                     recv_task.cancel()
-                    print('recv_task cancelled')
 
                 if send_task in done:
-                    print('sending')
                     data = send_task.result()
                     print(data)
                     await websocket.send(data)
                     send_queue.async_q.task_done()
                 else:
                     send_task.cancel()
-                    print('send_task cancelled')
         finally:
             print("Disconnected")
             self._nodes.remove(websocket)
@@ -114,7 +107,6 @@ class Node():
                                                'function': 'get_length',
                                                'length': chain_length})
                         q[1].sync_q.put(response)
-                        print(q[1])
                     elif message['type'] == 'response' and \
                          message['function'] == 'get_length':
                         print('Recieved blockchain length is: ',
