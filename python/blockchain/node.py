@@ -29,10 +29,10 @@ class Node():
         self._network.start()
         self._worker_thread.start()
 
-        def new_connection_event(websocket):
+        def new_connection_callback(websocket):
             self._get_length(websocket)
         Events.Instance().register_callback('new_connection',
-                                            new_connection_event)
+                                            new_connection_callback)
 
     def connect_node(self, ip):
         self._network.connect_node(ip)
