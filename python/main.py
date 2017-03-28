@@ -61,6 +61,8 @@ class Prompt(Cmd):
             elif l[0] == self.PRINTS[1]:
                 for block in self._node._chain:
                     print(block.json())
+            else:
+                print(fail(l[0] + " doesn't exist"))
         except:
             print(fail("error printing"))
             raise
