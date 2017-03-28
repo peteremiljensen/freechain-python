@@ -114,7 +114,7 @@ class Node():
             for q in list(self._queues.values()):
                 try:
                     raw_data = q[0].sync_q.get_nowait()
-                    message = json.loads(raw_data)
+                    message = json.loads(raw_data.decode('utf-8'))
                     if message['function'] == 'get_length':
                         if message['type'] == 'request':
                             chain_length = self._chain.get_length()
