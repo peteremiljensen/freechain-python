@@ -60,6 +60,9 @@ class Prompt(Cmd):
                     print(loaf.json())
             elif l[0] == self.PRINTS[1]:
                 print(self._node._chain.json())
+            else:
+                print(fail(l[0] + " doesn't exist"))
+
         except:
             print(fail("error printing"))
             raise
