@@ -1,14 +1,15 @@
 import threading
 import asyncio
 import websockets
-import queue
+import janus
 import time
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 from blockchain.chain import Chain
 from blockchain.loaf import Loaf
 from blockchain.block import Block
+
+from queue import Empty as SyncQueueEmpty
 
 class Node():
     def __init__(self, port):
@@ -34,10 +35,10 @@ class Node():
 
     def get_length(self):
         self.broadcast(json.dumps({'type': 'request',
-                                    'function': 'get_length'}))
+                                   'function': 'get_length'}))
     def broadcast(self, data):
         for queue in list(self._queues.values()):
-            queue[1].put(data)
+            queue[1].sync_q.put(data)
 
     async def _server(self, websocket, path):
         await self._socket(websocket)
@@ -50,15 +51,15 @@ class Node():
     async def _socket(self, websocket):
         loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
-        recv_queue = asyncio.Queue()
-        send_queue = asyncio.Queue()
+        recv_queue = janus.Queue(loop=loop)
+        send_queue = janus.Queue(loop=loop)
         self._queues[websocket] = (recv_queue, send_queue)
         try:
             while True:
                 print('while start')
                 print(send_queue)
                 recv_task = asyncio.ensure_future(websocket.recv())
-                send_task = asyncio.ensure_future(send_queue.get())
+                send_task = asyncio.ensure_future(send_queue.async_q.get())
 
                 done, pending = await asyncio.wait(
                     [recv_task, send_task],
@@ -69,7 +70,7 @@ class Node():
                     print('receiving')
                     data = recv_task.result()
                     print(data)
-                    recv_queue.put(data)
+                    await recv_queue.async_q.put(data)
                 else:
                     recv_task.cancel()
                     print('recv_task cancelled')
@@ -79,10 +80,11 @@ class Node():
                     data = send_task.result()
                     print(data)
                     await websocket.send(data)
+                    send_queue.async_q.task_done()
                 else:
                     send_task.cancel()
                     print('send_task cancelled')
-        except:
+        finally:
             print("Disconnected")
             self._nodes.remove(websocket)
             del self._queues[websocket]
@@ -103,7 +105,7 @@ class Node():
         while True:
             for q in list(self._queues.values()):
                 try:
-                    raw_data = q[0].get_nowait()
+                    raw_data = q[0].sync_q.get_nowait()
                     message = json.loads(raw_data)
                     if message['type'] == 'request' and \
                        message['function'] == 'get_length':
@@ -111,7 +113,7 @@ class Node():
                         response = json.dumps({'type': 'response',
                                                'function': 'get_length',
                                                'length': chain_length})
-                        q[1].put(response)
+                        q[1].sync_q.put(response)
                         print(q[1])
                     elif message['type'] == 'response' and \
                          message['function'] == 'get_length':
@@ -120,7 +122,8 @@ class Node():
                     elif message['type'] == 'error':
                         print('Received error')
                     else:
-                        q[1].put(json.dumps({'type': 'error'}))
-                except asyncio.queues.QueueEmpty:
+                        q[1].sync_q.put(json.dumps({'type': 'error'}))
+                    q[0].sync_q.task_done()
+                except SyncQueueEmpty:
                     pass
             time.sleep(0.01)
