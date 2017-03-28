@@ -40,7 +40,7 @@ class Loaf():
 
     @staticmethod
     def create_loaf_from_dict(dictio):
-        return Loaf.create_loaf_from_json(json.dumps(dictio))
+        return Loaf(dictio['data'], dictio['timestamp'], dictio['hash'])
 
 
 class LoafEncoder(json.JSONEncoder):
