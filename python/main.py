@@ -28,7 +28,7 @@ def main():
                 finally:
                     print("Unable to connect to:", ip)
             else:
-                print("Too many arguments given. Connect takes exactly 1 argument")
+                print("Connect takes exactly 1 argument")
         else:
             print("Unknown command:", inp[0])
 
