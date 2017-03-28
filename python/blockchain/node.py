@@ -34,9 +34,15 @@ class Node():
                          args=(ip,), daemon=True).start()
 
     def get_length(self):
-        self.broadcast(json.dumps({'type': 'request',
+        self._broadcast(json.dumps({'type': 'request',
                                    'function': 'get_length'}))
-    def broadcast(self, data):
+
+    def broadcast_loaf(loaf):
+        self._broadcast(json.dumps({'type': 'request',
+                                    'function': 'broadcast_loaf',
+                                    'loaf': loaf}))
+        
+    def _broadcast(self, data):
         for queue in list(self._queues.values()):
             queue[1].sync_q.put(data)
 
@@ -98,21 +104,22 @@ class Node():
                 try:
                     raw_data = q[0].sync_q.get_nowait()
                     message = json.loads(raw_data)
-                    if message['type'] == 'request' and \
-                       message['function'] == 'get_length':
-                        chain_length = self._chain.get_length()
-                        response = json.dumps({'type': 'response',
-                                               'function': 'get_length',
-                                               'length': chain_length})
-                        q[1].sync_q.put(response)
-                    elif message['type'] == 'response' and \
-                         message['function'] == 'get_length':
-                        print('Recieved blockchain length is: ',
-                              message['length'])
-                    elif message['type'] == 'error':
-                        print('Received error')
-                    else:
-                        q[1].sync_q.put(json.dumps({'type': 'error'}))
+                    if message['function'] == 'get_length':
+                        if message['type'] == 'request':
+                            chain_length = self._chain.get_length()
+                            response = json.dumps({'type': 'response',
+                                                   'function': 'get_length',
+                                                   'length': chain_length})
+                            q[1].sync_q.put(response)
+                        elif message['type'] == 'response':
+                            print('Recieved blockchain length is: ',
+                                  message['length'])
+                        elif messafe['type'] == 'error':
+                            print('Error received')
+                        else:
+                            q[1].sync_q.put(json.dumps({'type': 'error'}))
+                    elif message['function'] == 'broadcast_loaf':
+                        print('Received loaf:\nloaf here')
                     q[0].sync_q.task_done()
                 except SyncQueueEmpty:
                     pass
