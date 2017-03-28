@@ -132,7 +132,10 @@ class Node():
 
                     elif message['function'] == 'broadcast_loaf':
                         loaf = Loaf.create_loaf_from_dict(message['loaf'])
-                        print(info('Received loaf:\n' + str(loaf.json())))
+                        if loaf.validate():
+                            print(info('Received loaf:\n' + str(loaf.json())))
+                        else:
+                            print(warning('Received loaf could not validate'))
 
                     q[0].sync_q.task_done()
                 except SyncQueueEmpty:
