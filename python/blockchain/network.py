@@ -51,7 +51,7 @@ class Network():
             await self._socket(websocket)
 
     async def _socket(self, websocket):
-        Events.Instance().notify('new_connection', websocket)
+        Events.Instance().notify(EVENTS_TYPE.NEW_CONNECTION, websocket)
         loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = janus.Queue(loop=loop)

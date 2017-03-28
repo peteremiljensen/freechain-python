@@ -39,7 +39,7 @@ class Node():
 
         def new_connection_callback(websocket):
             self._get_length(websocket)
-        Events.Instance().register_callback('new_connection',
+        Events.Instance().register_callback(EVENTS_TYPE.NEW_CONNECTION,
                                             new_connection_callback)
 
     def connect_node(self, ip):
@@ -48,13 +48,15 @@ class Node():
     def broadcast_loaf(self, loaf):
         if loaf.validate():
             self._loaf_pool[loaf.get_hash()] = loaf
-            self._network.broadcast(self._json({'type': 'request',
-                                                'function': 'broadcast_loaf',
-                                                'loaf': loaf}))
+            self._network.broadcast(
+                self._json({'type': 'request',
+                            'function': FUNCTIONS.BROADCAST_LOAF,
+                            'loaf': loaf}))
 
     def _get_length(self, websocket):
-        self._network.send(websocket, self._json({'type': 'request',
-                                                  'function': 'get_length'}))
+        self._network.send(websocket, self._json(
+            {'type': 'request',
+             'function': FUNCTIONS.GET_LENGTH}))
 
     def _start_events_thread(self):
         try:
@@ -72,11 +74,11 @@ class Node():
             for q in list(queues.values()):
                 try:
                     raw_data = q[0].sync_q.get_nowait()
-                    message = json.loads(raw_data)
+                    message = json.loads(raw_data.decode('utf-8'))
 
-                    if message['function'] == 'get_length':
+                    if message['function'] == FUNCTIONS.GET_LENGTH:
                         self._function_get_length(q, message)
-                    elif message['function'] == 'broadcast_loaf':
+                    elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._function_broadcast_loaf(message)
 
                     q[0].sync_q.task_done()
@@ -90,17 +92,17 @@ class Node():
     def _function_get_length(self, q, message):
         if message['type'] == 'request':
             chain_length = self._chain.get_length()
-            response = json.dumps({'type': 'response',
-                                   'function': 'get_length',
+            response = self._json({'type': 'response',
+                                   'function': FUNCTIONS.GET_LENGTH,
                                    'length': chain_length})
             q[1].sync_q.put(response)
         elif message['type'] == 'response':
-            print(info('Recieved blockchain length is: '),
-                       message['length'])
+            print(info('Recieved blockchain length is: ' +
+                       str(message['length'])))
         elif message['type'] == 'error':
             print(fail('Error received'))
         else:
-            q[1].sync_q.put(json.dumps({'type': 'error'}))
+            q[1].sync_q.put(self._json({'type': 'error'}))
 
     def _function_broadcast_loaf(self, message):
         loaf = Loaf.create_loaf_from_dict(message['loaf'])

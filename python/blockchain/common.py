@@ -11,3 +11,10 @@ def warning(string):
     return('\033[93m*** ' + string + '\033[0m')
 def fail(string):
     return('\033[91m*** ' + string + '\033[0m')
+
+class EVENTS_TYPE:
+    NEW_CONNECTION = 'new_connection'
+
+class FUNCTIONS:
+    BROADCAST_LOAF = 'request'
+    GET_LENGTH = 'get_length'

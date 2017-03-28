@@ -79,8 +79,11 @@ class Prompt(Cmd):
         self.do_quit(line)
 
     def do_quit(self, args):
-        print("Quitting")
+        print(info("Quitting"))
         raise SystemExit
+
+    def do_q(self, args):
+        self.do_quit(args)
 
     def emptyline(self):
         return
