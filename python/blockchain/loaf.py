@@ -38,6 +38,10 @@ class Loaf():
         dump = json.loads(json_string)
         return Loaf(dump['data'], dump['timestamp'], dump['hash'])
 
+    @staticmethod
+    def create_loaf_from_dict(dictio):
+        return Loaf.create_loaf_from_json(json.dumps(dictio))
+
 
 class LoafEncoder(json.JSONEncoder):
     def default(self, obj):

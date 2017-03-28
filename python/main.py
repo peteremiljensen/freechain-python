@@ -5,14 +5,7 @@ import time
 import sys
 from cmd import Cmd
 
-from blockchain.node import Node
-
-def info(string):
-    return('\033[92m' + string + '\033[0m')
-def warning(string):
-    return('\033[93m' + string + '\033[0m')
-def fail(string):
-    return('\033[91m' + string + '\033[0m')
+from blockchain.node import *
 
 class Prompt(Cmd):
     def __init__(self):
@@ -23,16 +16,26 @@ class Prompt(Cmd):
     def do_connect(self, args):
         l = args.split()
         if len(l) != 1:
-            print(fail("*** invalid number of arguments"))
+            print(fail("invalid number of arguments"))
             return
         try:
             ip = l[0]
             self._node.connect_node(ip)
         except:
-            print(fail("*** error connecting to node"))
+            print(fail("error connecting to node"))
             raise
 
-#    def do_loaf(self, args):
+    def do_loaf(self, args):
+        l = args.split()
+        if len(l) != 1:
+            print(fail("invalid number of arguments"))
+            return
+        try:
+            loaf = Loaf({"string": l[0]})
+            self._node.broadcast_loaf(loaf)
+        except:
+            print(fail("error creating and broadcasting loaf"))
+            raise
 
     def do_EOF(self, line):
         self.do_quit(line)
@@ -47,7 +50,7 @@ if __name__ == '__main__':
     elif len(sys.argv) == 2:
         port = sys.argv[1]
     else:
-        print(fail("*** you must supply 0 or 1 argument"))
+        print(fail("you must supply 0 or 1 argument"))
         sys.exit()
 
     prompt = Prompt()
@@ -59,5 +62,5 @@ if __name__ == '__main__':
     except SystemExit:
         pass
     except:
-        print(fail("*** fatal error"))
+        print(fail("fatal error"))
         raise
