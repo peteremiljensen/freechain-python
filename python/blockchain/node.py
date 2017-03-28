@@ -52,30 +52,11 @@ class Node():
                 try:
                     raw_data = q[0].sync_q.get_nowait()
                     message = json.loads(raw_data.decode('utf-8'))
-                    if message['function'] == 'get_length':
-                        if message['type'] == 'request':
-                            chain_length = self._chain.get_length()
-                            response = json.dumps({'type': 'response',
-                                                   'function': 'get_length',
-                                                   'length': chain_length})
-                            q[1].sync_q.put(response)
-                        elif message['type'] == 'response':
-                            print(info('Recieved blockchain length is: ',
-                                  message['length']))
-                        elif message['type'] == 'error':
-                            print(fail('Error received'))
-                        else:
-                            q[1].sync_q.put(json.dumps({'type': 'error'}))
 
+                    if message['function'] == 'get_length':
+                        self._function_get_length(q, message)
                     elif message['function'] == 'broadcast_loaf':
-                        loaf = Loaf.create_loaf_from_dict(message['loaf'])
-                        if loaf.validate():
-                            if not loaf.get_hash() in self._loaf_pool:
-                                self._loaf_pool[loaf.get_hash()] = loaf
-                                self.broadcast_loaf(loaf)
-                                print(info('Received loaf and forwarding it'))
-                        else:
-                            print(warning('Received loaf could not validate'))
+                        self._function_broadcast_loaf(message)
 
                     q[0].sync_q.task_done()
                 except SyncQueueEmpty:
@@ -84,6 +65,31 @@ class Node():
                     print(fail("fatal error"))
                     raise
             time.sleep(0.01)
+
+    def _function_get_length(self, q, message):
+        if message['type'] == 'request':
+            chain_length = self._chain.get_length()
+            response = json.dumps({'type': 'response',
+                                   'function': 'get_length',
+                                   'length': chain_length})
+            q[1].sync_q.put(response)
+        elif message['type'] == 'response':
+            print(info('Recieved blockchain length is: ',
+                       message['length']))
+        elif message['type'] == 'error':
+            print(fail('Error received'))
+        else:
+            q[1].sync_q.put(json.dumps({'type': 'error'}))
+
+    def _function_broadcast_loaf(self, message):
+        loaf = Loaf.create_loaf_from_dict(message['loaf'])
+        if loaf.validate():
+            if not loaf.get_hash() in self._loaf_pool:
+                self._loaf_pool[loaf.get_hash()] = loaf
+                self.broadcast_loaf(loaf)
+                print(info('Received loaf and forwarding it'))
+        else:
+            print(warning('Received loaf could not validate'))
 
     @staticmethod
     def _json(dic):
