@@ -90,6 +90,8 @@ class Node():
                     send_queue.async_q.task_done()
                 else:
                     send_task.cancel()
+        except websockets.exceptions.ConnectionClosed:
+            pass
         finally:
             print(info("Disconnected"))
             self._nodes.remove(websocket)
