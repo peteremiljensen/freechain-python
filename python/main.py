@@ -8,6 +8,8 @@ from cmd import Cmd
 from blockchain.node import *
 
 class Prompt(Cmd):
+    PRINTS = ['loaf_pool']
+
     def __init__(self):
         super().__init__()
         self._node = Node(port)
@@ -36,6 +38,27 @@ class Prompt(Cmd):
         except:
             print(fail("error creating and broadcasting loaf"))
             raise
+
+    def do_print(self, args):
+        l = args.split()
+        if len(l) != 1:
+            print(fail("invalid number of arguments"))
+            return
+        try:
+            if l[0] == self.PRINTS[0]:
+                for loaf in list(self._node._loaf_pool.values()):
+                    print(loaf.json())
+        except:
+            print(fail("error printing"))
+            raise
+
+    def complete_print(self, text, line, begidx, endidx):
+        if not text:
+            completions = self.PRINTS[:]
+        else:
+            completions = [f for f in self.PRINTS
+                            if f.startswith(text)]
+        return completions
 
     def do_EOF(self, line):
         self.do_quit(line)
