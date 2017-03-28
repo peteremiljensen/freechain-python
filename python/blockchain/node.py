@@ -35,16 +35,17 @@ class Node():
     def connect_node(self, ip):
         self._network.connect_node(ip)
 
-    def get_length(self):
-        self._network.broadcast(json.dumps({'type': 'request',
-                                            'function': 'get_length'}))
-
     def broadcast_loaf(self, loaf):
         if loaf.validate():
             self._loaf_pool[loaf.get_hash()] = loaf
             self._network.broadcast(self._json({'type': 'request',
                                                 'function': 'broadcast_loaf',
                                                 'loaf': loaf}))
+
+    def _get_length(self, websocket):
+        self._network.send(websocket, json.dumps({'type': 'request',
+                                                  'function': 'get_length'}))
+
     def _worker_thread(self):
         queues = self._network.get_queues()
         while True:

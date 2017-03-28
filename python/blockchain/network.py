@@ -23,6 +23,10 @@ class Network():
         for queue in list(self._queues.values()):
             queue[1].sync_q.put(data)
 
+    def send(self, websocket, data):
+        if websocket in self._queues:
+            self._queues[websocket][1].put(data)
+
     def get_queues(self):
         return self._queues
 
