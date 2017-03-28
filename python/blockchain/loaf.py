@@ -34,14 +34,8 @@ class Loaf():
         return self._loaf['hash'] == hash_calc
 
     @staticmethod
-    def create_loaf_from_json(json_string):
-        dump = json.loads(json_string)
-        return Loaf(dump['data'], dump['timestamp'], dump['hash'])
-
-    @staticmethod
     def create_loaf_from_dict(dictio):
         return Loaf(dictio['data'], dictio['timestamp'], dictio['hash'])
-
 
 class LoafEncoder(json.JSONEncoder):
     def default(self, obj):
