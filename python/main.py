@@ -22,10 +22,13 @@ def main():
         if inp[0] == "connect":
             if len(inp) == 2:
                 ip = inp[1]
-                node.connect_node(ip)
-                print("Connected to:", ip)
+                try:
+                    node.connect_node(ip)
+                    print("Connected to:", ip)
+                finally:
+                    print("Unable to connect to:", ip)
             else:
-                print("Invalid input")
+                print("Too many arguments given. Connect takes exactly 1 argument")
         else:
             print("Unknown command:", inp[0])
 
