@@ -42,4 +42,3 @@ class Chain():
         return json.dumps(self._chain,
                           sort_keys=True,
                           cls=BlockEncoder).encode('utf-8')
-
