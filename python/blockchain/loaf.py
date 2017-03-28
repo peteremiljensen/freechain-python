@@ -2,6 +2,14 @@ import hashlib
 import datetime
 import json
 
+#   _                  __
+#  | |                / _|
+#  | |     ___   __ _| |_
+#  | |    / _ \ / _` |  _|
+#  | |___| (_) | (_| | |
+#  \_____/\___/ \__,_|_|
+#
+
 class Loaf():
     def __init__(self, data, timestamp=None, hash=None):
         self._loaf = {}

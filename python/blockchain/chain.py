@@ -4,6 +4,14 @@ import threading
 from blockchain.loaf import *
 from blockchain.block import *
 
+#   _____ _           _
+#  /  __ \ |         (_)
+#  | /  \/ |__   __ _ _ _ __
+#  | |   | '_ \ / _` | | '_ \
+#  | \__/\ | | | (_| | | | | |
+#   \____/_| |_|\__,_|_|_| |_|
+#
+
 class Chain():
     def __init__(self):
         genesis_block = Block.create_block_from_dict({"hash": "000002eae755addb7693ac1a1740d36ecc3c843b21affde7271eeb5a0c8cb6cd", "loafs": [], "nounce": 2104806, "previous_block_hash": "-1", "timestamp": "2017-03-21 14:49:34.218393"})

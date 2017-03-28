@@ -6,6 +6,14 @@ import websockets
 from blockchain.events import Events
 from blockchain.common import *
 
+#   _   _      _                      _
+#  | \ | |    | |                    | |
+#  |  \| | ___| |___      _____  _ __| | __
+#  | . ` |/ _ \ __\ \ /\ / / _ \| '__| |/ /
+#  | |\  |  __/ |_ \ V  V / (_) | |  |   <
+#  \_| \_/\___|\__| \_/\_/ \___/|_|  |_|\_\
+#
+
 class Network():
     def __init__(self, port):
         self._port = port

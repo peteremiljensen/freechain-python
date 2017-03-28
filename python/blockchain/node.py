@@ -13,6 +13,14 @@ from blockchain.common import *
 
 from queue import Empty as SyncQueueEmpty
 
+#   _   _           _
+#  | \ | |         | |
+#  |  \| | ___   __| | ___
+#  | . ` |/ _ \ / _` |/ _ \
+#  | |\  | (_) | (_| |  __/
+#  \_| \_/\___/ \__,_|\___|
+#
+
 class Node():
     def __init__(self, port):
         self._network = Network(port)

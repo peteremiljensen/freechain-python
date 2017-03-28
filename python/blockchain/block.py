@@ -4,6 +4,14 @@ import json
 
 from blockchain.loaf import *
 
+#  ______ _            _
+#  | ___ \ |          | |
+#  | |_/ / | ___   ___| | __
+#  | ___ \ |/ _ \ / __| |/ /
+#  | |_/ / | (_) | (__|   <
+#  \____/|_|\___/ \___|_|\_\
+#
+
 class Block:
     def __init__(self, loafs, previous_block_hash,
                  timestamp, nounce, hash=None):

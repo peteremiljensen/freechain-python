@@ -8,6 +8,15 @@ from cmd import Cmd
 from blockchain.node import *
 from blockchain.common import *
 
+#                   _
+#                  (_)
+#   _ __ ___   __ _ _ _ __
+#  | '_ ` _ \ / _` | | '_ \
+#  | | | | | | (_| | | | | |
+#  |_| |_| |_|\__,_|_|_| |_|
+#
+#
+
 class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'blockchain']
 

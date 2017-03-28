@@ -6,6 +6,14 @@ from asyncio import QueueEmpty as AsyncQueueEmpty
 
 from blockchain.singleton import Singleton
 
+#   _____                _
+#  |  ___|              | |
+#  | |____   _____ _ __ | |_ ___
+#  |  __\ \ / / _ \ '_ \| __/ __|
+#  | |___\ V /  __/ | | | |_\__ \
+#  \____/ \_/ \___|_| |_|\__|___/
+#
+
 @Singleton
 class Events():
     def __init__(self):
