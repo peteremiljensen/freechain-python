@@ -59,8 +59,7 @@ class Prompt(Cmd):
                 for loaf in list(self._node._loaf_pool.values()):
                     print(loaf.json())
             elif l[0] == self.PRINTS[1]:
-                for block in self._node._chain:
-                    print(block.json())
+                print(self._node._chain.json())
         except:
             print(fail("error printing"))
             raise
