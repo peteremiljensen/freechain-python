@@ -80,7 +80,7 @@ if __name__ == '__main__':
         sys.exit()
 
     prompt = Prompt()
-    prompt.prompt = '> '
+    prompt.prompt = '3==D~ '
     try:
         prompt.cmdloop(info('Starting node on port ' + str(port) + "..."))
     except KeyboardInterrupt:
