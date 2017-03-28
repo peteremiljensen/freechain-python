@@ -7,6 +7,15 @@ from cmd import Cmd
 
 from blockchain.node import Node
 
+def info(string):
+    return('\033[92m' + string + '\033[0m')
+
+def warning(string):
+    return('\033[93m' + string + '\033[0m')
+
+def fail(string):
+    return('\033[91m' + string + '\033[0m')
+
 class Prompt(Cmd):
     def __init__(self):
         super().__init__()
@@ -16,14 +25,16 @@ class Prompt(Cmd):
     def do_connect(self, args):
         l = args.split()
         if len(l) != 1:
-            print("*** invalid number of arguments")
+            print(fail("*** invalid number of arguments"))
             return
         try:
             ip = l[0]
             self._node.connect_node(ip)
         except:
-            print("*** error connecting to node")
+            print(fail("*** error connecting to node"))
             raise
+
+#    def do_loaf(self, args):
 
     def do_EOF(self, line):
         self.do_quit(line)
@@ -38,12 +49,12 @@ if __name__ == '__main__':
     elif len(sys.argv) == 2:
         port = sys.argv[1]
     else:
-        print("*** you must supply 0 or 1 argument")
+        print(fail("*** you must supply 0 or 1 argument"))
         sys.exit()
 
     prompt = Prompt()
     prompt.prompt = '> '
     try:
-        prompt.cmdloop('Starting node...')
+        prompt.cmdloop(info('Starting node...'))
     except KeyboardInterrupt:
         prompt.do_quit(None)
