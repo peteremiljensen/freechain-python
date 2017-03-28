@@ -43,7 +43,7 @@ class Node():
                                                 'loaf': loaf}))
 
     def _get_length(self, websocket):
-        self._network.send(websocket, json.dumps({'type': 'request',
+        self._network.send(websocket, self._json({'type': 'request',
                                                   'function': 'get_length'}))
 
     def _worker_thread(self):
