@@ -13,7 +13,8 @@ class Events():
         return
 
     def register_callback(event, callback):
-        if event in self._callback:
-            self._callback[event].append(callback)
-        else:
-            self._callback[event] = [callback]
+        with self._callback_lock:
+            if event in self._callback:
+                self._callback[event].append(callback)
+            else:
+                self._callback[event] = [callback]
