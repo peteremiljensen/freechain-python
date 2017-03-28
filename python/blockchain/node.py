@@ -65,14 +65,12 @@ class Node():
 
                 if recv_task in done:
                     data = recv_task.result()
-                    print(data)
                     await recv_queue.async_q.put(data)
                 else:
                     recv_task.cancel()
 
                 if send_task in done:
                     data = send_task.result()
-                    print(data)
                     await websocket.send(data)
                     send_queue.async_q.task_done()
                 else:
