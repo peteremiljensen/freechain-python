@@ -106,11 +106,10 @@ class Node():
 
     def _function_broadcast_loaf(self, message):
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
-        if loaf.validate():
-            if not loaf.get_hash() in self._loaf_pool:
-                self._loaf_pool[loaf.get_hash()] = loaf
-                self.broadcast_loaf(loaf)
-                print(info('Received loaf and forwarding it'))
+        if loaf.validate() and not loaf.get_hash() in self._loaf_pool:
+            self._loaf_pool[loaf.get_hash()] = loaf
+            self.broadcast_loaf(loaf)
+            print(info('Received loaf and forwarding it'))
         else:
             print(warning('Received loaf could not validate'))
 
