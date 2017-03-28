@@ -20,7 +20,7 @@ class Loaf():
         return json.dumps(self._loaf, sort_keys=True).encode('utf-8')
 
     def get_hash(self):
-        return self._block['hash']
+        return self._loaf['hash']
 
     def calculate_hash(self):
         hash_tmp = self._loaf['hash']
