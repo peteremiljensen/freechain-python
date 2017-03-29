@@ -69,7 +69,7 @@ class Node():
                             'function': FUNCTIONS.BROADCAST_BLOCK,
                             'block': block}))
         else:
-            printf(fail('error validating block while trying to broadcast'))
+            print(fail('error validating block while trying to broadcast'))
 
     def mine(self):
         loaves_total = 0
@@ -234,10 +234,12 @@ class Node():
 
         if block.get_height() > self._chain.get_length():
             self._get_length(websocket)
+            return
         elif block.get_height() < self._chain.get_length():
             return
         elif not self._chain.add_block(block):
             print(fail('block could not be added'))
+            return
 
         print(info('block succesfully added'))
         self.broadcast_block(block)
