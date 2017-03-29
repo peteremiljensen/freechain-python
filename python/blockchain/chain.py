@@ -14,7 +14,11 @@ from blockchain.block import *
 
 class Chain():
     def __init__(self):
-        genesis_block = ""
+        genesis_block = Block.create_block_from_dict(
+            {'loafs': [], 'nounce': 7868515,
+             'previous_block_hash': '-1', 'height': 0,
+             'timestamp': '2017-03-29 11:28:48.355664',
+             'hash': '0000001f0dc797d2c8034ff1e7dde91b2881230e60397d24f36ddea7ea09b1cd'})
         self._chain = [genesis_block]
         self._chain_lock = threading.RLock()
 
