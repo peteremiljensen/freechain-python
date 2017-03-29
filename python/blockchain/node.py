@@ -259,7 +259,7 @@ class Node():
             print(info('block succesfully added'))
             for loaf in block.get_loaves():
                 try:
-                    del self._loaf_pool[loaf]
+                    del self._loaf_pool[loaf.get_hash()]
                 except KeyError:
                     pass
             self.broadcast_block(block)
