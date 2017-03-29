@@ -61,6 +61,15 @@ class Node():
                             'function': FUNCTIONS.BROADCAST_LOAF,
                             'loaf': loaf}))
 
+    def broadcast_block(self, block):
+        if self._chain.add_block(block):
+            self._network.broadcast(
+                self._json({'type': 'request',
+                            'function': FUNCTIONS.BROADCAST_BLOCK,
+                            'block': block}))
+        else:
+            printf(fail('error validating block while trying to broadcast'))
+
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
 
@@ -98,12 +107,21 @@ class Node():
                     raw_data = self._network.recv_nowait(websocket)
                     message = json.loads(raw_data.decode('utf-8'))
 
-                    if message['function'] == FUNCTIONS.GET_LENGTH:
-                        self._response_get_length(message, websocket)
+                    if message['type'] == 'error':
+                        print(fail('Error received'))
+                    elif message['function'] == FUNCTIONS.GET_LENGTH:
+                        self._handle_get_length(message, websocket)
                     elif message['function'] == FUNCTIONS.GET_BLOCKS:
-                        self._response_get_blocks(message, websocket)
+                        self._handle_get_blocks(message, websocket)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
-                        self._response_broadcast_loaf(message)
+                        self._handle_broadcast_loaf(message)
+                    elif message['function'] == FUNCTINOS.BROADCAST_BLOCK:
+                        self._handle_broadcast_block(message)
+                    else:
+                        self._network.send(
+                            websocket, self._json({'type': 'error',
+                                                   'description':
+                                                   'Unsupported function'}))
 
                 except AttributeError:
                     response = self._json({'type': 'error',
@@ -117,7 +135,7 @@ class Node():
                     raise
             time.sleep(0.05)
 
-    def _response_get_length(self, message, websocket):
+    def _handle_get_length(self, message, websocket):
         """ Reads a request for the length of the blockchain. If local
             blockchain is shorter, it sends a request for missing blocks
         """
@@ -127,6 +145,7 @@ class Node():
                                    'function': FUNCTIONS.GET_LENGTH,
                                    'length': chain_length})
             self._network.send(websocket, response)
+
         elif message['type'] == 'response':
             chain_length = self._chain.get_length()
             response_length = message['length']
@@ -141,18 +160,16 @@ class Node():
                                  (response_length - chain_length))
             else:
                 print(info('Keeping local blocks'))
-        elif message['type'] == 'error':
-            print(fail('Error received'))
+
         else:
             self._network.send(websocket, self._json({'type': 'error'}))
 
-    def _response_get_blocks(self, message, websocket):
+    def _handle_get_blocks(self, message, websocket):
         """ Reads a request for missing blocks and sends them if local chain
             is longer
         """
         if message['type'] == 'request':
-            if self._chain.get_length() < \
-               message['offset'] + message['length'] - 1:
+            if self._chain.get_length() < message['offset'] + message['length']:
                 blocks = []
                 for i in range(message['length']):
                     blocks.append(self._chain.get_block(i + message['offset']))
@@ -163,7 +180,20 @@ class Node():
             else:
                 self._network.send(websocket, self._json({'type': 'error'}))
 
-    def _response_broadcast_loaf(self, message):
+        elif message['type'] == 'response':
+            blocks = []
+            for block_dict in message['blocks']:
+                blocks.append(Block.create_block_from_dict(block_dict))
+            for block in blocks:
+                if not self._chain.add_block(block):
+                    print(fail('block cannot be added'))
+                    return
+            print(info('blocks succesfully added to blockchain'))
+
+        else:
+            self._network.send(websocket, self._json({'type': 'error'}))
+
+    def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
             an error message is displayed. If loaf is validated, it checks
             whether loaf already exists in the local loaf pool. If it does not
@@ -178,6 +208,23 @@ class Node():
                 print(info('Received loaf and forwarding it'))
         else:
             print(warning('Received loaf could not validate'))
+
+    def _handle_broadcast_block(self, message):
+        block = Block.create_block_from_dict()
+
+        if block.get_height() != self._chain.get_length():
+            print(warning('received block cannot be added as ' +
+                          'it is of a higher height. Will try ' +
+                          'to query missing links.'))
+            length = block.get_height() - (self._chain.get_height() - 1)
+            self._get_blocks(websocket, self._chain.get_height(), length)
+        elif block.get_height() < self._chain.get_length():
+            return
+        elif not self._chain.add_block(block):
+            print(fail('block could not be added'))
+
+        print(info('block succesfully added'))
+        self.broadcast_block(block)
 
     @staticmethod
     def _json(dictio):
