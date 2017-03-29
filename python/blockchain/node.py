@@ -105,12 +105,15 @@ class Node():
                                    'length': chain_length})
             self._network.send(websocket, response)
         elif message['type'] == 'response':
+            chain_length = self._chain.get_length()
+            response_length = message['length']
             print(info('Recieved blockchain length is: ' +
-                       str(message['length'])))
+                       str(response_length)))
             print(info('local block length is : ' +
-                       str(len(self._chain._chain)))))
-            if message['length'] > len(self._chain._chain):
+                       str(chain_length)))
+            if response_length > chain_length:
                 print(info('local blockchain is shorter, querying missing blocks'))
+                self._get_blocks(websocket, chain_length, (response_length - chain_length))
             else:
                 print(info('Keeping local blocks'))
             
