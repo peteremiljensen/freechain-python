@@ -134,7 +134,7 @@ class Node():
                         self._handle_get_blocks(message, websocket)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._handle_broadcast_loaf(message)
-                    elif message['function'] == FUNCTINOS.BROADCAST_BLOCK:
+                    elif message['function'] == FUNCTIONS.BROADCAST_BLOCK:
                         self._handle_broadcast_block(message, websocket)
                     else:
                         self._network.send(
