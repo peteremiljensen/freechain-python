@@ -59,6 +59,13 @@ class Node():
             {'type': 'request',
              'function': FUNCTIONS.GET_LENGTH}))
 
+    def _get_blocks(self, websocket, offset, length):
+        self._network.send(websocket, self._json(
+            {'type': 'request',
+             'function': FUNCTIONS.GET_BLOCKS,
+             'offset': offset,
+             'length': length}))
+
     def _start_events_thread(self):
         try:
             loop = asyncio.new_event_loop()

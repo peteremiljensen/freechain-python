@@ -18,3 +18,4 @@ class EVENTS_TYPE:
 class FUNCTIONS:
     BROADCAST_LOAF = 'broadcast_loaf'
     GET_LENGTH = 'get_length'
+    GET_BLOCKS = 'get_blocks'
