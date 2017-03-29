@@ -68,7 +68,7 @@ class Block:
                 return False
         hash_calc = self.calculate_hash()
         return self._block['hash'] == hash_calc and \
-            hash_calc[:5] == '00000'
+            hash_calc[:4] == '0000'
 
     @staticmethod
     def create_block_from_dict(dictio):

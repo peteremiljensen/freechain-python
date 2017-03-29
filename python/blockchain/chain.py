@@ -17,10 +17,10 @@ class Chain():
         """ Chain class constructor
         """
         genesis_block = Block.create_block_from_dict(
-            {'loafs': [], 'nounce': 7868515,
+            {'loafs': [], 'nounce': 82743408,
              'previous_block_hash': '-1', 'height': 0,
-             'timestamp': '2017-03-29 11:28:48.355664',
-             'hash': '0000001f0dc797d2c8034ff1e7dde91b2881230e60397d24f36ddea7ea09b1cd'})
+             'timestamp': '2017-03-29 11:46:29.096909',
+             'hash': '00000002a51fcae0911249bcb257f87cf00410d6c98c08ba649ba48a029e6154'})
         self._chain = [genesis_block]
         self._chain_lock = threading.RLock()
 
@@ -64,7 +64,7 @@ class Chain():
         block = None
         while True:
             block = Block(loafs, height, previous_block_hash, timestamp, nounce)
-            if block.get_hash()[:5] == '00000':
+            if block.get_hash()[:4] == '0000':
                 return block
             nounce += 1
 
