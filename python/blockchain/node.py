@@ -77,21 +77,19 @@ class Node():
             raise
 
     def _worker_thread(self):
-        queues = self._network.get_queues()
         while True:
-            for q in list(queues.values()):
+            for websocket in list(self._network.get_queues().keys()):
                 try:
-                    raw_data = q[0].sync_q.get_nowait()
+                    raw_data = self._network.recv_nowait(websocket)
                     message = json.loads(raw_data.decode('utf-8'))
 
                     if message['function'] == FUNCTIONS.GET_LENGTH:
-                        self._response_get_length(message, q)
+                        self._response_get_length(message, websocket)
                     elif message['function'] == FUNCTIONS.GET_BLOCKS:
-                        self._response_get_blocks(message, q)
+                        self._response_get_blocks(message, websocket)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._response_broadcast_loaf(message)
 
-                    q[0].sync_q.task_done()
                 except SyncQueueEmpty:
                     pass
                 except:
@@ -99,30 +97,31 @@ class Node():
                     raise
             time.sleep(0.05)
 
-    def _response_get_length(self, message, q):
+    def _response_get_length(self, message, websocket):
         if message['type'] == 'request':
             chain_length = self._chain.get_length()
             response = self._json({'type': 'response',
                                    'function': FUNCTIONS.GET_LENGTH,
                                    'length': chain_length})
-            q[1].sync_q.put(response)
+            self._network.send(websocket, response)
         elif message['type'] == 'response':
             print(info('Recieved blockchain length is: ' +
                        str(message['length'])))
         elif message['type'] == 'error':
             print(fail('Error received'))
         else:
-            q[1].sync_q.put(self._json({'type': 'error'}))
+            self._network.send(websocket, self._json({'type': 'error'}))
 
-    def _response_get_blocks(self, message, q):
+    def _response_get_blocks(self, message, websocket):
         return
 
     def _response_broadcast_loaf(self, message):
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
-        if loaf.validate() and not loaf.get_hash() in self._loaf_pool:
-            self._loaf_pool[loaf.get_hash()] = loaf
-            self.broadcast_loaf(loaf)
-            print(info('Received loaf and forwarding it'))
+        if loaf.validate():
+            if not loaf.get_hash() in self._loaf_pool:
+                self._loaf_pool[loaf.get_hash()] = loaf
+                self.broadcast_loaf(loaf)
+                print(info('Received loaf and forwarding it'))
         else:
             print(warning('Received loaf could not validate'))
 

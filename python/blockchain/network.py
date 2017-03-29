@@ -39,6 +39,9 @@ class Network():
         if websocket in self._queues:
             self._queues[websocket][1].sync_q.put(data)
 
+    def recv_nowait(self, websocket):
+        return self._queues[websocket][0].sync_q.get_nowait()
+
     def get_queues(self):
         return self._queues
 
@@ -75,7 +78,6 @@ class Network():
                 if send_task in done:
                     data = send_task.result()
                     await websocket.send(data)
-                    send_queue.async_q.task_done()
                 else:
                     send_task.cancel()
         except websockets.exceptions.ConnectionClosed:
