@@ -247,4 +247,7 @@ class Node():
 
     @staticmethod
     def _json(dictio):
+        """ Serializes object to a JSON formatted string, encodes to utf-8
+            and returns
+        """
         return json.dumps(dictio, cls=BlockEncoder).encode('utf-8')
