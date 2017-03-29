@@ -88,7 +88,7 @@ class Node():
         for h in loaves_hash:
             loaves.append(self._loaf_pool[h])
         block = self._chain.mine_block(loaves)
-        if self.add_block(block):
+        if block.validate():
             for loaf_hash in loaves_hash:
                 del self._loaf_pool[loaf_hash]
             return block
