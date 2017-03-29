@@ -48,7 +48,7 @@ class Chain():
         block = None
         while True:
             block = Block(loafs, height, previous_block_hash, timestamp, nounce)
-            if block.get_hash()[:5] == '00000':
+            if block.get_hash()[:4] == '0000':
                 return block
             nounce += 1
 

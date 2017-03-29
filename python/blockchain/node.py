@@ -176,7 +176,7 @@ class Node():
                 print(info('local blockchain is shorter, ' +
                            'querying missing blocks'))
                 self._get_blocks(websocket, chain_length,
-                                 (response_length - (chain_length - 1)))
+                                 response_length - chain_length)
             else:
                 print(info('Keeping local blocks'))
 
@@ -190,6 +190,8 @@ class Node():
         if message['type'] == 'request':
             if self._chain.get_length() < message['offset'] + message['length']:
                 blocks = []
+                print(message['length'])
+                print(message['offset'])
                 for i in range(message['length']):
                     blocks.append(self._chain.get_block(i + message['offset']))
                 response = self._json({'type': 'response',
