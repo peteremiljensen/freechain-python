@@ -14,6 +14,8 @@ from blockchain.block import *
 
 class Chain():
     def __init__(self):
+        """ Chain class constructor
+        """
         genesis_block = Block.create_block_from_dict(
             {'loafs': [], 'nounce': 7868515,
              'previous_block_hash': '-1', 'height': 0,
@@ -23,6 +25,11 @@ class Chain():
         self._chain_lock = threading.RLock()
 
     def add_block(self, block):
+        """ Locks the chain, validates a block and compares previous hash of
+        the block and the blockchain. If hashes are the same, the block is
+        validated, and the length of the chain matches the height of the block,
+        the block is appended to the chain and the function returns True
+        """
         with self._chain_lock:
             if block.validate() and \
                self._chain[-1].get_hash() == block.get_previous_block_hash() \
@@ -33,14 +40,23 @@ class Chain():
                 return False
 
     def get_block(self, height):
+        """ Locks the chain and returns the height of the chain
+        """
         with self._chain_lock:
             return self._chain[height]
 
     def get_length(self):
+        """ Locks the chain and returns the height of the chain
+        """
         with self._chain_lock:
             return len(self._chain)
 
     def mine_block(self, loafs):
+        """ Creates a block from given loaves. Sets nounce to 0 and generates
+            a hash. If the first 5 digits in the hash are 0, the block is
+            returned. If not, nounce is incremented by one and a new hash is
+            generated
+        """
         height = self.get_length()
         previous_block_hash = self._chain[-1].get_hash()
         timestamp = str(datetime.datetime.now())
@@ -53,6 +69,9 @@ class Chain():
             nounce += 1
 
     def json(self):
+        """ Serializes chain to a JSON formatted string, encodes to utf-8
+            and returns
+        """
         return json.dumps(self._chain,
                           sort_keys=True,
                           cls=BlockEncoder).encode('utf-8')

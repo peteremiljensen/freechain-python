@@ -29,7 +29,7 @@ class Block:
             self._block['hash'] = hash
 
     def json(self):
-        """ Serializes loaf to a JSON formatted string, encodes to utf-8
+        """ Serializes block to a JSON formatted string, encodes to utf-8
             and returns
         """
         return json.dumps(self._block,
