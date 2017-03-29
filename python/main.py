@@ -51,11 +51,11 @@ class Prompt(Cmd):
 
     def do_loafbomb(self, args):
         l = args.split()
-        if len(l) != 1:
+        if len(l) != 2:
             print(fail("invalid number of arguments"))
             return
         try:
-            for i in range(500):
+            for i in range(int(l[1])):
                 loaf = Loaf({"string": l[0]+str(i)})
                 self._node.broadcast_loaf(loaf)
         except:
