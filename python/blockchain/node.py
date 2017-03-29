@@ -56,20 +56,17 @@ class Node():
             the loaf pool and broadcasts it to all connected nodes
         """
         if loaf.validate():
-            self._loaf_pool[loaf.get_hash()] = loaf
             self._network.broadcast(
                 self._json({'type': 'request',
                             'function': FUNCTIONS.BROADCAST_LOAF,
                             'loaf': loaf}))
 
     def broadcast_block(self, block):
-        if self._chain.add_block(block):
+        if block.validate():
             self._network.broadcast(
                 self._json({'type': 'request',
                             'function': FUNCTIONS.BROADCAST_BLOCK,
                             'block': block}))
-        else:
-            print(fail('error validating block while trying to broadcast'))
 
     def mine(self):
         loaves_total = 0
