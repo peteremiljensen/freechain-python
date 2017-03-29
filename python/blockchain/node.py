@@ -68,7 +68,7 @@ class Node():
                             'function': FUNCTIONS.BROADCAST_BLOCK,
                             'block': block}))
         else:
-            printf(fail('error validating block while trying to broadcast'))
+            print(fail('error validating block while trying to broadcast'))
 
     def mine(self):
         loafs_total = 0
@@ -237,6 +237,7 @@ class Node():
             return
         elif not self._chain.add_block(block):
             print(fail('block could not be added'))
+            return
 
         print(info('block succesfully added'))
         self.broadcast_block(block)
