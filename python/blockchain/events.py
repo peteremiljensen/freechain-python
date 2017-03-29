@@ -17,6 +17,8 @@ from blockchain.singleton import Singleton
 @Singleton
 class Events():
     def __init__(self):
+        """ Event class constructor
+        """
         self._loop = asyncio.get_event_loop()
         self._queue = janus.Queue(loop=self._loop)
         self._callback = {}

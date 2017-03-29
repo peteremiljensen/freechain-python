@@ -13,12 +13,12 @@ from blockchain.loaf import *
 #
 
 class Block:
-    def __init__(self, loafs, height, previous_block_hash,
+    def __init__(self, loaves, height, previous_block_hash,
                  timestamp, nounce, hash=None):
         """ Block class constructor. If hash is not given, a new hash is created
         """
         self._block = {}
-        self._block['loafs'] = loafs
+        self._block['loaves'] = loaves
         self._block['height'] = height
         self._block['previous_block_hash'] = previous_block_hash
         self._block['timestamp'] = timestamp
@@ -59,11 +59,11 @@ class Block:
         return hash_calc
 
     def validate(self):
-        """ Validates block by validating all loafs in block and calling
+        """ Validates block by validating all loaves in block and calling
             calculate_hash. returns true if hash is same as calculated hash
             and if the first 5 digit in the hash are all 0
         """
-        for l in self._block['loafs']:
+        for l in self._block['loaves']:
             if not l.validate():
                 return False
         hash_calc = self.calculate_hash()
@@ -73,7 +73,7 @@ class Block:
     @staticmethod
     def create_block_from_dict(dictio):
         """ Creates block object from dictionary """
-        return Block(dictio['loafs'], dictio['height'],
+        return Block(dictio['loaves'], dictio['height'],
                      dictio['previous_block_hash'], dictio['timestamp'],
                      dictio['nounce'], dictio['hash'])
 

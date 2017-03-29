@@ -17,7 +17,7 @@ class Chain():
         """ Chain class constructor
         """
         genesis_block = Block.create_block_from_dict(
-            {'loafs': [], 'nounce': 82743408,
+            {'loaves': [], 'nounce': 82743408,
              'previous_block_hash': '-1', 'height': 0,
              'timestamp': '2017-03-29 11:46:29.096909',
              'hash': '00000002a51fcae0911249bcb257f87cf00410d6c98c08ba649ba48a029e6154'})
@@ -51,7 +51,7 @@ class Chain():
         with self._chain_lock:
             return len(self._chain)
 
-    def mine_block(self, loafs):
+    def mine_block(self, loaves):
         """ Creates a block from given loaves. Sets nounce to 0 and generates
             a hash. If the first 5 digits in the hash are 0, the block is
             returned. If not, nounce is incremented by one and a new hash is
@@ -63,7 +63,7 @@ class Chain():
         nounce = 0
         block = None
         while True:
-            block = Block(loafs, height, previous_block_hash, timestamp, nounce)
+            block = Block(loaves, height, previous_block_hash, timestamp, nounce)
             if block.get_hash()[:4] == '0000':
                 return block
             nounce += 1

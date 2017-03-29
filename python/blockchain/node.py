@@ -23,7 +23,8 @@ from queue import Empty as SyncQueueEmpty
 
 class Node():
     def __init__(self, port):
-        """ Node class constructor """
+        """ Node class constructor
+        """
 
         self._network = Network(port)
 
@@ -51,7 +52,7 @@ class Node():
         self._network.connect_node(ip)
 
     def broadcast_loaf(self, loaf):
-        """ Validates a loaf. If it is validated, it puts the loafs hash in
+        """ Validates a loaf. If it is validated, it puts the loaves hash in
             the loaf pool and broadcasts it to all connected nodes
         """
         if loaf.validate():
@@ -71,19 +72,19 @@ class Node():
             printf(fail('error validating block while trying to broadcast'))
 
     def mine(self):
-        loafs_total = 0
-        loafs_hash = []
-        loafs = []
+        loaves_total = 0
+        loaves_hash = []
+        loaves = []
         for loaf_hash in list(self._loaf_pool.keys()):
-            loafs_hash.append(loaf_hash)
-            loafs_total += 1
-            if loafs_total == 1000:
+            loaves_hash.append(loaf_hash)
+            loaves_total += 1
+            if loaves_total == 1000:
                 break
-        for h in loafs_hash:
-            loafs.append(self._loaf_pool[h])
-        block = self._chain.mine_block(loafs)
+        for h in loaves_hash:
+            loaves.append(self._loaf_pool[h])
+        block = self._chain.mine_block(loaves)
         if block.validate():
-            for loaf_hash in loafs_hash:
+            for loaf_hash in loaves_hash:
                 del self._loaf_pool[loaf_hash]
             self.broadcast_block(block)
         else:
