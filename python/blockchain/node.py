@@ -43,7 +43,7 @@ class Node():
 
         def new_connection_callback(websocket):
             self._get_length(websocket)
-        Events.Instance().register_callback(EVENTS_TYPE.NEW_CONNECTION,
+        Events.Instance().register_callback(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                             new_connection_callback)
 
     def connect_node(self, ip):
@@ -105,6 +105,11 @@ class Node():
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._response_broadcast_loaf(message)
 
+                except AttributeError:
+                    response = self._json({'type': 'error',
+                                           'decription': 'Request not ' + \
+                                           'encoded correctly as UTF-8'})
+                    self._network.send(websocket, response)
                 except SyncQueueEmpty:
                     pass
                 except:
@@ -130,11 +135,12 @@ class Node():
             print(info('local block length is : ' +
                        str(chain_length)))
             if response_length > chain_length:
-                print(info('local blockchain is shorter, querying missing blocks'))
-                self._get_blocks(websocket, chain_length, (response_length - chain_length))
+                print(info('local blockchain is shorter, ' +
+                           'querying missing blocks'))
+                self._get_blocks(websocket, chain_length,
+                                 (response_length - chain_length))
             else:
                 print(info('Keeping local blocks'))
-            
         elif message['type'] == 'error':
             print(fail('Error received'))
         else:

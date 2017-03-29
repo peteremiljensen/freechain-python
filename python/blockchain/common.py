@@ -13,7 +13,7 @@ def fail(string):
     return('\033[91m*** ' + string + '\033[0m')
 
 class EVENTS_TYPE:
-    NEW_CONNECTION = 'new_connection'
+    NEW_CLIENT_CONNECTION = 'new_client_connection'
 
 class FUNCTIONS:
     BROADCAST_LOAF = 'broadcast_loaf'
