@@ -154,7 +154,7 @@ class Node():
 
                 except AttributeError:
                     response = self._json({'type': 'error',
-                                           'decription': 'Request not ' + \
+                                           'description': 'Request not ' + \
                                            'encoded correctly as UTF-8'})
                     self._network.send(websocket, response)
                 except SyncQueueEmpty:
