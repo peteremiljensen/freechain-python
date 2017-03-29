@@ -40,7 +40,7 @@ class Node():
 
         def new_connection_callback(websocket):
             self._get_length(websocket)
-        Events.Instance().register_callback(EVENTS_TYPE.NEW_CONNECTION,
+        Events.Instance().register_callback(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                             new_connection_callback)
 
     def connect_node(self, ip):

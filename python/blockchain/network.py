@@ -51,10 +51,11 @@ class Network():
     async def _client(self, ip):
         async with websockets.connect('ws://' + ip + ':' + str(self._port)) \
                    as websocket:
+            Events.Instance().notify(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
+                                     websocket)
             await self._socket(websocket)
 
     async def _socket(self, websocket):
-        Events.Instance().notify(EVENTS_TYPE.NEW_CONNECTION, websocket)
         loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = janus.Queue(loop=loop)
