@@ -29,7 +29,8 @@ class Node():
         self._loaf_pool = {}
 
         self._events_thread = threading.Thread(target=self._start_events_thread,
-                                               daemon=True).start()
+                                               daemon=True)
+        self._events_thread.start()
         self._worker_thread = threading.Thread(target=self._worker_thread,
                                                daemon=True)
 
