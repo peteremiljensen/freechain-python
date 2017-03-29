@@ -43,7 +43,11 @@ class Prompt(Cmd):
             print (fail("mine doesnt take any arguments"))
             return
         try:
-            self._node.mine()
+            block = self._node.mine()
+            if block is None:
+                print(fail("failed to mine and add block"))
+            else:
+                self._node.broadcast_block(block)
         except:
             print(fail("error trying to mine"))
             raise
@@ -55,7 +59,10 @@ class Prompt(Cmd):
             return
         try:
             loaf = Loaf({"string": l[0]})
-            self._node.broadcast_loaf(loaf)
+            if self._node.add_loaf(loaf) == True:
+                self._node.broadcast_loaf(loaf)
+            else:
+                print(fail("failed to add loaf to loaf pool"))
         except:
             print(fail("error creating and broadcasting loaf"))
             raise
