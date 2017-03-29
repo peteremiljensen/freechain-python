@@ -88,12 +88,13 @@ class Node():
         for h in loaves_hash:
             loaves.append(self._loaf_pool[h])
         block = self._chain.mine_block(loaves)
-        if block.validate():
+        if self.add_block(block):
             for loaf_hash in loaves_hash:
                 del self._loaf_pool[loaf_hash]
-            self.broadcast_block(block)
+            return block
         else:
             print(fail('block could not be mined'))
+            return None
 
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
