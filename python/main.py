@@ -59,7 +59,7 @@ class Prompt(Cmd):
             return
         try:
             loaf = Loaf({"string": l[0]})
-            if self._node.add_loaf(loaf) == True:
+            if self._node.add_loaf(loaf):
                 self._node.broadcast_loaf(loaf)
             else:
                 print(fail("failed to add loaf to loaf pool"))
