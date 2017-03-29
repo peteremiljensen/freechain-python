@@ -51,7 +51,7 @@ class Node():
         self._network.connect_node(ip)
 
     def broadcast_loaf(self, loaf):
-        """ Validates a loaf. If it is validated, it puts the loafs hash in     
+        """ Validates a loaf. If it is validated, it puts the loafs hash in
             the loaf pool and broadcasts it to all connected nodes
         """
         if loaf.validate():
@@ -90,7 +90,7 @@ class Node():
 
     def _worker_thread(self):
         """ Starts the worker thread, which listens for requests from other
-            nodes in the network.   
+            nodes in the network.
         """
         while True:
             for websocket in list(self._network.get_queues().keys()):
@@ -118,7 +118,7 @@ class Node():
             time.sleep(0.05)
 
     def _response_get_length(self, message, websocket):
-        """ Reads a request for the length of the blockchain. If local 
+        """ Reads a request for the length of the blockchain. If local
             blockchain is shorter, it sends a request for missing blocks
         """
         if message['type'] == 'request':
@@ -181,4 +181,7 @@ class Node():
 
     @staticmethod
     def _json(dictio):
+        """ Serializes object to a JSON formatted string, encodes to utf-8
+            and returns
+        """
         return json.dumps(dictio, cls=BlockEncoder).encode('utf-8')
