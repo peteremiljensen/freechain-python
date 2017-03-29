@@ -17,8 +17,8 @@ class Chain():
         genesis_block = Block.create_block_from_dict(
             {'loafs': [], 'nounce': 82743408,
              'previous_block_hash': '-1', 'height': 0,
-             'timestamp': '2017-03-29 11:46:29.096909'
-             'hash": "00000002a51fcae0911249bcb257f87cf00410d6c98c08ba649ba48a029e6154'})
+             'timestamp': '2017-03-29 11:46:29.096909',
+             'hash': '00000002a51fcae0911249bcb257f87cf00410d6c98c08ba649ba48a029e6154'})
         self._chain = [genesis_block]
         self._chain_lock = threading.RLock()
 
