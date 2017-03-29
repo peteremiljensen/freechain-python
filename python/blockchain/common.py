@@ -16,7 +16,7 @@ class EVENTS_TYPE:
     NEW_CLIENT_CONNECTION = 'new_client_connection'
 
 class FUNCTIONS:
-    BROADCAST_LOAF = 'broadcast_loaf'
-    BROADCAST_BLOCK = 'broadcast_block'
     GET_LENGTH = 'get_length'
     GET_BLOCKS = 'get_blocks'
+    BROADCAST_LOAF = 'broadcast_loaf'
+    BROADCAST_BLOCK = 'broadcast_block'

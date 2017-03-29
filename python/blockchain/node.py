@@ -167,8 +167,7 @@ class Node():
             is longer
         """
         if message['type'] == 'request':
-            if self._chain.get_length() < \
-               message['offset'] + message['length'] - 1:
+            if self._chain.get_length() < message['offset'] + message['length']:
                 blocks = []
                 for i in range(message['length']):
                     blocks.append(self._chain.get_block(i + message['offset']))
@@ -181,6 +180,20 @@ class Node():
 
         elif message['type'] == 'response':
             blocks = []
+            for block_dict in message['blocks']:
+                blocks.append(Block.create_block_from_dict(block_dict))
+            for block in blocks:
+                if block.get_height() > self._chain.get_height():
+                    print(warning('received block cannot be added as ' +
+                                  'it is of a higher height. Will try ' +
+                                  'to query missing links.'))
+                    length = block.get_height() - (self._chain.get_height() - 1)
+                    self._get_blocks(websocket, self._chain.get_height(),
+                                     length):
+                    return
+                elif not self._chain.add_block(block):
+                    print(fail('block cannot be added'))
+                    return
 
         else:
             self._network.send(websocket, self._json({'type': 'error'}))
