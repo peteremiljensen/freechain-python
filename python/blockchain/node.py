@@ -233,6 +233,7 @@ class Node():
 
         if block.get_height() > self._chain.get_length():
             self._get_length(websocket)
+            return
         elif block.get_height() < self._chain.get_length():
             return
         elif not self._chain.add_block(block):
