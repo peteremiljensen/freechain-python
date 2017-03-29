@@ -13,10 +13,11 @@ from blockchain.loaf import *
 #
 
 class Block:
-    def __init__(self, loafs, previous_block_hash,
+    def __init__(self, loafs, height, previous_block_hash,
                  timestamp, nounce, hash=None):
         self._block = {}
         self._block['loafs'] = loafs
+        self._block['height'] = height
         self._block['previous_block_hash'] = previous_block_hash
         self._block['timestamp'] = timestamp
         self._block['nounce'] = nounce
@@ -29,6 +30,9 @@ class Block:
         return json.dumps(self._block,
                           sort_keys=True,
                           cls=LoafEncoder).encode('utf-8')
+
+    def get_height(self):
+        return self._block['height']
 
     def get_hash(self):
         return self._block['hash']
@@ -52,8 +56,9 @@ class Block:
             hash_calc[:5] == '00000'
 
     def create_block_from_dict(dictio):
-        return Block(dictio['loafs'], dictio['previous_block_hash'],
-                     dictio['timestamp'], dictio['nounce'], dictio['hash'])
+        return Block(dictio['loafs'], dicito['height'],
+                     dictio['previous_block_hash'], dictio['timestamp'],
+                     dictio['nounce'], dictio['hash'])
 
 class BlockEncoder(LoafEncoder):
     def default(self, obj):

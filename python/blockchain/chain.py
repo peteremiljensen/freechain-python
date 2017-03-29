@@ -21,7 +21,8 @@ class Chain():
     def add_block(self, block):
         with self._chain_lock:
             if block.validate() and \
-               self._chain[-1].get_hash() == block.get_previous_block_hash():
+               self._chain[-1].get_hash() == block.get_previous_block_hash() \
+               and self._chain[-1].get_height() + 1 == block.get_height():
                 self._chain.append(block)
                 return True
             else:
@@ -36,12 +37,13 @@ class Chain():
             return len(self._chain)
 
     def mine_block(self, loafs):
-        timestamp = str(datetime.datetime.now())
+        height = self.get_length()
         previous_block_hash = self._chain[-1].get_hash()
+        timestamp = str(datetime.datetime.now())
         nounce = 0
         block = None
         while True:
-            block = Block(loafs, previous_block_hash, timestamp, nounce)
+            block = Block(loafs, height, previous_block_hash, timestamp, nounce)
             if block.get_hash()[:5] == '00000':
                 return block
             nounce += 1

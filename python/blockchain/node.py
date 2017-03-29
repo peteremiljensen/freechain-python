@@ -54,6 +54,10 @@ class Node():
                             'function': FUNCTIONS.BROADCAST_LOAF,
                             'loaf': loaf}))
 
+    def broadcast_block(self, block):
+        if self._chain.add_block(block):
+            self._network.broadcast()
+
     def _get_length(self, websocket):
         self._network.send(websocket, self._json(
             {'type': 'request',
