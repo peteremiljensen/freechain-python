@@ -227,11 +227,9 @@ class Node():
             broadcasts the loaf to all connected nodes.
         """
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
-        if loaf.validate():
-            if not loaf.get_hash() in self._loaf_pool:
-                self._loaf_pool[loaf.get_hash()] = loaf
-                self.broadcast_loaf(loaf)
-                print(info('Received loaf and forwarding it'))
+        if self.add_loaf(loaf):
+            self.broadcast_loaf(loaf)
+            print(info('Received loaf and forwarding it'))
         else:
             print(warning('Received loaf could not validate'))
 
@@ -243,7 +241,7 @@ class Node():
             return
         elif block.get_height() < self._chain.get_length():
             return
-        elif not self._chain.add_block(block):
+        elif not self.add_block(block):
             print(fail('block could not be added'))
             return
 
