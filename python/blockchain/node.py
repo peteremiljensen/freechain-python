@@ -190,8 +190,6 @@ class Node():
         if message['type'] == 'request':
             if self._chain.get_length() < message['offset'] + message['length']:
                 blocks = []
-                print(message['length'])
-                print(message['offset'])
                 for i in range(message['length']):
                     blocks.append(self._chain.get_block(i + message['offset']))
                 response = self._json({'type': 'response',
@@ -231,7 +229,7 @@ class Node():
             print(warning('Received loaf could not validate'))
 
     def _handle_broadcast_block(self, message, websocket):
-        block = Block.create_block_from_dict()
+        block = Block.create_block_from_dict(message['block'])
 
         if block.get_height() > self._chain.get_length():
             self._get_length(websocket)
