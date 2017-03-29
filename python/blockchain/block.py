@@ -15,6 +15,8 @@ from blockchain.loaf import *
 class Block:
     def __init__(self, loafs, height, previous_block_hash,
                  timestamp, nounce, hash=None):
+        """ Block class constructor. If hash is not given, a new hash is created
+        """
         self._block = {}
         self._block['loafs'] = loafs
         self._block['height'] = height
@@ -27,20 +29,29 @@ class Block:
             self._block['hash'] = hash
 
     def json(self):
+        """ Serializes loaf to a JSON formatted string, encodes to utf-8
+            and returns
+        """
         return json.dumps(self._block,
                           sort_keys=True,
                           cls=LoafEncoder).encode('utf-8')
 
     def get_height(self):
+        """ Returns height of block """
         return self._block['height']
 
     def get_hash(self):
+        """ Returns hash of block """
         return self._block['hash']
 
     def get_previous_block_hash(self):
+        """ Returns hash of previous block """
         return self._block['previous_block_hash']
 
     def calculate_hash(self):
+        """ Removes hash from block, calculates hash, reinserts old hash and
+            returns new hash
+        """
         hash_tmp = self._block['hash']
         del self._block['hash']
         hash_calc = hashlib.sha256(self.json()).hexdigest()
@@ -48,6 +59,10 @@ class Block:
         return hash_calc
 
     def validate(self):
+        """ Validates block by validating all loafs in block and calling
+            calculate_hash. returns true if hash is same as calculated hash
+            and if the first 5 digit in the hash are all 0
+        """
         for l in self._block['loafs']:
             if not l.validate():
                 return False
@@ -57,6 +72,7 @@ class Block:
 
     @staticmethod
     def create_block_from_dict(dictio):
+        """ Creates block object from dictionary """
         return Block(dictio['loafs'], dictio['height'],
                      dictio['previous_block_hash'], dictio['timestamp'],
                      dictio['nounce'], dictio['hash'])
