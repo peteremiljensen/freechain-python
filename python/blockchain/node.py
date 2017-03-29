@@ -85,7 +85,9 @@ class Node():
                     message = json.loads(raw_data.decode('utf-8'))
 
                     if message['function'] == FUNCTIONS.GET_LENGTH:
-                        self._response_get_length(q, message)
+                        self._response_get_length(message, q)
+                    elif message['function'] == FUNCTIONS.GET_BLOCKS:
+                        self._response_get_blocks(message, q)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._response_broadcast_loaf(message)
 
@@ -97,7 +99,7 @@ class Node():
                     raise
             time.sleep(0.05)
 
-    def _response_get_length(self, q, message):
+    def _response_get_length(self, message, q):
         if message['type'] == 'request':
             chain_length = self._chain.get_length()
             response = self._json({'type': 'response',
@@ -111,6 +113,9 @@ class Node():
             print(fail('Error received'))
         else:
             q[1].sync_q.put(self._json({'type': 'error'}))
+
+    def _response_get_blocks(self, message, q):
+        return
 
     def _response_broadcast_loaf(self, message):
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
