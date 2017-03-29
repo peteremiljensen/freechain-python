@@ -112,11 +112,12 @@ class Node():
             print(info('local block length is : ' +
                        str(chain_length)))
             if response_length > chain_length:
-                print(info('local blockchain is shorter, querying missing blocks'))
-                self._get_blocks(websocket, chain_length, (response_length - chain_length))
+                print(info('local blockchain is shorter, ' +
+                           'querying missing blocks'))
+                self._get_blocks(websocket, chain_length,
+                                 (response_length - chain_length))
             else:
                 print(info('Keeping local blocks'))
-            
         elif message['type'] == 'error':
             print(fail('Error received'))
         else:
