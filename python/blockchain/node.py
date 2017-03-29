@@ -109,6 +109,13 @@ class Node():
         elif message['type'] == 'response':
             print(info('Recieved blockchain length is: ' +
                        str(message['length'])))
+            print(info('local block length is : ' +
+                       str(len(self._chain._chain)))))
+            if message['length'] > len(self._chain._chain):
+                print(info('local blockchain is shorter, querying missing blocks'))
+            else:
+                print(info('Keeping local blocks'))
+            
         elif message['type'] == 'error':
             print(fail('Error received'))
         else:
