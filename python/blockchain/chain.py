@@ -26,7 +26,7 @@ class Chain():
         with self._chain_lock:
             if block.validate() and \
                self._chain[-1].get_hash() == block.get_previous_block_hash() \
-               and self._chain.get_length() == block.get_height():
+               and len(self._chain) == block.get_height():
                 self._chain.append(block)
                 return True
             else:

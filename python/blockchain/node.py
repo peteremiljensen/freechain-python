@@ -70,6 +70,25 @@ class Node():
         else:
             printf(fail('error validating block while trying to broadcast'))
 
+    def mine(self):
+        loafs_total = 0
+        loafs_hash = []
+        loafs = []
+        for loaf_hash in list(self._loaf_pool.keys()):
+            loafs_hash.append(loaf_hash)
+            loafs_total += 1
+            if loafs_total == 1000:
+                break
+        for h in loafs_hash:
+            loafs.append(self._loaf_pool[h])
+        block = self._chain.mine_block(loafs)
+        if block.validate():
+            for loaf_hash in loafs_hash:
+                del self._loaf_pool[loaf_hash]
+            self.broadcast_block(block)
+        else:
+            print(fail('block could not be mined'))
+
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
 
