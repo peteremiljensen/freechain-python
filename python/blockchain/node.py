@@ -228,11 +228,12 @@ class Node():
             broadcasts the loaf to all connected nodes.
         """
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
-        if self.add_loaf(loaf):
-            self.broadcast_loaf(loaf)
-            print(info('Received loaf and forwarding it'))
-        else:
-            print(warning('Received loaf could not validate'))
+        if not loaf.get_hash() in self._loaf_pool:
+            if self.add_loaf(loaf):
+                self.broadcast_loaf(loaf)
+                print(info('Received loaf and forwarding it'))
+            else:
+                print(fail('Received loaf could not validate'))
 
     def _handle_broadcast_block(self, message, websocket):
         block = Block.create_block_from_dict(message['block'])
