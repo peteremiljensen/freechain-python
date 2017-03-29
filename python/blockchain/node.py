@@ -120,7 +120,18 @@ class Node():
             self._network.send(websocket, self._json({'type': 'error'}))
 
     def _response_get_blocks(self, message, websocket):
-        return
+        if message['type'] == 'request':
+            if self._chain.get_length() < \
+               message['offset'] + message['length'] - 1:
+                blocks = []
+                for i in range(message['length']):
+                    blocks.append(self._chain.get_block(i + message['offset']))
+                response = self._json({'type': 'response',
+                                       'function': FUNCTION.GET_BLOCKS,
+                                       'blocks': blocks})
+                self._network.send(websocket, response)
+            else:
+                self._network.send(websocket, self._json({'type': 'error'}))
 
     def _response_broadcast_loaf(self, message):
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
