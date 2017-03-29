@@ -21,11 +21,15 @@ class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'blockchain']
 
     def __init__(self):
+        """ Prompt class constructor
+        """
         super().__init__()
         self._node = Node(port)
         self._node.start()
 
     def do_connect(self, args):
+        """ Parses the arguments to get nodes ip and connects to node
+        """
         l = args.split()
         if len(l) != 1:
             print(fail("invalid number of arguments"))
@@ -38,6 +42,9 @@ class Prompt(Cmd):
             raise
 
     def do_mine(self, args):
+        """ Reads argument and tries to mine block. if block is mined,
+            the block is added to the chain and broadcasted
+        """
         l = args.split()
         if len(l) != 0:
             print (fail("mine doesnt take any arguments"))
@@ -56,6 +63,9 @@ class Prompt(Cmd):
             raise
 
     def do_loaf(self, args):
+        """ Parses the argument to get loaf data, creates a loaf from data,
+            adds loaf to loaf pool and broadcasts the loaf
+        """
         l = args.split()
         if len(l) != 1:
             print(fail("invalid number of arguments"))
@@ -71,6 +81,9 @@ class Prompt(Cmd):
             raise
 
     def do_loafbomb(self, args):
+        """ Does as do_loaf, but does it a number of times, depending on the
+            number given as the second argument
+        """
         l = args.split()
         if len(l) != 2:
             print(fail("invalid number of arguments"))
@@ -84,6 +97,8 @@ class Prompt(Cmd):
             raise
 
     def do_print(self, args):
+        """ Prints loaf pool or blockchain
+        """
         l = args.split()
         if len(l) != 1:
             print(fail("invalid number of arguments"))
@@ -110,9 +125,13 @@ class Prompt(Cmd):
         return completions
 
     def do_EOF(self, line):
+        """ Calls do_quit if at end of file
+        """
         self.do_quit(line)
 
     def do_quit(self, args):
+        """ Quits program
+        """
         print(info("Quitting"))
         raise SystemExit
 
@@ -120,9 +139,15 @@ class Prompt(Cmd):
         self.do_quit(args)
 
     def emptyline(self):
+        """ If empty line is sent, does nothing
+        """
         return
 
 if __name__ == '__main__':
+    """ Program start. If no port argument is given, sets port to 9000.
+        Prints error if more than one argument is given, then creates a prompt
+        object and waits for user input
+    """
     if len(sys.argv) == 1:
         port = 9000
     elif len(sys.argv) == 2:
