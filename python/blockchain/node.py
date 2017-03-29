@@ -51,22 +51,30 @@ class Node():
         """ Connects to another node through its IP address """
         self._network.connect_node(ip)
 
+    def add_loaf(self, loaf):
+        if loaf.validate() and not loaf.get_hash() in self._loaf_pool:
+                self._loaf_pool[loaf.get_hash()] = loaf
+                return True
+        else:
+            return False
+
+    def add_block(self, block):
+        return self._chain.add_block(block)
+
     def broadcast_loaf(self, loaf):
         """ Validates a loaf. If it is validated, it puts the loaves hash in
             the loaf pool and broadcasts it to all connected nodes
         """
-        if loaf.validate():
-            self._network.broadcast(
-                self._json({'type': 'request',
-                            'function': FUNCTIONS.BROADCAST_LOAF,
-                            'loaf': loaf}))
+        self._network.broadcast(
+            self._json({'type': 'request',
+                        'function': FUNCTIONS.BROADCAST_LOAF,
+                        'loaf': loaf}))
 
     def broadcast_block(self, block):
-        if block.validate():
-            self._network.broadcast(
-                self._json({'type': 'request',
-                            'function': FUNCTIONS.BROADCAST_BLOCK,
-                            'block': block}))
+        self._network.broadcast(
+            self._json({'type': 'request',
+                        'function': FUNCTIONS.BROADCAST_BLOCK,
+                        'block': block}))
 
     def mine(self):
         loaves_total = 0
