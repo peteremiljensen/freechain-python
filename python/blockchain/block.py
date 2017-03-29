@@ -55,8 +55,9 @@ class Block:
         return self._block['hash'] == hash_calc and \
             hash_calc[:5] == '00000'
 
+    @staticmethod
     def create_block_from_dict(dictio):
-        return Block(dictio['loafs'], dicito['height'],
+        return Block(dictio['loafs'], dictio['height'],
                      dictio['previous_block_hash'], dictio['timestamp'],
                      dictio['nounce'], dictio['hash'])
 
