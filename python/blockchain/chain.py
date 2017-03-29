@@ -31,11 +31,6 @@ class Chain():
         the block is appended to the chain and the function returns True
         """
         with self._chain_lock:
-            print("validate:", block.validate())
-            print("_chain.get.hash:", self._chain[-1].get_hash())
-            print("previous:", block.get_previous_block_hash())
-            print("chain length:", len(self._chain))
-            print("block.get_height:", block.get_height())
             if block.validate() and \
                self._chain[-1].get_hash() == block.get_previous_block_hash() \
                and len(self._chain) == block.get_height():
