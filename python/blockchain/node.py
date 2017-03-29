@@ -23,6 +23,8 @@ from queue import Empty as SyncQueueEmpty
 
 class Node():
     def __init__(self, port):
+        """ Node class constructor """
+
         self._network = Network(port)
 
         self._chain = Chain()
@@ -35,6 +37,7 @@ class Node():
                                                daemon=True)
 
     def start(self):
+        """ Starts the node by creating a worker thread and a network thread """
         self._network.start()
         self._worker_thread.start()
 
@@ -44,9 +47,13 @@ class Node():
                                             new_connection_callback)
 
     def connect_node(self, ip):
+        """ Connects to another node through its IP address """
         self._network.connect_node(ip)
 
     def broadcast_loaf(self, loaf):
+        """ Validates a loaf. If it is validated, it puts the loafs hash in     
+            the loaf pool and broadcasts it to all connected nodes
+        """
         if loaf.validate():
             self._loaf_pool[loaf.get_hash()] = loaf
             self._network.broadcast(
@@ -55,11 +62,15 @@ class Node():
                             'loaf': loaf}))
 
     def _get_length(self, websocket):
+        """ Requests the length of the blockchain from a node """
+
         self._network.send(websocket, self._json(
             {'type': 'request',
              'function': FUNCTIONS.GET_LENGTH}))
 
     def _get_blocks(self, websocket, offset, length):
+        """ Requests  missing blocks from a node """
+
         self._network.send(websocket, self._json(
             {'type': 'request',
              'function': FUNCTIONS.GET_BLOCKS,
@@ -67,6 +78,7 @@ class Node():
              'length': length}))
 
     def _start_events_thread(self):
+        """ Starts an event thread that runs untill completion """
         try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -77,6 +89,9 @@ class Node():
             raise
 
     def _worker_thread(self):
+        """ Starts the worker thread, which listens for requests from other
+            nodes in the network.   
+        """
         while True:
             for websocket in list(self._network.get_queues().keys()):
                 try:
@@ -98,6 +113,9 @@ class Node():
             time.sleep(0.05)
 
     def _response_get_length(self, message, websocket):
+        """ Reads a request for the length of the blockchain. If local 
+            blockchain is shorter, it sends a request for missing blocks
+        """
         if message['type'] == 'request':
             chain_length = self._chain.get_length()
             response = self._json({'type': 'response',
@@ -123,6 +141,9 @@ class Node():
             self._network.send(websocket, self._json({'type': 'error'}))
 
     def _response_get_blocks(self, message, websocket):
+        """ Reads a request for missing blocks and sends them if local chain
+            is longer
+        """
         if message['type'] == 'request':
             if self._chain.get_length() < \
                message['offset'] + message['length'] - 1:
@@ -137,6 +158,12 @@ class Node():
                 self._network.send(websocket, self._json({'type': 'error'}))
 
     def _response_broadcast_loaf(self, message):
+        """ Receives and validates a loaf. If loaf is not validated,
+            an error message is displayed. If loaf is validated, it checks
+            whether loaf already exists in the local loaf pool. If it does not
+            exist in the loaf pool, it adds the loaf to the loaf pool and
+            broadcasts the loaf to all connected nodes.
+        """
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
         if loaf.validate():
             if not loaf.get_hash() in self._loaf_pool:
