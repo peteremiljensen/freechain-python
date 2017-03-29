@@ -90,6 +90,11 @@ class Node():
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._response_broadcast_loaf(message)
 
+                except AttributeError:
+                    response = self._json({'type': 'error',
+                                           'decription': 'Request not ' + \
+                                           'encoded correctly as UTF-8'})
+                    self._network.send(websocket, response)
                 except SyncQueueEmpty:
                     pass
                 except:
