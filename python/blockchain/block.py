@@ -73,7 +73,10 @@ class Block:
     @staticmethod
     def create_block_from_dict(dictio):
         """ Creates block object from dictionary """
-        return Block(dictio['loaves'], dictio['height'],
+        loaves = []
+        for loaf_raw in dictio['loaves']:
+            loaves.append(Loaf.create_loaf_from_dict(loaf_raw))
+        return Block(loaves, dictio['height'],
                      dictio['previous_block_hash'], dictio['timestamp'],
                      dictio['nounce'], dictio['hash'])
 
