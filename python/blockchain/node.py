@@ -195,7 +195,7 @@ class Node():
                 for i in range(message['length']):
                     blocks.append(self._chain.get_block(i + message['offset']))
                 response = self._json({'type': 'response',
-                                       'function': FUNCTION.GET_BLOCKS,
+                                       'function': FUNCTIONS.GET_BLOCKS,
                                        'blocks': blocks})
                 self._network.send(websocket, response)
             else:
