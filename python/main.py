@@ -37,6 +37,9 @@ class Prompt(Cmd):
             print(fail("error connecting to node"))
             raise
 
+    def do_mine(self, args):
+        return
+
     def do_loaf(self, args):
         l = args.split()
         if len(l) != 1:
@@ -61,7 +64,7 @@ class Prompt(Cmd):
         except:
             print(fail("error creating and broadcasting loaf"))
             raise
-        
+
     def do_print(self, args):
         l = args.split()
         if len(l) != 1:
