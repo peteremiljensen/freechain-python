@@ -51,7 +51,7 @@ class Node():
         self._network.connect_node(ip)
 
     def broadcast_loaf(self, loaf):
-        """ Validates a loaf. If it is validated, it puts the loafs hash in     
+        """ Validates a loaf. If it is validated, it puts the loafs hash in
             the loaf pool and broadcasts it to all connected nodes
         """
         if loaf.validate():
@@ -63,7 +63,12 @@ class Node():
 
     def broadcast_block(self, block):
         if self._chain.add_block(block):
-            self._network.broadcast()
+            self._network.broadcast(
+                self._json({'type': 'request',
+                            'function': FUNCTIONS.BROADCAST_BLOCK,
+                            'block': block}))
+        else:
+            printf(fail('error validating block while trying to broadcast'))
 
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
@@ -94,7 +99,7 @@ class Node():
 
     def _worker_thread(self):
         """ Starts the worker thread, which listens for requests from other
-            nodes in the network.   
+            nodes in the network.
         """
         while True:
             for websocket in list(self._network.get_queues().keys()):
@@ -122,7 +127,7 @@ class Node():
             time.sleep(0.05)
 
     def _response_get_length(self, message, websocket):
-        """ Reads a request for the length of the blockchain. If local 
+        """ Reads a request for the length of the blockchain. If local
             blockchain is shorter, it sends a request for missing blocks
         """
         if message['type'] == 'request':
