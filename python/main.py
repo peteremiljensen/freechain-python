@@ -45,9 +45,12 @@ class Prompt(Cmd):
         try:
             block = self._node.mine()
             if block is None:
-                print(fail("failed to mine and add block"))
+                print(fail("failed to mine block"))
             else:
-                self._node.broadcast_block(block)
+                if self._node.add_block(block):
+                    self._node.broadcast_block(block)
+                else:
+                    print(fail("failed to add block"))
         except:
             print(fail("error trying to mine"))
             raise
