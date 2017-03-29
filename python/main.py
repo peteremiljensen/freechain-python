@@ -49,6 +49,19 @@ class Prompt(Cmd):
             print(fail("error creating and broadcasting loaf"))
             raise
 
+    def do_loafbomb(self, args):
+        l = args.split()
+        if len(l) != 1:
+            print(fail("invalid number of arguments"))
+            return
+        try:
+            for i in range(500):
+                loaf = Loaf({"string": l[0]+str(i)})
+                self._node.broadcast_loaf(loaf)
+        except:
+            print(fail("error creating and broadcasting loaf"))
+            raise
+        
     def do_print(self, args):
         l = args.split()
         if len(l) != 1:
