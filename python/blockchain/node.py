@@ -115,6 +115,8 @@ class Node():
                         self._handle_get_blocks(message, websocket)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._handle_broadcast_loaf(message)
+                    elif message['function'] == FUNCTINOS.BROADCAST_BLOCK:
+                        self._handle_broadcast_block(message)
                     else:
                         self._network.send(
                             websocket, self._json({'type': 'error',
@@ -183,17 +185,10 @@ class Node():
             for block_dict in message['blocks']:
                 blocks.append(Block.create_block_from_dict(block_dict))
             for block in blocks:
-                if block.get_height() > self._chain.get_height():
-                    print(warning('received block cannot be added as ' +
-                                  'it is of a higher height. Will try ' +
-                                  'to query missing links.'))
-                    length = block.get_height() - (self._chain.get_height() - 1)
-                    self._get_blocks(websocket, self._chain.get_height(),
-                                     length):
-                    return
-                elif not self._chain.add_block(block):
+                if not self._chain.add_block(block):
                     print(fail('block cannot be added'))
                     return
+            print(info('blocks succesfully added to blockchain'))
 
         else:
             self._network.send(websocket, self._json({'type': 'error'}))
@@ -213,6 +208,23 @@ class Node():
                 print(info('Received loaf and forwarding it'))
         else:
             print(warning('Received loaf could not validate'))
+
+    def _handle_broadcast_block(self, message):
+        block = Block.create_block_from_dict()
+
+        if block.get_height() != self._chain.get_length():
+            print(warning('received block cannot be added as ' +
+                          'it is of a higher height. Will try ' +
+                          'to query missing links.'))
+            length = block.get_height() - (self._chain.get_height() - 1)
+            self._get_blocks(websocket, self._chain.get_height(), length)
+        elif block.get_height() < self._chain.get_length():
+            return
+        elif not self._chain.add_block(block):
+            print(fail('block could not be added'))
+
+        print(info('block succesfully added'))
+        self.broadcast_block(block)
 
     @staticmethod
     def _json(dictio):
