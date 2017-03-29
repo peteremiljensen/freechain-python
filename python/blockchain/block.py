@@ -36,6 +36,9 @@ class Block:
                           sort_keys=True,
                           cls=LoafEncoder).encode('utf-8')
 
+    def get_loaves(self):
+        return self._block['loaves']
+
     def get_height(self):
         """ Returns height of block """
         return self._block['height']

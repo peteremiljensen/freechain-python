@@ -257,6 +257,11 @@ class Node():
             return
         elif self.add_block(block):
             print(info('block succesfully added'))
+            for loaf in block.get_loaves():
+                try:
+                    del self._loaf_pool[loaf]
+                except KeyError:
+                    pass
             self.broadcast_block(block)
         else:
             print(fail('block could not be added'))
