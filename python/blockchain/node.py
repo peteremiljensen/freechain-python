@@ -189,7 +189,8 @@ class Node():
             is longer
         """
         if message['type'] == 'request':
-            if self._chain.get_length() < message['offset'] + message['length']:
+            if self._chain.get_length() >= \
+               message['offset'] + message['length']:
                 blocks = []
                 for i in range(message['length']):
                     blocks.append(self._chain.get_block(i + message['offset']))
