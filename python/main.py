@@ -91,7 +91,10 @@ class Prompt(Cmd):
         try:
             for i in range(int(l[1])):
                 loaf = Loaf({"string": l[0]+str(i)})
-                self._node.broadcast_loaf(loaf)
+                if self._node.add_loaf(loaf):
+                    self._node.broadcast_loaf(loaf)
+                else:
+                    print(fail("failed to add loaf to loaf pool"))
         except:
             print(fail("error creating and broadcasting loaf"))
             raise
