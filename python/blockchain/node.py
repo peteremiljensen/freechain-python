@@ -239,15 +239,13 @@ class Node():
 
         if block.get_height() > self._chain.get_length():
             self._get_length(websocket)
-            return
         elif block.get_height() < self._chain.get_length():
             return
-        elif not self.add_block(block):
+        elif self.add_block(block):
+            print(info('block succesfully added'))
+            self.broadcast_block(block)
+        else:
             print(fail('block could not be added'))
-            return
-
-        print(info('block succesfully added'))
-        self.broadcast_block(block)
 
     @staticmethod
     def _json(dictio):
