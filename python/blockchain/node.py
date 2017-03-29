@@ -191,7 +191,10 @@ class Node():
                 print(info('Keeping local blocks'))
 
         else:
-            self._network.send(websocket, self._json({'type': 'error'}))
+            self._network.send(
+                websocket,
+                self._json({'type': 'error',
+                            'description': 'type is not supported'}))
 
     def _handle_get_blocks(self, message, websocket):
         """ Reads a request for missing blocks and sends them if local chain
@@ -208,7 +211,11 @@ class Node():
                                        'blocks': blocks})
                 self._network.send(websocket, response)
             else:
-                self._network.send(websocket, self._json({'type': 'error'}))
+                self._network.send(
+                    websocket,
+                    self._json({'type': 'error',
+                                'description': 'requested length is ' + \
+                                'longer than chain'}))
 
         elif message['type'] == 'response':
             blocks = []
@@ -221,7 +228,10 @@ class Node():
             print(info('blocks succesfully added to blockchain'))
 
         else:
-            self._network.send(websocket, self._json({'type': 'error'}))
+            self._network.send(
+                websocket,
+                self._json({'type': 'error',
+                            'description': 'type is not supported'}))
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
