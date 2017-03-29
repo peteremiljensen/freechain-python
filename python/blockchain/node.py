@@ -1,3 +1,4 @@
+import threading
 import asyncio
 import janus
 import time
@@ -30,6 +31,7 @@ class Node():
 
         self._chain = Chain()
         self._loaf_pool = {}
+        self._loaf_pool_lock = threading.RLock()
 
         self._events_thread = threading.Thread(target=self._start_events_thread,
                                                daemon=True)
@@ -51,44 +53,54 @@ class Node():
         """ Connects to another node through its IP address """
         self._network.connect_node(ip)
 
+    def add_loaf(self, loaf):
+        with self._loaf_pool_lock:
+            if loaf.validate() and not loaf.get_hash() in self._loaf_pool:
+                self._loaf_pool[loaf.get_hash()] = loaf
+                return True
+            else:
+                return False
+
+    def add_block(self, block):
+        return self._chain.add_block(block)
+
     def broadcast_loaf(self, loaf):
         """ Validates a loaf. If it is validated, it puts the loaves hash in
             the loaf pool and broadcasts it to all connected nodes
         """
-        if loaf.validate():
-            self._loaf_pool[loaf.get_hash()] = loaf
-            self._network.broadcast(
-                self._json({'type': 'request',
-                            'function': FUNCTIONS.BROADCAST_LOAF,
-                            'loaf': loaf}))
+        self._network.broadcast(
+            self._json({'type': 'request',
+                        'function': FUNCTIONS.BROADCAST_LOAF,
+                        'loaf': loaf}))
 
     def broadcast_block(self, block):
-        if self._chain.add_block(block):
-            self._network.broadcast(
-                self._json({'type': 'request',
-                            'function': FUNCTIONS.BROADCAST_BLOCK,
-                            'block': block}))
-        else:
-            print(fail('error validating block while trying to broadcast'))
+        self._network.broadcast(
+            self._json({'type': 'request',
+                        'function': FUNCTIONS.BROADCAST_BLOCK,
+                        'block': block}))
 
     def mine(self):
-        loaves_total = 0
-        loaves_hash = []
-        loaves = []
-        for loaf_hash in list(self._loaf_pool.keys()):
-            loaves_hash.append(loaf_hash)
-            loaves_total += 1
-            if loaves_total == 1000:
-                break
-        for h in loaves_hash:
-            loaves.append(self._loaf_pool[h])
-        block = self._chain.mine_block(loaves)
-        if block.validate():
-            for loaf_hash in loaves_hash:
-                del self._loaf_pool[loaf_hash]
-            self.broadcast_block(block)
-        else:
-            print(fail('block could not be mined'))
+        with self._loaf_pool_lock:
+            loaves_total = 0
+            loaves_hash = []
+            loaves = []
+            for loaf_hash in list(self._loaf_pool.keys()):
+                loaves_hash.append(loaf_hash)
+                loaves_total += 1
+                if loaves_total == 1000:
+                    break
+            for h in loaves_hash:
+                loaves.append(self._loaf_pool[h])
+
+            block = self._chain.mine_block(loaves)
+
+            if block.validate():
+                for loaf_hash in loaves_hash:
+                    del self._loaf_pool[loaf_hash]
+                return block
+            else:
+                print(fail('block could not be mined'))
+                return None
 
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
@@ -128,7 +140,10 @@ class Node():
                     message = json.loads(raw_data.decode('utf-8'))
 
                     if message['type'] == 'error':
-                        print(fail('Error received'))
+                        desc = 'No description'
+                        if 'description' in message:
+                            desc = message['description']
+                        print(fail('Error received: ' + desc))
                     elif message['function'] == FUNCTIONS.GET_LENGTH:
                         self._handle_get_length(message, websocket)
                     elif message['function'] == FUNCTIONS.GET_BLOCKS:
@@ -145,7 +160,7 @@ class Node():
 
                 except AttributeError:
                     response = self._json({'type': 'error',
-                                           'decription': 'Request not ' + \
+                                           'description': 'Request not ' + \
                                            'encoded correctly as UTF-8'})
                     self._network.send(websocket, response)
                 except SyncQueueEmpty:
@@ -182,23 +197,31 @@ class Node():
                 print(info('Keeping local blocks'))
 
         else:
-            self._network.send(websocket, self._json({'type': 'error'}))
+            self._network.send(
+                websocket,
+                self._json({'type': 'error',
+                            'description': 'type is not supported'}))
 
     def _handle_get_blocks(self, message, websocket):
         """ Reads a request for missing blocks and sends them if local chain
             is longer
         """
         if message['type'] == 'request':
-            if self._chain.get_length() < message['offset'] + message['length']:
+            if self._chain.get_length() >= \
+               message['offset'] + message['length']:
                 blocks = []
                 for i in range(message['length']):
                     blocks.append(self._chain.get_block(i + message['offset']))
                 response = self._json({'type': 'response',
-                                       'function': FUNCTION.GET_BLOCKS,
+                                       'function': FUNCTIONS.GET_BLOCKS,
                                        'blocks': blocks})
                 self._network.send(websocket, response)
             else:
-                self._network.send(websocket, self._json({'type': 'error'}))
+                self._network.send(
+                    websocket,
+                    self._json({'type': 'error',
+                                'description': 'requested length is ' + \
+                                'longer than chain'}))
 
         elif message['type'] == 'response':
             blocks = []
@@ -211,7 +234,10 @@ class Node():
             print(info('blocks succesfully added to blockchain'))
 
         else:
-            self._network.send(websocket, self._json({'type': 'error'}))
+            self._network.send(
+                websocket,
+                self._json({'type': 'error',
+                            'description': 'type is not supported'}))
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
@@ -221,28 +247,32 @@ class Node():
             broadcasts the loaf to all connected nodes.
         """
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
-        if loaf.validate():
+        with self._loaf_pool_lock:
             if not loaf.get_hash() in self._loaf_pool:
-                self._loaf_pool[loaf.get_hash()] = loaf
-                self.broadcast_loaf(loaf)
-                print(info('Received loaf and forwarding it'))
-        else:
-            print(warning('Received loaf could not validate'))
+                if self.add_loaf(loaf):
+                    self.broadcast_loaf(loaf)
+                    print(info('Received loaf and forwarding it'))
+                else:
+                    print(fail('Received loaf could not validate'))
 
     def _handle_broadcast_block(self, message, websocket):
         block = Block.create_block_from_dict(message['block'])
 
         if block.get_height() > self._chain.get_length():
             self._get_length(websocket)
-            return
         elif block.get_height() < self._chain.get_length():
             return
-        elif not self._chain.add_block(block):
+        elif self.add_block(block):
+            with self._loaf_pool_lock:
+                print(info('block succesfully added'))
+                for loaf in block.get_loaves():
+                    try:
+                        del self._loaf_pool[loaf.get_hash()]
+                    except KeyError:
+                        pass
+            self.broadcast_block(block)
+        else:
             print(fail('block could not be added'))
-            return
-
-        print(info('block succesfully added'))
-        self.broadcast_block(block)
 
     @staticmethod
     def _json(dictio):
