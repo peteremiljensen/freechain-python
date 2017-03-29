@@ -38,7 +38,15 @@ class Prompt(Cmd):
             raise
 
     def do_mine(self, args):
-        return
+        l = args.split()
+        if len(l) != 0:
+            print (fail("mine doesnt take any arguments"))
+            return
+        try:
+            self._node.mine()
+        except:
+            print(fail("error trying to mine"))
+            raise
 
     def do_loaf(self, args):
         l = args.split()
