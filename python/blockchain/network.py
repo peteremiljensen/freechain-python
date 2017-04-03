@@ -126,4 +126,3 @@ class Network():
         except:
             print(fail('fatal error'))
             raise
-

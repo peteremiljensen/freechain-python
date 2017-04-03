@@ -252,12 +252,13 @@ class Node():
                                    'hash': hash,
                                    'length': length})
             self._network.send(websocket, response)
+            
         elif message['type'] == 'response':
             height = message['height']
             block_hash = self._chain.get_block(height).get_hash()
             response_hash = message['hash']
             if block_hash == response_hash:
-                self._get_blocks(websocket, height+1, None)
+                self._get_blocks(websocket, height+1, -1)
             elif height != 1:
                 self._get_hash(websocket, height-1)
             else:
@@ -274,7 +275,7 @@ class Node():
             is longer
         """
         if message['type'] == 'request':
-            if message['length'] == None:
+            if message['length'] == -1:
                 length = self._chain.get_length()
             else:
                 length = message['length']
