@@ -118,6 +118,8 @@ class Node():
             
     def _get_blocks(self, websocket, offset, length):
         """ Requests  missing blocks from a node """
+        print('offset: ' + str(offset))
+        print('length: ' + str(length))
 
         self._network.send(websocket, self._json(
             {'type': 'request',
@@ -258,8 +260,9 @@ class Node():
             block_hash = self._chain.get_block(height).get_hash()
             response_hash = message['hash']
             if block_hash == response_hash:
-                print(info('Block hashes of height: ' + str(height) + 'matches'))
+                print(info('Block hashes of height: ' + str(height) + ' matches'))
                 print(info('Requesting blocks'))
+                print('height+1: ' + str(height+1))
                 self._get_blocks(websocket, height+1, -1)
             else:
                 print(info('Block hashes of height: ' + str(height) + 'do not much'))
@@ -276,6 +279,7 @@ class Node():
             is longer
         """
         if message['type'] == 'request':
+            print('length: ' + str(message['length']))
             if message['length'] == -1:
                 length = self._chain.get_length()
             else:
