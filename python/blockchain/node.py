@@ -181,38 +181,6 @@ class Node():
                     raise
             time.sleep(0.05)
 
-    # def _handle_get_length(self, message, websocket):
-    #     """ Reads a request for the length of the blockchain. If local
-    #         blockchain is shorter, it sends a request for missing blocks
-    #     """
-    #     if message['type'] == 'request':
-    #         chain_length = self._chain.get_length()
-    #         response = self._json({'type': 'response',
-    #                                'function': FUNCTIONS.GET_LENGTH,
-    #                                'length': chain_length})
-    #         self._network.send(websocket, response)
-
-    #     elif message['type'] == 'response':
-    #         chain_length = self._chain.get_length()
-    #         response_length = message['length']
-    #         print(info('Recieved blockchain length is: ' +
-    #                    str(response_length)))
-    #         print(info('local block length is : ' +
-    #                    str(chain_length)))
-    #         if response_length > chain_length:
-    #             print(info('local blockchain is shorter, ' +
-    #                        'querying missing blocks'))
-    #             self._get_blocks(websocket, chain_length,
-    #                              response_length - chain_length)
-    #         else:
-    #             print(info('Keeping local blocks'))
-
-    #     else:
-    #         self._network.send(
-    #             websocket,
-    #             self._json({'type': 'error',
-    #                         'description': 'type is not supported'}))
-
     def _handle_get_length(self, message, websocket):
         """ Reads a request for the length of the blockchain. If local
             blockchain is shorter, it sends a request for missing blocks
