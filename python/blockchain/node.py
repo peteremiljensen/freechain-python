@@ -110,7 +110,7 @@ class Node():
              'function': FUNCTIONS.GET_LENGTH}))
 
     def _get_hash(self, websocket, height):
-            self._network.send(websocket, self.json(
+            self._network.send(websocket, self._json(
                 {'type': 'request',
                  'function': FUNCTIONS.GET_HASH,
                  'height': height}))
