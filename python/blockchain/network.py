@@ -89,7 +89,6 @@ class Network():
                 done, pending = await asyncio.wait(
                     [recv_task, send_task],
                     return_when=asyncio.FIRST_COMPLETED)
-
                 if recv_task in done:
                     data = recv_task.result()
                     await recv_queue.async_q.put(data)

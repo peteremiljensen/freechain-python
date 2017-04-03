@@ -140,9 +140,10 @@ class Node():
                     message = json.loads(raw_data.decode('utf-8'))
 
                     if message['type'] == 'error':
-                        desc = 'No description'
                         if 'description' in message:
                             desc = message['description']
+                        else:
+                            desc = 'No description'
                         print(fail('Error received: ' + desc))
                     elif message['function'] == FUNCTIONS.GET_LENGTH:
                         self._handle_get_length(message, websocket)
