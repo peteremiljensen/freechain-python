@@ -281,9 +281,10 @@ class Node():
         if message['type'] == 'request':
             print('length: ' + str(message['length']))
             if message['length'] == -1:
-                length = self._chain.get_length()
+                length = self._chain.get_length() - message['offset']
             else:
                 length = message['length']
+                print('length after check: ' + str(length))
             if self._chain.get_length() >= \
                message['offset'] + length:
                 blocks = []
