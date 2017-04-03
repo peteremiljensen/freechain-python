@@ -36,6 +36,7 @@ class Node():
         self._events_thread = threading.Thread(target=self._start_events_thread,
                                                daemon=True)
         self._events_thread.start()
+        time.sleep(0.5) ## TODO: Shall be fixed to a smarter solution
         self._worker_thread = threading.Thread(target=self._worker_thread,
                                                daemon=True)
 
