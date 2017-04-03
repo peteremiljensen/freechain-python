@@ -109,6 +109,12 @@ class Node():
             {'type': 'request',
              'function': FUNCTIONS.GET_LENGTH}))
 
+    def _get_hash(self, websocket, height):
+            self._network_send(websocket, self.json(
+                {'type': 'request',
+                 'function': FUNCTIONS.GET_HASH,
+                 'height': height}))
+            
     def _get_blocks(self, websocket, offset, length):
         """ Requests  missing blocks from a node """
 
@@ -147,6 +153,8 @@ class Node():
                         print(fail('Error received: ' + desc))
                     elif message['function'] == FUNCTIONS.GET_LENGTH:
                         self._handle_get_length(message, websocket)
+                    elif message['function'] == FUNCTIONS.GET_HASH:
+                        self._handle_get_hash(message, websocket)
                     elif message['function'] == FUNCTIONS.GET_BLOCKS:
                         self._handle_get_blocks(message, websocket)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
@@ -171,6 +179,38 @@ class Node():
                     raise
             time.sleep(0.05)
 
+    # def _handle_get_length(self, message, websocket):
+    #     """ Reads a request for the length of the blockchain. If local
+    #         blockchain is shorter, it sends a request for missing blocks
+    #     """
+    #     if message['type'] == 'request':
+    #         chain_length = self._chain.get_length()
+    #         response = self._json({'type': 'response',
+    #                                'function': FUNCTIONS.GET_LENGTH,
+    #                                'length': chain_length})
+    #         self._network.send(websocket, response)
+
+    #     elif message['type'] == 'response':
+    #         chain_length = self._chain.get_length()
+    #         response_length = message['length']
+    #         print(info('Recieved blockchain length is: ' +
+    #                    str(response_length)))
+    #         print(info('local block length is : ' +
+    #                    str(chain_length)))
+    #         if response_length > chain_length:
+    #             print(info('local blockchain is shorter, ' +
+    #                        'querying missing blocks'))
+    #             self._get_blocks(websocket, chain_length,
+    #                              response_length - chain_length)
+    #         else:
+    #             print(info('Keeping local blocks'))
+
+    #     else:
+    #         self._network.send(
+    #             websocket,
+    #             self._json({'type': 'error',
+    #                         'description': 'type is not supported'}))
+
     def _handle_get_length(self, message, websocket):
         """ Reads a request for the length of the blockchain. If local
             blockchain is shorter, it sends a request for missing blocks
@@ -190,13 +230,38 @@ class Node():
             print(info('local block length is : ' +
                        str(chain_length)))
             if response_length > chain_length:
-                print(info('local blockchain is shorter, ' +
-                           'querying missing blocks'))
-                self._get_blocks(websocket, chain_length,
-                                 response_length - chain_length)
+                print(info('Requesting hash of block: ' + str(chain_length-1)))
+                self._get_hash(websocket, chain_length-1)
             else:
                 print(info('Keeping local blocks'))
+        else:
+            self._network.send(
+                websocket,
+                self._json({'type': 'error',
+                            'description': 'type is not supported'}))
 
+    def _handle_get_hash(self, message, websocket):
+        if message['type'] == 'request':
+            height = message['height']
+            hash = self._chain.get_block(height).get_hash()
+            length = self._chain.get_length()
+            response = self._json({'type': 'response',
+                                   'function': FUNCTIONS.GET_HASH,
+                                   'height': height,
+                                   'hash': hash,
+                                   'length': length})
+            self._network.send(websocket, response)
+        elif message['type'] == 'response':
+            height = message['height']
+            block_hash = self._chain.get_block(height).get_hash()
+            response_hash = message['hash']
+            if block_hash == response_hash:
+                self._get_blocks(websocket, height+1, None)
+            elif height != 1:
+                self._get_hash(websocket, height-1)
+            else:
+                # COPY ENTIRE BLOCKCHAIN
+                print('COP BLOCKCHAIN')
         else:
             self._network.send(
                 websocket,
@@ -208,10 +273,14 @@ class Node():
             is longer
         """
         if message['type'] == 'request':
+            if message['length'] == None:
+                length = self._chain.get_length()
+            else:
+                length = message['length']
             if self._chain.get_length() >= \
-               message['offset'] + message['length']:
+               message['offset'] + length:
                 blocks = []
-                for i in range(message['length']):
+                for i in range(length):
                     blocks.append(self._chain.get_block(i + message['offset']))
                 response = self._json({'type': 'response',
                                        'function': FUNCTIONS.GET_BLOCKS,
@@ -230,7 +299,7 @@ class Node():
                 blocks.append(Block.create_block_from_dict(block_dict))
             for block in blocks:
                 if not self._chain.add_block(block):
-                    print(fail('block cannot be added'))
+                    print(fail('blocks cannot be added'))
                     return
             print(info('blocks succesfully added to blockchain'))
 
