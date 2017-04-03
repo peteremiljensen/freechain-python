@@ -249,8 +249,7 @@ class Node():
             response = self._json({'type': 'response',
                                    'function': FUNCTIONS.GET_HASH,
                                    'height': height,
-                                   'hash': hash,
-                                   'length': length})
+                                   'hash': hash})
             self._network.send(websocket, response)
             
         elif message['type'] == 'response':
@@ -258,12 +257,13 @@ class Node():
             block_hash = self._chain.get_block(height).get_hash()
             response_hash = message['hash']
             if block_hash == response_hash:
+                print(info('Block hashes of height: ' + str(height) + 'matches'))
+                print(info('Requesting blocks'))
                 self._get_blocks(websocket, height+1, -1)
-            elif height != 1:
-                self._get_hash(websocket, height-1)
             else:
-                # COPY ENTIRE BLOCKCHAIN
-                print('COP BLOCKCHAIN')
+                print(info('Block hashes of height: ' + str(height) + 'do not much'))
+                print(info('Requesting block hash of height: ' + str(height-1)))
+                self._get_hash(websocket, height-1)
         else:
             self._network.send(
                 websocket,
