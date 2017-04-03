@@ -115,11 +115,9 @@ class Node():
                 {'type': 'request',
                  'function': FUNCTIONS.GET_HASH,
                  'height': height}))
-            
+
     def _get_blocks(self, websocket, offset, length):
         """ Requests  missing blocks from a node """
-        print('offset: ' + str(offset))
-        print('length: ' + str(length))
 
         self._network.send(websocket, self._json(
             {'type': 'request',
@@ -254,7 +252,7 @@ class Node():
                                    'height': height,
                                    'hash': hash})
             self._network.send(websocket, response)
-            
+
         elif message['type'] == 'response':
             height = message['height']
             block_hash = self._chain.get_block(height).get_hash()
@@ -262,10 +260,9 @@ class Node():
             if block_hash == response_hash:
                 print(info('Block hashes of height: ' + str(height) + ' matches'))
                 print(info('Requesting blocks'))
-                print('height+1: ' + str(height+1))
                 self._get_blocks(websocket, height+1, -1)
             else:
-                print(info('Block hashes of height: ' + str(height) + 'do not much'))
+                print(info('Block hashes of height: ' + str(height) + ' do not match'))
                 print(info('Requesting block hash of height: ' + str(height-1)))
                 self._get_hash(websocket, height-1)
         else:
@@ -279,12 +276,10 @@ class Node():
             is longer
         """
         if message['type'] == 'request':
-            print('length: ' + str(message['length']))
             if message['length'] == -1:
                 length = self._chain.get_length() - message['offset']
             else:
                 length = message['length']
-                print('length after check: ' + str(length))
             if self._chain.get_length() >= \
                message['offset'] + length:
                 blocks = []
@@ -303,9 +298,12 @@ class Node():
 
         elif message['type'] == 'response':
             blocks = []
+            print(message['blocks'])
             for block_dict in message['blocks']:
                 blocks.append(Block.create_block_from_dict(block_dict))
             for block in blocks:
+                # SLET CHAIN
+                # OG SÆT NYE BLOKKE PÅ
                 if not self._chain.add_block(block):
                     print(fail('blocks cannot be added'))
                     return
