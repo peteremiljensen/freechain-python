@@ -110,7 +110,7 @@ class Node():
              'function': FUNCTIONS.GET_LENGTH}))
 
     def _get_hash(self, websocket, height):
-            self._network_send(websocket, self.json(
+            self._network.send(websocket, self.json(
                 {'type': 'request',
                  'function': FUNCTIONS.GET_HASH,
                  'height': height}))
@@ -172,6 +172,7 @@ class Node():
                                            'description': 'Request not ' + \
                                            'encoded correctly as UTF-8'})
                     self._network.send(websocket, response)
+                    raise
                 except SyncQueueEmpty:
                     pass
                 except:
