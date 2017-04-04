@@ -98,9 +98,8 @@ class Network():
 
         recv_task = asyncio.ensure_future(recv())
         send_task = asyncio.ensure_future(send())
-        done, pending = await asyncio.wait(
-            [recv_task, send_task],
-            return_when=asyncio.FIRST_COMPLETED)
+        await asyncio.wait([recv_task, send_task],
+                           return_when=asyncio.FIRST_COMPLETED)
 
         print(info("Disconnected"))
         self._nodes.remove(websocket)
