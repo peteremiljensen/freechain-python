@@ -31,11 +31,11 @@ class Network():
         """
         self._server_thread.start()
 
-    def connect_node(self, ip):
+    def connect_node(self, ip, port):
         """ Connects server to a node
         """
         threading.Thread(target=self._start_client_thread,
-                         args=(ip,), daemon=True).start()
+                         args=(ip,port,), daemon=True).start()
 
     def broadcast(self, data):
         """ Broadcasts data to connected nodes
@@ -64,10 +64,10 @@ class Network():
         """
         await self._socket(websocket)
 
-    async def _client(self, ip):
+    async def _client(self, ip, port):
         """ Connects to a new node
         """
-        async with websockets.connect('ws://' + ip + ':' + str(self._port)) \
+        async with websockets.connect('ws://' + ip + ':' + str(port)) \
                    as websocket:
             Events.Instance().notify(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                      websocket)
@@ -116,13 +116,13 @@ class Network():
         loop.run_until_complete(start_server)
         loop.run_forever()
 
-    def _start_client_thread(self, ip):
+    def _start_client_thread(self, ip, port):
         """ Starts a client thread and sets it to run until completion
         """
         try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            loop.run_until_complete(self._client(ip))
+            loop.run_until_complete(self._client(ip, port))
         except:
             print(fail('fatal error'))
             raise

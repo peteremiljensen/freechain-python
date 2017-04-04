@@ -31,12 +31,15 @@ class Prompt(Cmd):
         """ Parses the arguments to get nodes ip and connects to node
         """
         l = args.split()
-        if len(l) != 1:
+        if len(l) > 2:
             print(fail("invalid number of arguments"))
             return
         try:
             ip = l[0]
-            self._node.connect_node(ip)
+            if len(l) == 2:
+                self._node.connect_node(ip, l[1])
+            else:
+                self._node.connect_node(ip)
         except:
             print(fail("error connecting to node"))
             raise

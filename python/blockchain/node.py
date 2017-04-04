@@ -50,9 +50,9 @@ class Node():
         Events.Instance().register_callback(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                             new_connection_callback)
 
-    def connect_node(self, ip):
+    def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """
-        self._network.connect_node(ip)
+        self._network.connect_node(ip, port)
 
     def add_loaf(self, loaf):
         with self._loaf_pool_lock:
