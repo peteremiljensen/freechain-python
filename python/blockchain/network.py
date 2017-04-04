@@ -16,6 +16,9 @@ from blockchain.common import *
 #  \_| \_/\___|\__| \_/\_/ \___/|_|  |_|\_\
 #
 
+## TODO: BELOW IS NOT PRODUCTION-FRIENDLY
+network = None
+
 class Network():
     def __init__(self, port):
         """ Network class constructor
@@ -26,6 +29,9 @@ class Network():
 
         self._server_thread = threading.Thread(target=self._start_server_thread,
                                                daemon=True)
+
+        global network
+        network = self
 
     def start(self):
         """ Starts a thread for the server
@@ -68,6 +74,7 @@ class Network():
 
         factory = WebSocketServerFactory('ws://0.0.0.0:'+str(self._port))
         factory.protocol = ServerProtocol
+        factory.network = self
         coro = loop.create_server(factory, '0.0.0.0', self._port)
         server = loop.run_until_complete(coro)
 
@@ -92,16 +99,26 @@ class Network():
         loop.run_until_complete(coro)
         loop.run_forever()
         loop.close()
+        print("Done")
 
     def _onConnect(self, response):
         print("Connection")
 
+    def _onOpen(self):
+        print("Open")
+
 class ServerProtocol(WebSocketServerProtocol):
     def onConnect(self, response):
-        pass
+        network._onConnect(response)
+
+    def onOpen(self):
+        network._onOpen()
 
 class ClientProtocol(WebSocketClientProtocol):
     def onConnect(self, response):
-        pass
+        network._onConnect(response)
+
+    def onOpen(self):
+        network._onOpen()
 
 
