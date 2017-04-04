@@ -97,20 +97,11 @@ class Network():
         print("Connection")
 
 class ServerProtocol(WebSocketServerProtocol):
-    def __init__(self, network):
-        super().__init__()
-        self._network = network
-
     def onConnect(self, response):
-        self._network._onConnect(response)
-
+        pass
 
 class ClientProtocol(WebSocketClientProtocol):
-    def __init__(self, network):
-        super().__init__()
-        self._network = network
-
     def onConnect(self, response):
-        self._network._onConnect(response)
+        pass
 
 
