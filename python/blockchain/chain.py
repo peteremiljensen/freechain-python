@@ -40,7 +40,8 @@ class Chain():
                 return False
 
     def remove_blocks(self, height):
-        self._chain = self._chain[:height]
+        with self._chain_lock:
+            self._chain = self._chain[:height]
 
     def get_block(self, height):
         """ Locks the chain and returns the height of the chain

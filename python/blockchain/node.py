@@ -270,6 +270,21 @@ class Node():
             blocks = []
             for block_dict in message['blocks']:
                 blocks.append(Block.create_block_from_dict(block_dict))
+            if blocks[0].get_height()+len(blocks)-1 <= self._chain.get_length():
+                print(fail('Replacing the local blocks with the received,' + \
+                           'ones will result in a shorther blockchain'))
+            for i in range(len(blocks)):
+                if blocks[i].validate() and i == 0:
+                    pass
+                elif blocks[i].validate():
+                    if (blocks[i-1].get_hash() !=
+                        blocks[i].get_previous_block_hash()):
+                        print(fail('Hash of previous block, does not match ' + \
+                                   'previous_block_hash'))
+                else:
+                    print(fail('Failed to validate block: ' + str(blocks[k])))
+                    return
+
             print(info('Replacing blocks from height ' +
                        str(blocks[0].get_height()) + ' and up'))
             self._chain.remove_blocks(blocks[0].get_height())
