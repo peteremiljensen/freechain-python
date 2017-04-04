@@ -18,7 +18,7 @@ from blockchain.common import *
 #
 
 class Prompt(Cmd):
-    PRINTS = ['loaf_pool', 'blockchain']
+    PRINTS = ['loaf_pool', 'blockchain', 'block_hash']
 
     def __init__(self):
         """ Prompt class constructor
@@ -106,15 +106,21 @@ class Prompt(Cmd):
         """ Prints loaf pool or blockchain
         """
         l = args.split()
-        if len(l) != 1:
-            print(fail("invalid number of arguments"))
-            return
         try:
             if l[0] == self.PRINTS[0]:
                 for loaf in list(self._node._loaf_pool.values()):
                     print(loaf.json())
             elif l[0] == self.PRINTS[1]:
                 print(self._node._chain.json())
+            elif l[0] == self.PRINTS[2]:
+                if len(l) != 2:
+                    print(fail("invalid number of arguments"))
+                else:
+                    if self._node._chain.get_length() > int(l[1]):
+                        print(self._node._chain.get_block(int(l[1])).get_hash())
+                    else:
+                        print(fail("Blockchain doesn't contain a block of height " + 
+                              str(l[1])))
             else:
                 print(fail(l[0] + " doesn't exist"))
 

@@ -226,11 +226,13 @@ class Node():
             block_hash = self._chain.get_block(height).get_hash()
             response_hash = message['hash']
             if block_hash == response_hash:
-                print(info('Block hashes of height: ' + str(height) + ' matches'))
+                print(info('Block hashes of height: ' + str(height) +
+                           ' matches'))
                 print(info('Requesting blocks'))
                 self._get_blocks(websocket, height+1, -1)
             else:
-                print(info('Block hashes of height: ' + str(height) + ' do not match'))
+                print(info('Block hashes of height: ' + str(height) +
+                           ' do not match'))
                 print(info('Requesting block hash of height: ' + str(height-1)))
                 self._get_hash(websocket, height-1)
         else:
@@ -266,14 +268,15 @@ class Node():
 
         elif message['type'] == 'response':
             blocks = []
-            print(message['blocks'])
             for block_dict in message['blocks']:
                 blocks.append(Block.create_block_from_dict(block_dict))
+            print(info('Replacing blocks from height ' +
+                       str(blocks[0].get_height()) + ' and up'))
+            self._chain.remove_blocks(blocks[0].get_height())
             for block in blocks:
-                # SLET CHAIN
-                # OG SÆT NYE BLOKKE PÅ
                 if not self._chain.add_block(block):
-                    print(fail('blocks cannot be added'))
+                    print(fail('block of height ' + str(block.get_height) +
+                               'cannot be added'))
                     return
             print(info('blocks succesfully added to blockchain'))
 
