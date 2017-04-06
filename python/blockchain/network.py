@@ -107,25 +107,13 @@ class Network():
         server = websockets.serve(self._server, '0.0.0.0',
                                   self._port)
         self._loop.run_until_complete(server)
-
-    async def hello(self, port):
-        async with websockets.connect('ws://localhost:' + str(port)) as websocket:
-
-            name = input("What's your name? ")
-            await websocket.send(name)
-            reply = await websocket.recv()
-            print(reply)
+        #self._loop.run_forever()
 
     def _start_client(self, ip, port):
         """ Starts a client thread and sets it to run until completion
         """
-        #print ('ws://' + ip + ':' + str(port))
-        #client = websockets.connect('ws://' + ip + ':' + str(port))
-        self._loop.run_until_complete(self.hello(port))
-        '''ut = asyncio.ensure_future(client)
-        def test():
-            print("test_callback")
-        fut.add_done_callback(test)'''
-        '''self._loop.run_until_complete(websocket.send("Hello!"))
+        client = websockets.connect('ws://' + ip + ':' + str(port))
+        websocket = self._loop.run_until_complete(client)
+        self._loop.run_until_complete(websocket.send("Hello!"))
         reply = self._loop.run_until_complete(websocket.recv())
-        print(reply)'''
+        print(reply)
