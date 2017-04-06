@@ -33,9 +33,9 @@ class Node():
         self._loaf_pool = {}
         self._loaf_pool_lock = threading.RLock()
 
-        self._events_thread = threading.Thread(target=self._start_events_thread,
-                                               daemon=True)
-        self._events_thread.start()
+        #self._events_thread = threading.Thread(target=self._start_events_thread,
+        #                                       daemon=True)
+        #self._events_thread.start()
         time.sleep(0.5) ## TODO: Shall be fixed to a smarter solution
         self._worker_thread = threading.Thread(target=self._worker_thread,
                                                daemon=True)
@@ -47,8 +47,8 @@ class Node():
 
         def new_connection_callback(websocket):
             self._get_length(websocket)
-        Events.Instance().register_callback(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
-                                            new_connection_callback)
+        #Events.Instance().register_callback(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
+        #                                    new_connection_callback)
 
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """
