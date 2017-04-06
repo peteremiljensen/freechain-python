@@ -69,7 +69,7 @@ class Network():
     async def _client(self, ip, port, loop):
         """ Connects to a new node
         """
-        async with websockets.connect('ws://' + ip + ':' + str(port)) \
+        async with websockets.connect('ws://' + ip + ':' + str(port), loop=loop) \
                    as websocket:
             Events.Instance().notify(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                      websocket)
@@ -79,8 +79,8 @@ class Network():
         """ Creates two queues. One for sending and one for receiving
         """
         self._nodes.add(websocket)
-        recv_queue = janus.Queue()
-        send_queue = janus.Queue()
+        recv_queue = janus.Queue(loop=loop)
+        send_queue = janus.Queue(loop=loop)
         self._queues[websocket] = (recv_queue, send_queue)
         async def recv():
             try:
@@ -99,7 +99,7 @@ class Network():
 
         recv_task = asyncio.ensure_future(recv(), loop=loop)
         send_task = asyncio.ensure_future(send(), loop=loop)
-        await asyncio.wait([recv_task, send_task], loop=loop
+        await asyncio.wait([recv_task, send_task], loop=loop,
                            return_when=asyncio.FIRST_COMPLETED)
 
         print(info("Disconnected"))
