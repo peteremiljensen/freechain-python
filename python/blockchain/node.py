@@ -36,14 +36,14 @@ class Node():
         #self._events_thread = threading.Thread(target=self._start_events_thread,
         #                                       daemon=True)
         #self._events_thread.start()
-        time.sleep(0.5) ## TODO: Shall be fixed to a smarter solution
-        self._worker_thread = threading.Thread(target=self._worker_thread,
-                                               daemon=True)
+        #time.sleep(0.5) ## TODO: Shall be fixed to a smarter solution
+        #self._worker_thread = threading.Thread(target=self._worker_thread,
+        #                                       daemon=True)
 
     def start(self):
         """ Starts the node by creating a worker thread and a network thread """
         self._network.start()
-        self._worker_thread.start()
+        #self._worker_thread.start()
 
         def new_connection_callback(websocket):
             self._get_length(websocket)

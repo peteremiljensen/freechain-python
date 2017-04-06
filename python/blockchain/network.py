@@ -1,6 +1,7 @@
 import threading
 import asyncio
 import janus
+import websockets
 
 from blockchain.events import Events
 from blockchain.common import *
@@ -59,12 +60,34 @@ class Network():
         """
         pass
 
+    @staticmethod
+    async def hello(websocket, path):
+        name = await websocket.recv()
+        print("< {}".format(name))
+
+        greeting = "Hello {}!".format(name)
+        await websocket.send(greeting)
+        print("> {}".format(greeting))
+
+    @staticmethod
+    async def hello_client():
+        async with websockets.connect('ws://localhost:9000') as websocket:
+            name = input("What's your name? ")
+            await websocket.send(name)
+            print("> {}".format(name))
+
+            greeting = await websocket.recv()
+            print("< {}".format(greeting))
+
     def _start_server(self):
         """ Starts a server thread and sets it to run until completion
         """
-        pass
+        start_server = websockets.serve(self.hello, 'localhost', 9000)
+
+        self._loop.run_until_complete(start_server)
+        self._loop.run_forever()
 
     def _start_client(self, ip, port):
         """ Starts a client thread and sets it to run until completion
         """
-        pass
+        self._loop.run_until_complete(self.hello_client())
