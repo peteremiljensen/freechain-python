@@ -18,10 +18,12 @@ class Network():
     def __init__(self, port):
         """ Network class constructor
         """
+        asyncio.set_event_loop(None)
         self._port = port
         self._nodes = set()
         self._queues = {}
         self._events = None
+        self._sever_loop = None
 
         self._server_thread = threading.Thread(target=self._start_server_thread,
                                                daemon=True)
@@ -62,21 +64,20 @@ class Network():
     async def _server(self, websocket, path):
         """ Waits for _socket to be called
         """
-        await self._socket(websocket)
+        await self._socket(websocket, self._server_loop)
 
-    async def _client(self, ip, port):
+    async def _client(self, ip, port, loop):
         """ Connects to a new node
         """
         async with websockets.connect('ws://' + ip + ':' + str(port)) \
                    as websocket:
             Events.Instance().notify(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                      websocket)
-            await self._socket(websocket)
+            await self._socket(websocket, loop)
 
-    async def _socket(self, websocket):
+    async def _socket(self, websocket, loop):
         """ Creates two queues. One for sending and one for receiving
         """
-        loop = asyncio.get_event_loop()
         self._nodes.add(websocket)
         recv_queue = janus.Queue()
         send_queue = janus.Queue()
@@ -96,9 +97,9 @@ class Network():
             except websockets.exceptions.ConnectionClosed:
                 pass
 
-        recv_task = asyncio.ensure_future(recv())
-        send_task = asyncio.ensure_future(send())
-        await asyncio.wait([recv_task, send_task],
+        recv_task = asyncio.ensure_future(recv(), loop=loop)
+        send_task = asyncio.ensure_future(send(), loop=loop)
+        await asyncio.wait([recv_task, send_task], loop=loop
                            return_when=asyncio.FIRST_COMPLETED)
 
         print(info("Disconnected"))
@@ -108,9 +109,11 @@ class Network():
     def _start_server_thread(self):
         """ Starts a server thread and sets it to run until completion
         """
+        asyncio.set_event_loop(None)
         loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        start_server = websockets.serve(self._server, '0.0.0.0', self._port)
+        self._server_loop = loop
+        start_server = websockets.serve(self._server, '0.0.0.0',
+                                        self._port, loop=loop)
         loop.run_until_complete(start_server)
         loop.run_forever()
 
@@ -118,9 +121,9 @@ class Network():
         """ Starts a client thread and sets it to run until completion
         """
         try:
+            asyncio.set_event_loop(None)
             loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(self._client(ip, port))
+            loop.run_until_complete(self._client(ip, port, loop))
         except:
             print(fail('fatal error'))
             raise
