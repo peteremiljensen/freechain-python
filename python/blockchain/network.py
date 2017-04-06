@@ -69,8 +69,8 @@ class Network():
     async def _client(self, ip, port, loop):
         """ Connects to a new node
         """
-        async with websockets.connect('ws://' + ip + ':' + str(port), loop=loop) \
-                   as websocket:
+        async with websockets.connect('ws://' + ip + ':' + str(port),
+                                      loop=loop) as websocket:
             Events.Instance().notify(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                      websocket)
             await self._socket(websocket, loop)
@@ -110,12 +110,11 @@ class Network():
         """ Starts a server thread and sets it to run until completion
         """
         asyncio.set_event_loop(None)
-        loop = asyncio.new_event_loop()
-        self._server_loop = loop
+        self._server_loop = asyncio.new_event_loop()
         start_server = websockets.serve(self._server, '0.0.0.0',
-                                        self._port, loop=loop)
-        loop.run_until_complete(start_server)
-        loop.run_forever()
+                                        self._port, loop=self._server_loop)
+        self._server_loop.run_until_complete(start_server)
+        self._server_loop.run_forever()
 
     def _start_client_thread(self, ip, port):
         """ Starts a client thread and sets it to run until completion
