@@ -26,7 +26,7 @@ class Network():
     def start(self):
         """ Starts a thread for the server
         """
-        self._start_server()
+        #self._start_server()
 
     def connect_node(self, ip, port):
         """ Connects server to a node
@@ -55,39 +55,40 @@ class Network():
         """
         return self._queues
 
-    async def _socket(self, websocket):
+    async def _socket(self, websocket, path):
         """ Creates two queues. One for sending and one for receiving
         """
-        pass
-
-    @staticmethod
-    async def hello(websocket, path):
-        name = await websocket.recv()
-        print("< {}".format(name))
-
-        greeting = "Hello {}!".format(name)
-        await websocket.send(greeting)
-        print("> {}".format(greeting))
-
-    @staticmethod
-    async def hello_client():
-        async with websockets.connect('ws://localhost:9000') as websocket:
-            name = input("What's your name? ")
-            await websocket.send(name)
-            print("> {}".format(name))
-
-            greeting = await websocket.recv()
-            print("< {}".format(greeting))
+        print("_socket")
 
     def _start_server(self):
         """ Starts a server thread and sets it to run until completion
         """
-        start_server = websockets.serve(self.hello, 'localhost', 9000)
+        start_server = websockets.serve(self._socket, 'localhost', 9000)
 
         self._loop.run_until_complete(start_server)
         self._loop.run_forever()
 
+    async def _client(self):
+        async with websockets.connect('ws://localhost:9000/') as websocket:
+            await self._socket(websocket, '/')
+            #raise Exception("Catch me!")
+
+    async def _client_runner(self):
+        tasks = [self._client() for _ in range(10)]
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_EXCEPTION)
+
+        if pending:
+            for t in pending:
+                t.cancel()
+            await asyncio.wait(pending)
+
+        for t in done:
+            t.exception()  # Retrieve any exception.
+
+        print ("_client_runner done")
+
     def _start_client(self, ip, port):
         """ Starts a client thread and sets it to run until completion
         """
-        self._loop.run_until_complete(self.hello_client())
+        self._loop.run_until_complete(self._client_runner())
+        #print(websocket)
