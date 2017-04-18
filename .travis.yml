@@ -1,7 +1,8 @@
+notifications:
+  email: false
 language: python
 python:
   - "3.5"
   - "3.6"
 install: "pip install -r python/requirements.txt"
-notifications:
-  email: false
+script: "python python/tests/main.py"
