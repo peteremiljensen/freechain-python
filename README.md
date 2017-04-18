@@ -1,1 +1,1 @@
-# Blockchain framework in both Python and NodeJS
+# Blockchain framework in both Python and Scala
