@@ -30,5 +30,10 @@ class TestBlockMethods(unittest.TestCase):
         self.assertEqual(self.b_3.get_hash(), "test")
         self.assertEqual(self.b_3.get_previous_block_hash(), "-1")
 
+    def test_create_block_from_dict(self):
+        dictio = json.loads(self.b_1.json().decode('utf-8'))
+        b = block.Block.create_block_from_dict(dictio)
+        self.assertTrue(b.validate())
+
 if __name__ == '__main__':
     unittest.main()
