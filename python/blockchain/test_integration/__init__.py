@@ -1,1 +1,1 @@
-from test_integration_1 import *
+from .test_integration_1 import *
