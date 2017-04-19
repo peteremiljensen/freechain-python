@@ -18,6 +18,7 @@ class EVENTS_TYPE:
     RECEIVED_LOAF = 'received_loaf'
     RECEIVED_BLOCK = 'received_block'
     BLOCKS_ADDED = 'blocks_added'
+    RECEIVED_ERROR = 'received_error'
 
 class FUNCTIONS:
     GET_LENGTH = 'get_length'

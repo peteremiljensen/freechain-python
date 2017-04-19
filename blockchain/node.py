@@ -167,9 +167,11 @@ class Node():
                             desc = message['description']
                         else:
                             desc = 'No description'
+                        Events.Instance().notify(EVENTS_TYPE.RECEIVED_ERROR,
+                                                 desc)
                         print(fail('Error received: ' + desc))
-                    if message['type'] != 'request' or \
-                       message['type'] != 'response':
+                    elif message['type'] != 'request' and \
+                         message['type'] != 'response':
                         self._network.send(
                             websocket, self._json({'type': 'error',
                                                    'description': \
