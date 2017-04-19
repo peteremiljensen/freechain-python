@@ -21,8 +21,10 @@ class TestIntegration1(unittest.TestCase):
 
         cls.node_1 = Node(9000)
         cls.node_2 = Node(9001)
+        cls.node_3 = Node(9002)
         cls.node_1.start()
         cls.node_2.start()
+        cls.node_3.start()
 
         cls.node_1.connect_node('localhost', 9001)
         cls.is_connected = cls.connect_sema.acquire(timeout=20)
@@ -102,6 +104,28 @@ class TestIntegration1(unittest.TestCase):
 
         new_block = self.node_2._chain.get_block(1)
         self.assertEqual(new_block.get_hash(), block.get_hash())
+
+    def test_9_replacing_chain(self):
+        connect_sema = threading.Semaphore(0)
+        def connection_callback(websocket):
+            connect_sema.release()
+        self.e.register_callback(EVENTS_TYPE.CONNECTION_READY,
+                                 connection_callback)
+
+        self.node_3.connect_node('localhost', 9000)
+        self.assertTrue(connect_sema.acquire(timeout=20))
+
+        replaced_sema = threading.Semaphore(0)
+        def replaced_callback(websocket):
+            replaced_sema.release()
+        self.e.register_callback(EVENTS_TYPE.REPLACED_CHAIN,
+                                 replaced_callback)
+
+        self.assertTrue(replaced_sema.acquire(timeout=20))
+
+        for i in range(2):
+            self.assertEqual(self.node_1._chain.get_block(i).get_hash(),
+                             self.node_3._chain.get_block(i).get_hash())
 
 if __name__ == '__main__':
     unittest.main()
