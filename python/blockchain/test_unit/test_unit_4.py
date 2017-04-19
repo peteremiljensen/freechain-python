@@ -22,8 +22,11 @@ class TestEventsMethods(unittest.TestCase):
         self.thread.start()
 
     def thread(self):
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(self.e.start())
+        try:
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(self.e.start())
+        except RuntimeError:
+            pass
 
     def test_callback(self):
         self.sema.acquire()
