@@ -168,6 +168,12 @@ class Node():
                         else:
                             desc = 'No description'
                         print(fail('Error received: ' + desc))
+                    if message['type'] != 'request' or \
+                       message['type'] != 'response':
+                        self._network.send(
+                            websocket, self._json({'type': 'error',
+                                                   'description': \
+                                                   'type is not supported'}))
                     elif message['function'] == FUNCTIONS.GET_LENGTH:
                         self._handle_get_length(message, websocket)
                     elif message['function'] == FUNCTIONS.GET_HASH:
@@ -220,11 +226,6 @@ class Node():
                 self._get_hash(websocket, chain_length-1)
             else:
                 print(info('Keeping local blocks'))
-        else:
-            self._network.send(
-                websocket,
-                self._json({'type': 'error',
-                            'description': 'type is not supported'}))
 
     def _handle_get_hash(self, message, websocket):
         if message['type'] == 'request':
@@ -251,11 +252,6 @@ class Node():
                            ' do not match'))
                 print(info('Requesting block hash of height: ' + str(height-1)))
                 self._get_hash(websocket, height-1)
-        else:
-            self._network.send(
-                websocket,
-                self._json({'type': 'error',
-                            'description': 'type is not supported'}))
 
     def _handle_get_blocks(self, message, websocket):
         """ Reads a request for missing blocks and sends them if local chain
@@ -316,12 +312,6 @@ class Node():
                     return
             Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, None)
             print(info('blocks succesfully added to blockchain'))
-
-        else:
-            self._network.send(
-                websocket,
-                self._json({'type': 'error',
-                            'description': 'type is not supported'}))
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
