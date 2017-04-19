@@ -41,7 +41,16 @@ class TestIntegration1(unittest.TestCase):
                 break
         self.assertTrue(exists)
 
-    def test_3_broadcast_loaf(self):
+    def test_3_add_loaf_twice(self):
+        self.assertFalse(self.node_1.add_loaf(self.loaf))
+        times = 0
+        for l in self.node_1._loaf_pool:
+            if l == self.loaf.get_hash():
+                times += 1
+                break
+        self.assertEqual(times, 1)
+
+    def test_4_broadcast_loaf(self):
         self.node_1.broadcast_loaf(self.loaf)
         loaf_sema = threading.Semaphore(0)
         received_loaf = None
@@ -58,18 +67,27 @@ class TestIntegration1(unittest.TestCase):
                 break
         self.assertTrue(exists)
 
-    def test_4_mining(self):
+    def test_5_mining(self):
         global block
         block = self.node_1.mine()
         self.assertEqual(block.get_loaves()[0].get_hash(),
                          self.loaf.get_hash())
         self.assertTrue(block.validate())
 
-    def test_5_add_block(self):
+    def test_6_add_block(self):
         global block
         self.assertTrue(self.node_1.add_block(block))
         new_block = self.node_1._chain.get_block(1)
         self.assertEqual(new_block.get_hash(), block.get_hash())
+
+    def test_7_loaf_added_twice_mined(self):
+        self.assertFalse(self.node_1.add_loaf(self.loaf))
+        times = 0
+        for l in self.node_1._loaf_pool:
+            if l == self.loaf.get_hash():
+                times += 1
+                break
+        self.assertEqual(times, 0)
 
 if __name__ == '__main__':
     unittest.main()
