@@ -106,6 +106,7 @@ class Network():
         print(info("Disconnected"))
         self._nodes.remove(websocket)
         del self._queues[websocket]
+        Events.Instance().notify(EVENTS_TYPE.CONNECTION_CLOSED, websocket)
 
     def _start_server_thread(self):
         """ Starts a server thread and sets it to run until completion

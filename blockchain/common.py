@@ -15,6 +15,7 @@ def fail(string):
 class EVENTS_TYPE:
     NEW_CLIENT_CONNECTION = 'new_client_connection'
     CONNECTION_READY = 'connection_ready'
+    CONNECTION_CLOSED = 'connection_closed'
     RECEIVED_LOAF = 'received_loaf'
     RECEIVED_BLOCK = 'received_block'
     BLOCKS_ADDED = 'blocks_added'
