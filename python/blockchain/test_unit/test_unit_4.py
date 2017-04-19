@@ -21,10 +21,10 @@ class TestEventsMethods(unittest.TestCase):
                 self.sema.release()
         def callback_2(data):
             if data == 'data_2':
-                self.sema_3.acquire(timeout=20)
+                self.sema_2.acquire(timeout=20)
                 self.assertion_2 = True
                 self.data = data
-                self.sema_2.release()
+                self.sema_3.release()
         self.e.register_callback("test", callback)
         self.e.register_callback("test", callback_2)
         self.e.notify("test", "data")
@@ -37,8 +37,8 @@ class TestEventsMethods(unittest.TestCase):
         self.sema.acquire(timeout=20)
         self.assertTrue(self.assertion)
         self.assertEqual(self.data, "data")
-        self.sema_3.release()
-        self.sema_2.acquire(timeout=20)
+        self.sema_2.release()
+        self.sema_3.acquire(timeout=20)
         self.assertTrue(self.assertion_2)
         self.assertEqual(self.data, "data_2")
 
