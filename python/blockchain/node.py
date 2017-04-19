@@ -311,6 +311,7 @@ class Node():
             if not loaf.get_hash() in self._loaf_pool:
                 if self.add_loaf(loaf):
                     self.broadcast_loaf(loaf)
+                    Events.Instance().notify(EVENTS_TYPE.RECEIVED_LOAF, loaf)
                     print(info('Received loaf and forwarding it'))
                 else:
                     print(fail('Received loaf could not validate'))
@@ -331,6 +332,7 @@ class Node():
                     except KeyError:
                         pass
             self.broadcast_block(block)
+            Events.Instance().notify(EVENTS_TYPE.RECEIVED_BLOCK, block)
         else:
             print(fail('block could not be added'))
 
