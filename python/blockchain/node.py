@@ -32,6 +32,8 @@ class Node():
         self._chain = Chain()
         self._loaf_pool = {}
         self._loaf_pool_lock = threading.RLock()
+        self._mined_loaves = {}
+        self._mined_loaves_lock = threading.RLock()
 
         self._events_thread = threading.Thread(target=self._start_events_thread,
                                                daemon=True)
@@ -56,13 +58,31 @@ class Node():
 
     def add_loaf(self, loaf):
         with self._loaf_pool_lock:
-            if loaf.validate() and not loaf.get_hash() in self._loaf_pool:
-                self._loaf_pool[loaf.get_hash()] = loaf
-                return True
-            else:
+            if not loaf.validate():
+                print(fail('Loaf could not validate'))
                 return False
+            if loaf.get_hash() in self._loaf_pool:
+                return False
+            if loaf.get_hash in self._mined_loaves.keys():
+                print(warning('Loaf has already been mined'))
+                return False
+            self._loaf_pool[loaf.get_hash()] = loaf
+            return True
 
     def add_block(self, block):
+        height = block.get_height()
+        with self._loaf_pool_lock:
+            for loaf in block.get_loaves():
+                try:
+                    del self._loaf_pool[loaf.get_hash()]
+                except KeyError:
+                    pass
+        with self._mined_loaves_lock:
+            for loaf in block.get_loaves():
+                try:
+                    self._mined_loaves[loaf.get_hash()]=height
+                except KeyError:
+                    print(fail('Failed to ad mined loaf to mined_loaves'))
         return self._chain.add_block(block)
 
     def broadcast_loaf(self, loaf):
@@ -97,8 +117,6 @@ class Node():
             block = self._chain.mine_block(loaves)
 
             if block.validate():
-                for loaf_hash in loaves_hash:
-                    del self._loaf_pool[loaf_hash]
                 return block
             else:
                 print(fail('block could not be mined'))
@@ -268,9 +286,13 @@ class Node():
             blocks = []
             for block_dict in message['blocks']:
                 blocks.append(Block.create_block_from_dict(block_dict))
-            if blocks[0].get_height()+len(blocks)-1 <= self._chain.get_length():
+            if blocks[0].get_height()+len(blocks) <= self._chain.get_length():
+                print(blocks[0].get_height())
+                print(len(blocks))
+                print(self._chain.get_length())
                 print(fail('Replacing the local blocks with the received,' + \
                            'ones will result in a shorther blockchain'))
+                return
             for i in range(len(blocks)):
                 if blocks[i].validate() and i == 0:
                     pass
@@ -279,6 +301,7 @@ class Node():
                         blocks[i].get_previous_block_hash()):
                         print(fail('Hash of previous block, does not match ' + \
                                    'previous_block_hash'))
+                        return
                 else:
                     print(fail('Failed to validate block: ' + str(blocks[k])))
                     return
@@ -287,7 +310,7 @@ class Node():
                        str(blocks[0].get_height()) + ' and up'))
             self._chain.remove_blocks(blocks[0].get_height())
             for block in blocks:
-                if not self._chain.add_block(block):
+                if not self.add_block(block):
                     print(fail('block of height ' + str(block.get_height) +
                                'cannot be added'))
                     return
@@ -308,29 +331,20 @@ class Node():
         """
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
         with self._loaf_pool_lock:
-            if not loaf.get_hash() in self._loaf_pool:
-                if self.add_loaf(loaf):
-                    self.broadcast_loaf(loaf)
-                    print(info('Received loaf and forwarding it'))
-                else:
-                    print(fail('Received loaf could not validate'))
+            if self.add_loaf(loaf):
+                self.broadcast_loaf(loaf)
+                print(info('Received loaf and forwarding it'))
 
     def _handle_broadcast_block(self, message, websocket):
         block = Block.create_block_from_dict(message['block'])
+        block_height = block.get_height()
 
         if block.get_height() > self._chain.get_length():
             self._get_length(websocket)
         elif block.get_height() < self._chain.get_length():
             return
         elif self.add_block(block):
-            with self._loaf_pool_lock:
-                print(info('block succesfully added'))
-                for loaf in block.get_loaves():
-                    try:
-                        del self._loaf_pool[loaf.get_hash()]
-                    except KeyError:
-                        pass
-            self.broadcast_block(block)
+            print(info('Block succesfully added'))
         else:
             print(fail('block could not be added'))
 

@@ -18,7 +18,7 @@ from blockchain.common import *
 #
 
 class Prompt(Cmd):
-    PRINTS = ['loaf_pool', 'blockchain', 'block_hash']
+    PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
 
     def __init__(self):
         """ Prompt class constructor
@@ -111,8 +111,10 @@ class Prompt(Cmd):
                 for loaf in list(self._node._loaf_pool.values()):
                     print(loaf.json())
             elif l[0] == self.PRINTS[1]:
-                print(self._node._chain.json())
+                print(self._node._mined_loaves)
             elif l[0] == self.PRINTS[2]:
+                print(self._node._chain.json())
+            elif l[0] == self.PRINTS[3]:
                 if len(l) != 2:
                     print(fail("invalid number of arguments"))
                 else:
