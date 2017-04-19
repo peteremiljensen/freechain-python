@@ -45,6 +45,7 @@ class TestIntegration1(unittest.TestCase):
                 exists = True
                 break
         self.assertTrue(exists)
+        self.assertFalse(self.node_1.add_loaf(Loaf("t", "t", "t")))
 
     def test_c_add_loaf_twice(self):
         self.assertFalse(self.node_1.add_loaf(self.loaf))
