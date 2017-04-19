@@ -160,7 +160,7 @@ class TestIntegration1(unittest.TestCase):
             self.assertEqual(self.node_1._chain.get_block(i).get_hash(),
                              self.node_4._chain.get_block(i).get_hash())
 
-    def test_unknown_function(self):
+    def test_k_unknown_function(self):
         response = self.node_1._json({'type': 'test'})
         self.node_1._network.broadcast(response)
 
