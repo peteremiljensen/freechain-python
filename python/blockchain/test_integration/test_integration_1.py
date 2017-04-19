@@ -3,8 +3,8 @@ import threading
 from ..node import *
 from ..events import *
 from ..common import *
-#from .. import loaf
-#from .. import block
+from .. import loaf
+from .. import block
 
 class TestIntegration1(unittest.TestCase):
 
@@ -25,16 +25,17 @@ class TestIntegration1(unittest.TestCase):
         cls.node_1.connect_node('localhost', 9001)
         cls.is_connected = cls.connect_sema.acquire(timeout=20)
 
-    def test_connect_node(self):
+    def test_1_connect_node(self):
         self.assertTrue(self.is_connected)
 
-    def test_add_loaf(self):
-        pass
-        #loaf = Loaf("test123")
-        #self.assertTrue(self.node_1.add_loaf(loaf))
-        '''exists = False
+    def test_2_add_loaf(self):
+        loaf = Loaf("test123")
+        self.assertTrue(self.node_1.add_loaf(loaf))
+        exists = False
         for l in self.node_1._loaf_pool:
-            if l == loaf:
+            if l == loaf.get_hash():
                 exists = True
                 break
-        self.assertTrue(exists)'''
+        self.assertTrue(exists)
+
+    #def test_3self.node_1.broadcast_loaf
