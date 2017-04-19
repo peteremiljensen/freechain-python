@@ -90,7 +90,18 @@ class TestIntegration1(unittest.TestCase):
         self.assertEqual(times, 0)
 
     def test_8_broadcast_block(self):
-        pass
+        global block
+        self.node_1.broadcast_block(block)
+        block_sema = threading.Semaphore(0)
+        received_block = None
+        def block_callback(block):
+            block_sema.release()
+            received_block = block
+        self.e.register_callback(EVENTS_TYPE.RECEIVED_BLOCK, block_callback)
+        self.assertTrue(block_sema.acquire(timeout=20))
+
+        new_block = self.node_2._chain.get_block(1)
+        self.assertEqual(new_block.get_hash(), block.get_hash())
 
 if __name__ == '__main__':
     unittest.main()
