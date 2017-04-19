@@ -18,7 +18,6 @@ class Network():
     def __init__(self, port):
         """ Network class constructor
         """
-        asyncio.set_event_loop(None)
         self._port = port
         self._nodes = set()
         self._queues = {}
@@ -32,6 +31,13 @@ class Network():
         """ Starts a thread for the server
         """
         self._server_thread.start()
+
+    def close_connections(self):
+        for node in list(self._nodes):
+            try:
+                asyncio.get_event_loop().run_until_complete(node.close_connection(force=True))
+            except RuntimeError:
+                pass
 
     def connect_node(self, ip, port):
         """ Connects server to a node

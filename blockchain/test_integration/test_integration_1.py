@@ -1,5 +1,5 @@
 import unittest
-import threading, time
+import threading, time, asyncio
 from ..node import *
 from ..events import *
 from ..common import *
@@ -171,6 +171,17 @@ class TestIntegration1(unittest.TestCase):
                                  error_callback)
 
         self.assertTrue(error_sema.acquire(timeout=20))
+
+    def test_z_closed_connection(self):
+        self.node_1._network.close_connections()
+
+        closed_sema = threading.Semaphore(0)
+        def closed_callback(data):
+            closed_sema.release()
+        self.e.register_callback(EVENTS_TYPE.CONNECTION_CLOSED,
+                                 closed_callback)
+
+        self.assertTrue(closed_sema.acquire(timeout=20))
 
 if __name__ == '__main__':
     unittest.main()
