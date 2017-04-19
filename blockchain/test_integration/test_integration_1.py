@@ -6,6 +6,8 @@ from ..common import *
 from .. import loaf
 from .. import block
 
+block = None
+
 class TestIntegration1(unittest.TestCase):
 
     @classmethod
@@ -26,7 +28,6 @@ class TestIntegration1(unittest.TestCase):
         cls.is_connected = cls.connect_sema.acquire(timeout=20)
 
         cls.loaf = Loaf("test123")
-        cls.block = None
 
     def test_1_connect_node(self):
         self.assertTrue(self.is_connected)
@@ -58,10 +59,17 @@ class TestIntegration1(unittest.TestCase):
         self.assertTrue(exists)
 
     def test_4_mining(self):
-        self.block = self.node_1.mine()
-        self.assertEqual(self.block.get_loaves()[0].get_hash(),
+        global block
+        block = self.node_1.mine()
+        self.assertEqual(block.get_loaves()[0].get_hash(),
                          self.loaf.get_hash())
-        self.assertTrue(self.block.validate())
+        self.assertTrue(block.validate())
 
     def test_5_add_block(self):
-        pass
+        global block
+        self.assertTrue(self.node_1.add_block(block))
+        new_block = self.node_1._chain.get_block(1)
+        self.assertEqual(new_block.get_hash(), block.get_hash())
+
+if __name__ == '__main__':
+    unittest.main()
