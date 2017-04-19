@@ -20,7 +20,8 @@ class TestEventsMethods(unittest.TestCase):
         def callback_2(data):
             self.data = data
             self.assertion_2 = True
-            self.sema_2.release()
+            if data == 'data_2':
+                self.sema_2.release()
         self.e.register_callback("test", callback)
         self.e.register_callback("test", callback_2)
         self.e.notify("test", "data")
