@@ -89,5 +89,8 @@ class TestIntegration1(unittest.TestCase):
                 break
         self.assertEqual(times, 0)
 
+    def test_8_broadcast_block(self):
+        pass
+
 if __name__ == '__main__':
     unittest.main()
