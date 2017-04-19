@@ -314,6 +314,7 @@ class Node():
                     print(fail('block of height ' + str(block.get_height) +
                                'cannot be added'))
                     return
+            Events.Instance().notify(EVENTS_TYPE.REPLACED_CHAIN, None)
             print(info('blocks succesfully added to blockchain'))
 
         else:
