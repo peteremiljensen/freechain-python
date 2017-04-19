@@ -4,13 +4,14 @@ from .. import loaf
 
 class TestLoafMethods(unittest.TestCase):
 
-    def setUp(self):
-        self.data = 'test'
-        self.timestamp = str(datetime.datetime.now())
-        self.l = loaf.Loaf(self.data, self.timestamp)
+    @classmethod
+    def setUpClass(cls):
+        cls.data = 'test'
+        cls.timestamp = str(datetime.datetime.now())
+        cls.l = loaf.Loaf(cls.data, cls.timestamp)
 
-        self.hashtest = '12525718923'
-        self.l_hash = loaf.Loaf(self.data, self.timestamp, self.hashtest)
+        cls.hashtest = '12525718923'
+        cls.l_hash = loaf.Loaf(cls.data, cls.timestamp, cls.hashtest)
 
     def test_loaf_validate(self):
         self.assertTrue(self.l.validate())

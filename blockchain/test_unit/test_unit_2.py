@@ -5,14 +5,15 @@ from .miner import *
 
 class TestBlockMethods(unittest.TestCase):
 
-    def setUp(self):
-        self.l_1 = loaf.Loaf('test')
-        self.l_2 = loaf.Loaf('test', 'test', 'test')
+    @classmethod
+    def setUpClass(cls):
+        cls.l_1 = loaf.Loaf('test')
+        cls.l_2 = loaf.Loaf('test', 'test', 'test')
 
-        self.b_1 = miner([self.l_1], 0, '-1')
-        self.b_2 = miner([self.l_2], 0, '-1')
+        cls.b_1 = miner([cls.l_1], 0, '-1')
+        cls.b_2 = miner([cls.l_2], 0, '-1')
 
-        self.b_3 = block.Block([self.l_1], 0, "-1", "2012", 512, "test")
+        cls.b_3 = block.Block([cls.l_1], 0, "-1", "2012", 512, "test")
 
     def test_block_validate(self):
         self.assertTrue(self.b_1.validate())

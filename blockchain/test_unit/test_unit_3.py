@@ -5,10 +5,11 @@ from .miner import *
 
 class TestChainMethods(unittest.TestCase):
 
-    def setUp(self):
-        self.chain = chain.Chain()
-        self.b_1 = self.chain.mine_block([])
-        self.b_2 = block.Block([], 0, "-1", "2012", 512, "test")
+    @classmethod
+    def setUpClass(cls):
+        cls.chain = chain.Chain()
+        cls.b_1 = cls.chain.mine_block([])
+        cls.b_2 = block.Block([], 0, "-1", "2012", 512, "test")
 
     def test_add_block(self):
         self.assertTrue(self.chain.add_block(self.b_1))
