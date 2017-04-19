@@ -29,7 +29,7 @@ class TestEventsMethods(unittest.TestCase):
             pass
 
     def test_callback(self):
-        self.sema.acquire()
+        self.sema.acquire(timeout=20)
         self.assertTrue(self.assertion)
         self.assertEqual(self.data, "data")
 
