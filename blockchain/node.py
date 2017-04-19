@@ -331,19 +331,10 @@ class Node():
         """
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
         with self._loaf_pool_lock:
-<<<<<<< HEAD:python/blockchain/node.py
             if self.add_loaf(loaf):
-                self.broadcast_loaf(loaf)
                 print(info('Received loaf and forwarding it'))
-=======
-            if not loaf.get_hash() in self._loaf_pool:
-                if self.add_loaf(loaf):
-                    self.broadcast_loaf(loaf)
-                    Events.Instance().notify(EVENTS_TYPE.RECEIVED_LOAF, loaf)
-                    print(info('Received loaf and forwarding it'))
-                else:
-                    print(fail('Received loaf could not validate'))
->>>>>>> c3bb67ca2344a0f82d2c6bc8cf316dfbf4f3ea4a:blockchain/node.py
+                self.broadcast_loaf(loaf)
+                Events.Instance().notify(EVENTS_TYPE.RECEIVED_LOAF, loaf)
 
     def _handle_broadcast_block(self, message, websocket):
         block = Block.create_block_from_dict(message['block'])
@@ -354,19 +345,9 @@ class Node():
         elif block.get_height() < self._chain.get_length():
             return
         elif self.add_block(block):
-<<<<<<< HEAD:python/blockchain/node.py
             print(info('Block succesfully added'))
-=======
-            with self._loaf_pool_lock:
-                print(info('block succesfully added'))
-                for loaf in block.get_loaves():
-                    try:
-                        del self._loaf_pool[loaf.get_hash()]
-                    except KeyError:
-                        pass
             self.broadcast_block(block)
             Events.Instance().notify(EVENTS_TYPE.RECEIVED_BLOCK, block)
->>>>>>> c3bb67ca2344a0f82d2c6bc8cf316dfbf4f3ea4a:blockchain/node.py
         else:
             print(fail('block could not be added'))
 
