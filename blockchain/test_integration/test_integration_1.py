@@ -62,3 +62,6 @@ class TestIntegration1(unittest.TestCase):
         self.assertEqual(self.block.get_loaves()[0].get_hash(),
                          self.loaf.get_hash())
         self.assertTrue(self.block.validate())
+
+    def test_5_add_block(self):
+        pass
