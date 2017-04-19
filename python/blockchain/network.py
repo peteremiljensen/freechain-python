@@ -99,6 +99,7 @@ class Network():
 
         recv_task = asyncio.ensure_future(recv(), loop=loop)
         send_task = asyncio.ensure_future(send(), loop=loop)
+        Events.Instance().notify(EVENTS_TYPE.CONNECTION_READY, websocket)
         await asyncio.wait([recv_task, send_task], loop=loop,
                            return_when=asyncio.FIRST_COMPLETED)
 

@@ -14,6 +14,7 @@ def fail(string):
 
 class EVENTS_TYPE:
     NEW_CLIENT_CONNECTION = 'new_client_connection'
+    CONNECTION_READY = 'connection_ready'
 
 class FUNCTIONS:
     GET_LENGTH = 'get_length'
