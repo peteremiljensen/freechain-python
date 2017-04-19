@@ -17,7 +17,7 @@ class TestChainMethods(unittest.TestCase):
 
     def test_remove_blocks(self):
         height = self.chain.get_length()
-        self.chain.remove_blocks(height-1)
+        self.chain.remove_block(height-1)
         self.assertEqual(height-1, self.chain.get_length())
 
     def test_get_block(self):
