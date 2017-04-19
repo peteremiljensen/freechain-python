@@ -22,9 +22,9 @@ class TestEventsMethods(unittest.TestCase):
             self.assertion_2 = True
             self.sema_2.release()
         self.e.register_callback("test", callback)
-        self.e.register_callback("test_2", callback_2)
+        self.e.register_callback("test", callback_2)
         self.e.notify("test", "data")
-        self.e.notify("test_2", "data_2")
+        self.e.notify("test", "data_2")
 
         self.thread = threading.Thread(target=self.thread, daemon=True)
         self.thread.start()
