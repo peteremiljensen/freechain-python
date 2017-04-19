@@ -287,7 +287,7 @@ class Node():
                        str(blocks[0].get_height()) + ' and up'))
             self._chain.remove_blocks(blocks[0].get_height())
             for block in blocks:
-                if not self._chain.add_block(block):
+                if not self.add_block(block):
                     print(fail('block of height ' + str(block.get_height) +
                                'cannot be added'))
                     return
