@@ -80,7 +80,7 @@ class Node():
         with self._mined_loaves_lock:
             for loaf in block.get_loaves():
                 try:
-                    self._mined_loaves[loaf.get_hash()]=height
+                    self._mined_loaves[loaf.get_hash()] = height
                 except KeyError:
                     print(fail('Failed to ad mined loaf to mined_loaves'))
         return self._chain.add_block(block)
@@ -306,7 +306,20 @@ class Node():
 
             print(info('Replacing blocks from height ' +
                        str(blocks[0].get_height()) + ' and up'))
-            self._chain.remove_blocks(blocks[0].get_height())
+
+            for i in reversed(range(blocks[0].get_height(), self._chain.get_length())):
+                for loaf in self._chain.get_block(i).get_loaves():
+                    with self._mined_loaves_lock:
+                        try:
+                            del self._mined_loaves[loaf.get_hash()]
+                        except KeyError:
+                            pass
+                    with self._loaf_pool_lock:
+                        try:
+                            self._loaf_pool[loaf.get_hash()] = loaf
+                        except KeyError:
+                            pass
+                    self._chain.remove_block(i)
             for block in blocks:
                 if not self.add_block(block):
                     print(fail('block of height ' + str(block.get_height) +
