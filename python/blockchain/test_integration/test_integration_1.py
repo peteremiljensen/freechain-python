@@ -25,17 +25,33 @@ class TestIntegration1(unittest.TestCase):
         cls.node_1.connect_node('localhost', 9001)
         cls.is_connected = cls.connect_sema.acquire(timeout=20)
 
+        cls.loaf = Loaf("test123")
+
     def test_1_connect_node(self):
         self.assertTrue(self.is_connected)
 
     def test_2_add_loaf(self):
-        loaf = Loaf("test123")
-        self.assertTrue(self.node_1.add_loaf(loaf))
+        self.assertTrue(self.node_1.add_loaf(self.loaf))
         exists = False
         for l in self.node_1._loaf_pool:
-            if l == loaf.get_hash():
+            if l == self.loaf.get_hash():
                 exists = True
                 break
         self.assertTrue(exists)
 
-    #def test_3self.node_1.broadcast_loaf
+    def test_3_broadcast_loaf(self):
+        self.node_1.broadcast_loaf(self.loaf)
+        loaf_sema = threading.Semaphore(0)
+        received_loaf = None
+        def loaf_callback(loaf):
+            loaf_sema.release()
+            received_loaf = loaf
+        self.e.register_callback(EVENTS_TYPE.RECEIVED_LOAF, loaf_callback)
+        self.assertTrue(loaf_sema.acquire(timeout=20))
+
+        exists = False
+        for l in self.node_2._loaf_pool:
+            if l == self.loaf.get_hash():
+                exists = True
+                break
+        self.assertTrue(exists)
