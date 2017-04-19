@@ -314,7 +314,7 @@ class Node():
                     print(fail('block of height ' + str(block.get_height) +
                                'cannot be added'))
                     return
-            Events.Instance().notify(EVENTS_TYPE.REPLACED_CHAIN, None)
+            Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, None)
             print(info('blocks succesfully added to blockchain'))
 
         else:
@@ -334,8 +334,8 @@ class Node():
         with self._loaf_pool_lock:
             if self.add_loaf(loaf):
                 print(info('Received loaf and forwarding it'))
-                self.broadcast_loaf(loaf)
                 Events.Instance().notify(EVENTS_TYPE.RECEIVED_LOAF, loaf)
+                self.broadcast_loaf(loaf)
 
     def _handle_broadcast_block(self, message, websocket):
         block = Block.create_block_from_dict(message['block'])
@@ -347,8 +347,8 @@ class Node():
             return
         elif self.add_block(block):
             print(info('Block succesfully added'))
-            self.broadcast_block(block)
             Events.Instance().notify(EVENTS_TYPE.RECEIVED_BLOCK, block)
+            self.broadcast_block(block)
         else:
             print(fail('block could not be added'))
 

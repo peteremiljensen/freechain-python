@@ -17,7 +17,7 @@ class EVENTS_TYPE:
     CONNECTION_READY = 'connection_ready'
     RECEIVED_LOAF = 'received_loaf'
     RECEIVED_BLOCK = 'received_block'
-    REPLACED_CHAIN = 'replaced_chain'
+    BLOCKS_ADDED = 'blocks_added'
 
 class FUNCTIONS:
     GET_LENGTH = 'get_length'
