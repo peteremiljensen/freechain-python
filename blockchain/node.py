@@ -63,7 +63,7 @@ class Node():
                 return False
             if loaf.get_hash() in self._loaf_pool:
                 return False
-            if loaf.get_hash in self._mined_loaves.keys():
+            if loaf.get_hash() in self._mined_loaves.keys():
                 print(warning('Loaf has already been mined'))
                 return False
             self._loaf_pool[loaf.get_hash()] = loaf
