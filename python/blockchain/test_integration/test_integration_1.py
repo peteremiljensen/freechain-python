@@ -26,6 +26,7 @@ class TestIntegration1(unittest.TestCase):
         cls.is_connected = cls.connect_sema.acquire(timeout=20)
 
         cls.loaf = Loaf("test123")
+        cls.block = None
 
     def test_1_connect_node(self):
         self.assertTrue(self.is_connected)
@@ -55,3 +56,9 @@ class TestIntegration1(unittest.TestCase):
                 exists = True
                 break
         self.assertTrue(exists)
+
+    def test_4_mining(self):
+        self.block = self.node_1.mine()
+        self.assertEqual(self.block.get_loaves()[0].get_hash(),
+                         self.loaf.get_hash())
+        self.assertTrue(self.block.validate())
