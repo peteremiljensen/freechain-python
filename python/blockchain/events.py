@@ -19,14 +19,14 @@ class Events():
     def __init__(self):
         """ Event class constructor
         """
-        self._loop = asyncio.get_event_loop()
+        self._loop = asyncio.new_event_loop()
         self._queue = janus.Queue(loop=self._loop)
         self._callback = {}
         self._callback_lock = threading.RLock()
 
-    async def start(self):
+    def start(self):
         while True:
-            event_tuple = await self._queue.async_q.get()
+            event_tuple = self._queue.sync_q.get()
             with self._callback_lock:
                 event = event_tuple[0]
                 if event in self._callback:

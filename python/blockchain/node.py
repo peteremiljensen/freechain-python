@@ -129,10 +129,7 @@ class Node():
     def _start_events_thread(self):
         """ Starts an event thread that runs untill completion """
         try:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            events = Events.Instance()
-            loop.run_until_complete(events.start())
+            Events.Instance().start()
         except:
             print(fail('fatal error regarding events'))
             raise
