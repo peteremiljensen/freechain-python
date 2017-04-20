@@ -17,9 +17,17 @@ from blockchain.common import *
 #
 #
 
-def loaf_validator():
+def loaf_validator(loaf):
+    hash_calc = loaf.calculate_hash()
+    return self._loaf['hash'] == hash_calc
 
-def block_validator():
+def block_validator(block):
+    for l in self._block['loaves']:
+        if not l.validate():
+            return False
+    hash_calc = self.calculate_hash()
+    return self._block['hash'] == hash_calc and \
+           hash_calc[:4] == '0000'
 
 class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
