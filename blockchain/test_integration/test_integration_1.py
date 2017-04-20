@@ -139,14 +139,7 @@ class TestIntegration1(unittest.TestCase):
         block_3 = self.node_4.mine()
         self.assertTrue(self.node_4.add_block(block_3))
 
-        connect_sema = threading.Semaphore(0)
-        def connection_callback(websocket):
-            connect_sema.release()
-        self.e.register_callback(EVENTS_TYPE.CONNECTION_READY,
-                                 connection_callback)
-
         self.node_1.connect_node('localhost', 9003)
-        self.assertTrue(connect_sema.acquire(timeout=20))
 
         replaced_sema = threading.Semaphore(0)
         def replaced_callback(data):
