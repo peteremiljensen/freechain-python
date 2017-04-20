@@ -29,8 +29,8 @@ class Node():
 
         self._network = Network(port)
 
-        self._loaf_validator = None
-        self._block_validator = None
+        self._loaf_validator = lambda l: return True
+        self._block_validator = lambda b: return True
 
         self._chain = Chain()
         self._loaf_pool = {}
