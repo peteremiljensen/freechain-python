@@ -61,4 +61,3 @@ class LoafEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Loaf):
             return obj._loaf
-        return json.JSONEncoder.default(self, obj)
