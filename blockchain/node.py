@@ -311,8 +311,8 @@ class Node():
                 self.remove_block(i)
             for block in blocks:
                 if not self.add_block(block):
-                    print(fail('block of height ' + str(block.get_height) +
-                               'cannot be added'))
+                    print(fail('block of height ' + str(block.get_height()) +
+                               ' cannot be added'))
                     return
             Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, None)
             print(info('blocks succesfully added to blockchain'))

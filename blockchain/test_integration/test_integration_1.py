@@ -129,6 +129,15 @@ class TestIntegration1(unittest.TestCase):
         self.assertTrue(self.node_4.add_block(block_2))
         block_3 = self.node_4.mine()
         self.assertTrue(self.node_4.add_block(block_3))
+        block_4 = self.node_4.mine()
+        self.assertTrue(self.node_4.add_block(block_4))
+
+        self.node_1.add_loaf(self.loaf)
+        block_5 = self.node_1.mine()
+        self.assertTrue(self.node_1.add_block(block_5))
+
+        self.assertTrue(self.loaf.get_hash() in
+                        list(self.node_1._mined_loaves.keys()))
 
         self.node_1.connect_node('localhost', 9003)
 
@@ -140,9 +149,12 @@ class TestIntegration1(unittest.TestCase):
 
         self.assertTrue(replaced_sema.acquire(timeout=20))
 
-        for i in range(4):
+        for i in range(5):
             self.assertEqual(self.node_1._chain.get_block(i).get_hash(),
                              self.node_4._chain.get_block(i).get_hash())
+
+        self.assertTrue(loaf.get_hash() in list(self.node_1._loaf_pool.keys()))
+        self.assertTrue(loaf            in list(self.node_1._loaf_pool.values()))
 
     def test_k_unknown_type(self):
         response = self.node_1._json({'type': 'test'})
