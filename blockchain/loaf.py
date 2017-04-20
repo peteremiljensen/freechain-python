@@ -41,6 +41,7 @@ class Loaf():
 
     def calculate_hash(self):
         """ Calculates the same hash of loaf object """
+        ## TODO: Secure loaf by either lock or do calculations on a copy
         hash_tmp = self._loaf['hash']
         del self._loaf['hash']
         hash_calc = hashlib.sha256(self.json()).hexdigest()
