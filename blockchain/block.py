@@ -3,6 +3,7 @@ import datetime
 import json
 
 from blockchain.loaf import *
+from blockchain.validator import Validator
 
 #  ______ _            _
 #  | ___ \ |          | |

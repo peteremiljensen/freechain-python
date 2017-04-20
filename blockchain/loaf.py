@@ -2,7 +2,7 @@ import hashlib
 import datetime
 import json
 
-from blochain.validator import Validator
+from blockchain.validator import Validator
 
 #   _                  __
 #  | |                / _|
