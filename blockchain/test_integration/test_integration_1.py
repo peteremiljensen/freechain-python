@@ -79,6 +79,7 @@ class TestIntegration1(unittest.TestCase):
         self.assertFalse(self.loaf.get_hash() in self.node_1._loaf_pool.keys())
 
     def test_h_broadcast_block(self):
+        Loaf("test").validate()
         global block
         self.node_1.broadcast_block(block)
         block_sema = threading.Semaphore(0)

@@ -26,11 +26,7 @@ class Node():
     def __init__(self, port):
         """ Node class constructor
         """
-
         self._network = Network(port)
-
-        self._loaf_validator = lambda l: return True
-        self._block_validator = lambda b: return True
 
         self._chain = Chain()
         self._loaf_pool = {}
@@ -67,7 +63,7 @@ class Node():
 
     def add_loaf(self, loaf):
         with self._loaf_pool_lock:
-            if not (loaf.validate() and self._loaf_validator(loaf)):
+            if loaf.validate():
                 print(fail('Loaf could not validate'))
                 return False
             if loaf.get_hash() in self._loaf_pool:
@@ -89,10 +85,7 @@ class Node():
         with self._mined_loaves_lock:
             for loaf in block.get_loaves():
                 self._mined_loaves[loaf.get_hash()] = height
-        if self._block_validator(block):
-            return self._chain.add_block(block)
-        else:
-            return False
+        return self._chain.add_block(block)
 
     def remove_block(self, height):
         for loaf in self._chain.get_block(height).get_loaves():
