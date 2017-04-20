@@ -49,12 +49,8 @@ class TestIntegration1(unittest.TestCase):
 
     def test_c_add_loaf_twice(self):
         self.assertFalse(self.node_1.add_loaf(self.loaf))
-        times = 0
-        for l in self.node_1._loaf_pool:
-            if l == self.loaf.get_hash():
-                times += 1
-                break
-        self.assertEqual(times, 1)
+        pool_keys = list(self.node_1._loaf_pool.keys())
+        self.assertEqual(pool_keys.count(self.loaf.get_hash()), 1)
 
     def test_d_broadcast_loaf(self):
         self.node_1.broadcast_loaf(self.loaf)
@@ -63,8 +59,7 @@ class TestIntegration1(unittest.TestCase):
             loaf_sema.release()
         self.e.register_callback(EVENTS_TYPE.RECEIVED_LOAF, loaf_callback)
         self.assertTrue(loaf_sema.acquire(timeout=20))
-        self.assertTrue(self.loaf.get_hash() in
-                        self.node_2._loaf_pool.keys())
+        self.assertTrue(self.loaf.get_hash() in self.node_2._loaf_pool.keys())
 
     def test_e_mining(self):
         global block
@@ -81,12 +76,7 @@ class TestIntegration1(unittest.TestCase):
 
     def test_g_loaf_added_twice_mined(self):
         self.assertFalse(self.node_1.add_loaf(self.loaf))
-        times = 0
-        for l in self.node_1._loaf_pool:
-            if l == self.loaf.get_hash():
-                times += 1
-                break
-        self.assertEqual(times, 0)
+        self.assertFalse(self.loaf.get_hash() in self.node_1._loaf_pool.keys())
 
     def test_h_broadcast_block(self):
         global block
