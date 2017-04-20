@@ -22,9 +22,6 @@ def loaf_validator(loaf):
     return self._loaf['hash'] == hash_calc
 
 def block_validator(block):
-    for l in self._block['loaves']:
-        if not l.validate():
-            return False
     hash_calc = self.calculate_hash()
     return self._block['hash'] == hash_calc and \
            hash_calc[:4] == '0000'
