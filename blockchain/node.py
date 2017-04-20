@@ -293,14 +293,13 @@ class Node():
                            'ones will result in a shorther blockchain'))
                 return
             for i in range(len(blocks)):
-                if blocks[i].validate():
-                    if (i > 0 and blocks[i-1].get_hash() !=
-                        blocks[i].get_previous_block_hash()):
-                        print(fail('Hash of previous block, does not match ' + \
-                                   'previous_block_hash'))
-                        return
-                else:
+                if not blocks[i].validate():
                     print(fail('Failed to validate block: ' + str(blocks[k])))
+                    return
+                if i > 0 and blocks[i-1].get_hash() != \
+                   blocks[i].get_previous_block_hash():
+                    print(fail('Hash of previous block, does not match ' + \
+                               'previous_block_hash'))
                     return
 
             print(info('Replacing blocks from height ' +
