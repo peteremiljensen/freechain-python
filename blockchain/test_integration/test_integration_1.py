@@ -185,6 +185,19 @@ class TestIntegration1(unittest.TestCase):
 
         self.assertTrue(error_sema.acquire(timeout=20))
 
+    def test_m_unsupported_function(self):
+        response = self.node_1._json({'type': 'response',
+                                      'function': 'test215'})
+        self.node_1._network.broadcast(response)
+
+        error_sema = threading.Semaphore(0)
+        def error_callback(data):
+            error_sema.release()
+        self.e.register_callback(EVENTS_TYPE.RECEIVED_ERROR,
+                                 error_callback)
+
+        self.assertTrue(error_sema.acquire(timeout=20))
+
     def test_z_closed_connection(self):
         self.node_1._network.close_connections()
 
