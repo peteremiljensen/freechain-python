@@ -39,7 +39,7 @@ class Chain():
             else:
                 return False
 
-    def remove_blocks(self, height):
+    def remove_block(self, height):
         with self._chain_lock:
             self._chain = self._chain[:height]
 
