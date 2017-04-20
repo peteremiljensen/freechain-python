@@ -53,10 +53,10 @@ class Node():
                                             new_connection_callback)
 
     def attach_loaf_validator(self, function):
-        Validator.Instance().attach_block_validator(function)
+        Validator.Instance().attach_loaf_validator(function)
 
     def attach_block_validator(self, function):
-        Validator.Instance().attach_loaf_validator(function)
+        Validator.Instance().attach_block_validator(function)
 
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """
