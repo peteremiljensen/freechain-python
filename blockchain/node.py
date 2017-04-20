@@ -79,10 +79,7 @@ class Node():
                     pass
         with self._mined_loaves_lock:
             for loaf in block.get_loaves():
-                try:
-                    self._mined_loaves[loaf.get_hash()] = height
-                except KeyError:
-                    print(fail('Failed to ad mined loaf to mined_loaves'))
+                self._mined_loaves[loaf.get_hash()] = height
         return self._chain.add_block(block)
 
     def broadcast_loaf(self, loaf):
