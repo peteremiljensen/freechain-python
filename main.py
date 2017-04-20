@@ -19,11 +19,11 @@ from blockchain.common import *
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
-    return self._loaf['hash'] == hash_calc
+    return loaf.get_hash() == hash_calc
 
 def block_validator(block):
-    hash_calc = self.calculate_hash()
-    return self._block['hash'] == hash_calc and \
+    hash_calc = block.calculate_hash()
+    return block.get_hash() == hash_calc and \
            hash_calc[:4] == '0000'
 
 class Prompt(Cmd):
