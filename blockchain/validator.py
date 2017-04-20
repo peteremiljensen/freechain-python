@@ -13,7 +13,7 @@ class Validator():
         self._block_validator = function
 
     def validate_loaf(self, loaf):
-        self._loaf_validator(loaf)
+        return self._loaf_validator(loaf)
 
     def validate_block(self, block):
-        self._block_validator(block)
+        return self._block_validator(block)
