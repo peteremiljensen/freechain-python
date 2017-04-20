@@ -64,7 +64,7 @@ class Node():
 
     def add_loaf(self, loaf):
         with self._loaf_pool_lock:
-            if loaf.validate():
+            if not loaf.validate():
                 print(fail('Loaf could not validate'))
                 return False
             if loaf.get_hash() in self._loaf_pool:
