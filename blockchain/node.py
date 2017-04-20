@@ -88,6 +88,19 @@ class Node():
                 self._mined_loaves[loaf.get_hash()] = height
         return self._chain.add_block(block)
 
+    def get_loaves(self):
+        loaves = []
+        with self._loaf_pool_lock:
+            loaves_total = 0
+            loaves_hash = []
+            loaf_pool_keys = list(self._loaf_pool.keys())
+            loaves_total = min(1000, len(loaf_pool_keys))
+            loaves_hash = loaf_pool_keys[:loaves_total]
+            for h in loaves_hash:
+                loaves.append(self._loaf_pool[h])
+
+        return loaves
+
     def remove_block(self, height):
         for loaf in self._chain.get_block(height).get_loaves():
             with self._mined_loaves_lock:

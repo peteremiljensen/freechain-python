@@ -17,6 +17,9 @@ from blockchain.common import *
 #
 #
 
+
+
+
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
     return loaf.get_hash() == hash_calc
@@ -26,33 +29,23 @@ def block_validator(block):
     return block.get_hash() == hash_calc and \
            hash_calc[:4] == '0000'
 
-def mine(node):
-    with node._loaf_pool_lock:
-        loaves_total = 0
-        loaves_hash = []
-        loaves = []
-        loaf_pool_keys = list(node._loaf_pool.keys())
-        loaves_total = min(1000, len(loaf_pool_keys))
-        loaves_hash = loaf_pool_keys[:loaves_total]
-        for h in loaves_hash:
-            loaves.append(node._loaf_pool[h])
-
-        height = node._chain.get_length()
-        previous_block_hash = node._chain._chain[-1].get_hash()
-        timestamp = str(datetime.datetime.now())
-        nounce = 0
-        block = None
-        while True:
-            block = Block(loaves, height, previous_block_hash, timestamp, nounce)
-            if block.get_hash()[:4] == '0000':
-                return block
-            nounce += 1
-
-        if block.validate():
+def mine(loaves, prev_block):
+    height = prev_block.get_height() + 1
+    previous_block_hash = prev_block.get_hash()
+    timestamp = str(datetime.datetime.now())
+    nounce = 0
+    block = None
+    while True:
+        block = Block(loaves, height, previous_block_hash, timestamp, nounce)
+        if block.get_hash()[:4] == '0000':
             return block
-        else:
-            print(fail('block could not be mined'))
-            return None
+        nounce += 1
+
+    if block.validate():
+        return block
+    else:
+        print(fail('block could not be mined'))
+        return None
 
 class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
@@ -93,7 +86,10 @@ class Prompt(Cmd):
             print (fail("mine doesnt take any arguments"))
             return
         try:
-            block = mine(self._node)
+            loaves = self._node.get_loaves()
+            chain_length = self._node._chain.get_length()
+            prev_block = self._node._chain.get_block(chain_length-1)
+            block = mine(loaves, prev_block)
             if block is None:
                 print(fail("failed to mine block"))
             else:

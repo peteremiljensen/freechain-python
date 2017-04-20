@@ -50,7 +50,7 @@ class Chain():
             return self._chain[height]
 
     def get_length(self):
-        """ Locks the chain and returns the height of the chain
+        """ Locks the chain and returns the length of the chain
         """
         with self._chain_lock:
             return len(self._chain)
