@@ -21,6 +21,34 @@ def attach(node):
     node.attach_loaf_validator(loaf_validator)
     node.attach_block_validator(block_validator)
 
+def mine(node):
+    with node._loaf_pool_lock:
+        loaves_total = 0
+        loaves_hash = []
+        loaves = []
+        loaf_pool_keys = list(node._loaf_pool.keys())
+        loaves_total = min(1000, len(loaf_pool_keys))
+        loaves_hash = loaf_pool_keys[:loaves_total]
+        for h in loaves_hash:
+            loaves.append(node._loaf_pool[h])
+
+        height = node.get_length()
+        previous_block_hash = self._chain[-1].get_hash()
+        timestamp = str(datetime.datetime.now())
+        nounce = 0
+        block = None
+        while True:
+            block = Block(loaves, height, previous_block_hash, timestamp, nounce)
+            if block.get_hash()[:4] == '0000':
+                return block
+            nounce += 1
+
+        if block.validate():
+            return block
+        else:
+            print(fail('block could not be mined'))
+            return None
+
 class TestIntegration1(unittest.TestCase):
 
     @classmethod
@@ -80,7 +108,7 @@ class TestIntegration1(unittest.TestCase):
 
     def test_e_mining(self):
         global block
-        block = self.node_1.mine()
+        block = mine(self.node_1)
         self.assertEqual(block.get_loaves()[0].get_hash(),
                          self.loaf.get_hash())
         self.assertTrue(block.validate())
@@ -126,19 +154,19 @@ class TestIntegration1(unittest.TestCase):
                              self.node_3._chain.get_block(i).get_hash())
 
     def test_j_longer_chain(self):
-        block_1 = self.node_4.mine()
+        block_1 = mine(self.node_4)
         self.assertTrue(self.node_4.add_block(block_1))
-        block_2 = self.node_4.mine()
+        block_2 = mine(self.node_4)
         self.assertTrue(self.node_4.add_block(block_2))
-        block_3 = self.node_4.mine()
+        block_3 = mine(self.node_4)
         self.assertTrue(self.node_4.add_block(block_3))
-        block_4 = self.node_4.mine()
+        block_4 = mine(self.node_4)
         self.assertTrue(self.node_4.add_block(block_4))
 
         loaf2 = Loaf("test1")
 
         self.assertTrue(self.node_1.add_loaf(loaf2))
-        block_5 = self.node_1.mine()
+        block_5 = mine(self.node_1)
         self.assertTrue(self.node_1.add_block(block_5))
 
         self.assertTrue(loaf2.get_hash() in self.node_1._mined_loaves.keys())

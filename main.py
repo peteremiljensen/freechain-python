@@ -37,7 +37,16 @@ def mine(node):
         for h in loaves_hash:
             loaves.append(node._loaf_pool[h])
 
-        block = node._chain.mine_block(loaves)
+        height = node._chain.get_length()
+        previous_block_hash = node._chain._chain[-1].get_hash()
+        timestamp = str(datetime.datetime.now())
+        nounce = 0
+        block = None
+        while True:
+            block = Block(loaves, height, previous_block_hash, timestamp, nounce)
+            if block.get_hash()[:4] == '0000':
+                return block
+            nounce += 1
 
         if block.validate():
             return block
