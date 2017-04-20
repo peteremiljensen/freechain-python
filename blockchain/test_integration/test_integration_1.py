@@ -59,9 +59,7 @@ class TestIntegration1(unittest.TestCase):
     def test_d_broadcast_loaf(self):
         self.node_1.broadcast_loaf(self.loaf)
         loaf_sema = threading.Semaphore(0)
-        received_loaf = None
         def loaf_callback(loaf):
-            received_loaf = loaf
             loaf_sema.release()
         self.e.register_callback(EVENTS_TYPE.RECEIVED_LOAF, loaf_callback)
         self.assertTrue(loaf_sema.acquire(timeout=20))
