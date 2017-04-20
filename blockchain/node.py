@@ -9,6 +9,7 @@ from blockchain.network import Network
 from blockchain.chain import *
 from blockchain.loaf import Loaf
 from blockchain.block import Block
+from blockchain.validator import Validator
 
 from blockchain.common import *
 
@@ -52,10 +53,10 @@ class Node():
                                             new_connection_callback)
 
     def attach_loaf_validator(self, function):
-        self._loaf_validator = function
+        Validator.Instance().attach_block_validator(function)
 
     def attach_block_validator(self, function):
-        self._block_validator = function
+        Validator.Instance().attach_loaf_validator(function)
 
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """

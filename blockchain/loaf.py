@@ -2,6 +2,8 @@ import hashlib
 import datetime
 import json
 
+from blochain.validator import Validator
+
 #   _                  __
 #  | |                / _|
 #  | |     ___   __ _| |_
@@ -49,8 +51,7 @@ class Loaf():
         """ Calculates loaf hash and compares it to current hash.
         returns True if they are the same
         """
-        hash_calc = self.calculate_hash()
-        return self._loaf['hash'] == hash_calc
+        return Validator.Instance().validate_loaf(self)
 
     @staticmethod
     def create_loaf_from_dict(dictio):
