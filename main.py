@@ -31,6 +31,9 @@ class Prompt(Cmd):
         self._node = Node(port)
         self._node.start()
 
+        self._node.attach_loaf_validator(loaf_validator)
+        self._node.attach_block_validator(block_validator)
+
     def do_connect(self, args):
         """ Parses the arguments to get nodes ip and connects to node
         """
