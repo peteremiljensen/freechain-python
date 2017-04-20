@@ -192,12 +192,11 @@ class Node():
                                                    'description':
                                                    'Unsupported function'}))
 
-                except AttributeError:
+                except (AttributeError, KeyError):
                     response = self._json({'type': 'error',
                                            'description': 'Request not ' + \
                                            'encoded correctly as UTF-8'})
                     self._network.send(websocket, response)
-                    raise
                 except SyncQueueEmpty:
                     pass
                 except:
