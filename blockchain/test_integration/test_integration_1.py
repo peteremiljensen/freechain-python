@@ -117,12 +117,13 @@ class TestIntegration1(unittest.TestCase):
         block_4 = self.node_4.mine()
         self.assertTrue(self.node_4.add_block(block_4))
 
-        self.node_1.add_loaf(self.loaf)
+        loaf2 = Loaf("test1")
+
+        self.assertTrue(self.node_1.add_loaf(loaf2))
         block_5 = self.node_1.mine()
         self.assertTrue(self.node_1.add_block(block_5))
 
-        self.assertTrue(self.loaf.get_hash() in
-                        list(self.node_1._mined_loaves.keys()))
+        self.assertTrue(loaf2.get_hash() in self.node_1._mined_loaves.keys())
 
         self.node_1.connect_node('localhost', 9003)
 
@@ -138,8 +139,9 @@ class TestIntegration1(unittest.TestCase):
             self.assertEqual(self.node_1._chain.get_block(i).get_hash(),
                              self.node_4._chain.get_block(i).get_hash())
 
-        self.assertTrue(loaf.get_hash() in list(self.node_1._loaf_pool.keys()))
-        self.assertTrue(loaf            in list(self.node_1._loaf_pool.values()))
+        self.assertTrue(loaf2.get_hash() in list(self.node_1._loaf_pool.keys()))
+        self.assertTrue(loaf2            in list(self.node_1._loaf_pool.values()))
+        self.assertTrue(loaf2.get_hash() not in self.node_1._mined_loaves.keys())
 
     def test_k_unknown_type(self):
         response = self.node_1._json({'type': 'test'})
