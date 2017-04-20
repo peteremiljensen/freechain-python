@@ -35,7 +35,8 @@ class Network():
     def close_connections(self):
         for node in list(self._nodes):
             try:
-                asyncio.get_event_loop().run_until_complete(node.close_connection(force=True))
+                asyncio.get_event_loop().run_until_complete(
+                    node.close_connection(force=True))
             except RuntimeError:
                 pass
 
