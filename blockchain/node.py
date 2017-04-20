@@ -29,6 +29,9 @@ class Node():
 
         self._network = Network(port)
 
+        self._loaf_validator = None
+        self._block_validator = None
+
         self._chain = Chain()
         self._loaf_pool = {}
         self._loaf_pool_lock = threading.RLock()
@@ -53,10 +56,10 @@ class Node():
                                             new_connection_callback)
 
     def attach_loaf_validator(self, function):
-        pass
+        self._loaf_validator = function
 
     def attach_block_validator(self, function):
-        pass
+        self._block_validator = function
 
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """
@@ -64,7 +67,7 @@ class Node():
 
     def add_loaf(self, loaf):
         with self._loaf_pool_lock:
-            if not loaf.validate():
+            if not (loaf.validate() and self._loaf_validator(loaf)):
                 print(fail('Loaf could not validate'))
                 return False
             if loaf.get_hash() in self._loaf_pool:
@@ -86,7 +89,10 @@ class Node():
         with self._mined_loaves_lock:
             for loaf in block.get_loaves():
                 self._mined_loaves[loaf.get_hash()] = height
-        return self._chain.add_block(block)
+        if self._block_validator(block):
+            return self._chain.add_block(block)
+        else:
+            return False
 
     def remove_block(self, height):
         for loaf in self._chain.get_block(height).get_loaves():
