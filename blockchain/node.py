@@ -52,6 +52,12 @@ class Node():
         Events.Instance().register_callback(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                             new_connection_callback)
 
+    def attach_loaf_validator(self, function):
+        pass
+
+    def attach_block_validator(self, function):
+        pass
+
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """
         self._network.connect_node(ip, port)
