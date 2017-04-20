@@ -194,6 +194,9 @@ class TestIntegration1(unittest.TestCase):
 
         self.assertTrue(error_sema.acquire(timeout=20))
 
+    def test_n_remove_block(self):
+        pass
+
     def test_z_closed_connection(self):
         self.node_1._network.close_connections()
 
