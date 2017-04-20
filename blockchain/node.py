@@ -314,10 +314,7 @@ class Node():
                         except KeyError:
                             pass
                     with self._loaf_pool_lock:
-                        try:
-                            self._loaf_pool[loaf.get_hash()] = loaf
-                        except KeyError:
-                            pass
+                        self._loaf_pool[loaf.get_hash()] = loaf
                     self._chain.remove_block(i)
             for block in blocks:
                 if not self.add_block(block):
