@@ -63,13 +63,8 @@ class TestIntegration1(unittest.TestCase):
             loaf_sema.release()
         self.e.register_callback(EVENTS_TYPE.RECEIVED_LOAF, loaf_callback)
         self.assertTrue(loaf_sema.acquire(timeout=20))
-
-        exists = False
-        for l in self.node_2._loaf_pool:
-            if l == self.loaf.get_hash():
-                exists = True
-                break
-        self.assertTrue(exists)
+        self.assertTrue(self.loaf.get_hash() in
+                        list(self.node_2._loaf_pool.keys()))
 
     def test_e_mining(self):
         global block
