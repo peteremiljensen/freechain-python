@@ -110,14 +110,7 @@ class TestIntegration1(unittest.TestCase):
         self.assertEqual(new_block.get_hash(), block.get_hash())
 
     def test_i_replacing_chain(self):
-        connect_sema = threading.Semaphore(0)
-        def connection_callback(websocket):
-            connect_sema.release()
-        self.e.register_callback(EVENTS_TYPE.CONNECTION_READY,
-                                 connection_callback)
-
         self.node_3.connect_node('localhost', 9000)
-        self.assertTrue(connect_sema.acquire(timeout=20))
 
         replaced_sema = threading.Semaphore(0)
         def replaced_callback(websocket):
