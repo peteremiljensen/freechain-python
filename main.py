@@ -17,6 +17,10 @@ from blockchain.common import *
 #
 #
 
+def loaf_validator():
+
+def block_validator():
+
 class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
 
