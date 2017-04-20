@@ -103,10 +103,7 @@ class Node():
             loaves_hash = []
             loaves = []
             loaf_pool_keys = list(self._loaf_pool.keys())
-            if len(loaf_pool_keys) < 1000:
-                loaves_total = len(loaf_pool_keys)
-            else:
-                loaves_total = 1000
+            loaves_total = min(1000, len(loaf_pool_keys))
             loaves_hash = loaf_pool_keys[:loaves_total]
             for h in loaves_hash:
                 loaves.append(self._loaf_pool[h])
