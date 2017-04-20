@@ -26,6 +26,25 @@ def block_validator(block):
     return block.get_hash() == hash_calc and \
            hash_calc[:4] == '0000'
 
+def mine(node):
+    with node._loaf_pool_lock:
+        loaves_total = 0
+        loaves_hash = []
+        loaves = []
+        loaf_pool_keys = list(node._loaf_pool.keys())
+        loaves_total = min(1000, len(loaf_pool_keys))
+        loaves_hash = loaf_pool_keys[:loaves_total]
+        for h in loaves_hash:
+            loaves.append(node._loaf_pool[h])
+
+        block = node._chain.mine_block(loaves)
+
+        if block.validate():
+            return block
+        else:
+            print(fail('block could not be mined'))
+            return None
+
 class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
 
@@ -65,7 +84,7 @@ class Prompt(Cmd):
             print (fail("mine doesnt take any arguments"))
             return
         try:
-            block = self._node.mine()
+            block = mine(self._node)
             if block is None:
                 print(fail("failed to mine block"))
             else:

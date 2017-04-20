@@ -114,25 +114,6 @@ class Node():
                         'function': FUNCTIONS.BROADCAST_BLOCK,
                         'block': block}))
 
-    def mine(self):
-        with self._loaf_pool_lock:
-            loaves_total = 0
-            loaves_hash = []
-            loaves = []
-            loaf_pool_keys = list(self._loaf_pool.keys())
-            loaves_total = min(1000, len(loaf_pool_keys))
-            loaves_hash = loaf_pool_keys[:loaves_total]
-            for h in loaves_hash:
-                loaves.append(self._loaf_pool[h])
-
-            block = self._chain.mine_block(loaves)
-
-            if block.validate():
-                return block
-            else:
-                print(fail('block could not be mined'))
-                return None
-
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
 
