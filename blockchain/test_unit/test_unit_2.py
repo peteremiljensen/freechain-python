@@ -2,11 +2,24 @@ import unittest
 import datetime, json
 from .. import block, loaf
 from .miner import *
+from ..validator import Validator
+
+def loaf_validator(loaf):
+    hash_calc = loaf.calculate_hash()
+    return loaf.get_hash() == hash_calc
+
+def block_validator(block):
+    hash_calc = block.calculate_hash()
+    return block.get_hash() == hash_calc and \
+           hash_calc[:4] == '0000'
 
 class TestBlockMethods(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        Validator.Instance().attach_loaf_validator(loaf_validator)
+        Validator.Instance().attach_block_validator(block_validator)
+
         cls.l_1 = loaf.Loaf('test')
         cls.l_2 = loaf.Loaf('test', 'test', 'test')
 
