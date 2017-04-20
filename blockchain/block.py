@@ -3,6 +3,7 @@ import datetime
 import json
 
 from blockchain.loaf import *
+from blockchain.validator import Validator
 
 #  ______ _            _
 #  | ___ \ |          | |
@@ -69,9 +70,7 @@ class Block:
         for l in self._block['loaves']:
             if not l.validate():
                 return False
-        hash_calc = self.calculate_hash()
-        return self._block['hash'] == hash_calc and \
-            hash_calc[:4] == '0000'
+        return Validator.Instance().validate_block(self)
 
     @staticmethod
     def create_block_from_dict(dictio):

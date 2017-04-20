@@ -8,6 +8,19 @@ from .. import block
 
 block = None
 
+def loaf_validator(loaf):
+    hash_calc = loaf.calculate_hash()
+    return loaf.get_hash() == hash_calc
+
+def block_validator(block):
+    hash_calc = block.calculate_hash()
+    return block.get_hash() == hash_calc and \
+           hash_calc[:4] == '0000'
+
+def attach(node):
+    node.attach_loaf_validator(loaf_validator)
+    node.attach_block_validator(block_validator)
+
 class TestIntegration1(unittest.TestCase):
 
     @classmethod
@@ -28,6 +41,10 @@ class TestIntegration1(unittest.TestCase):
         cls.node_3.start()
         cls.node_4.start()
         time.sleep(1)
+        attach(cls.node_1)
+        attach(cls.node_2)
+        attach(cls.node_3)
+        attach(cls.node_4)
 
         cls.node_1.connect_node('localhost', 9001)
         cls.is_connected = cls.connect_sema.acquire(timeout=20)
@@ -79,6 +96,7 @@ class TestIntegration1(unittest.TestCase):
         self.assertFalse(self.loaf.get_hash() in self.node_1._loaf_pool.keys())
 
     def test_h_broadcast_block(self):
+        Loaf("test").validate()
         global block
         self.node_1.broadcast_block(block)
         block_sema = threading.Semaphore(0)

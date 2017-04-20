@@ -9,6 +9,7 @@ from blockchain.network import Network
 from blockchain.chain import *
 from blockchain.loaf import Loaf
 from blockchain.block import Block
+from blockchain.validator import Validator
 
 from blockchain.common import *
 
@@ -26,7 +27,6 @@ class Node():
     def __init__(self, port):
         """ Node class constructor
         """
-
         self._network = Network(port)
 
         self._chain = Chain()
@@ -51,6 +51,12 @@ class Node():
             self._get_length(websocket)
         Events.Instance().register_callback(EVENTS_TYPE.NEW_CLIENT_CONNECTION,
                                             new_connection_callback)
+
+    def attach_loaf_validator(self, function):
+        Validator.Instance().attach_loaf_validator(function)
+
+    def attach_block_validator(self, function):
+        Validator.Instance().attach_block_validator(function)
 
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """

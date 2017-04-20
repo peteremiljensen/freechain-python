@@ -2,6 +2,8 @@ import hashlib
 import datetime
 import json
 
+from blockchain.validator import Validator
+
 #   _                  __
 #  | |                / _|
 #  | |     ___   __ _| |_
@@ -39,6 +41,7 @@ class Loaf():
 
     def calculate_hash(self):
         """ Calculates the same hash of loaf object """
+        ## TODO: Secure loaf by either lock or do calculations on a copy
         hash_tmp = self._loaf['hash']
         del self._loaf['hash']
         hash_calc = hashlib.sha256(self.json()).hexdigest()
@@ -49,8 +52,7 @@ class Loaf():
         """ Calculates loaf hash and compares it to current hash.
         returns True if they are the same
         """
-        hash_calc = self.calculate_hash()
-        return self._loaf['hash'] == hash_calc
+        return Validator.Instance().validate_loaf(self)
 
     @staticmethod
     def create_loaf_from_dict(dictio):

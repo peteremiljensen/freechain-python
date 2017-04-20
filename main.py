@@ -17,6 +17,15 @@ from blockchain.common import *
 #
 #
 
+def loaf_validator(loaf):
+    hash_calc = loaf.calculate_hash()
+    return loaf.get_hash() == hash_calc
+
+def block_validator(block):
+    hash_calc = block.calculate_hash()
+    return block.get_hash() == hash_calc and \
+           hash_calc[:4] == '0000'
+
 class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
 
@@ -26,6 +35,9 @@ class Prompt(Cmd):
         super().__init__()
         self._node = Node(port)
         self._node.start()
+
+        self._node.attach_loaf_validator(loaf_validator)
+        self._node.attach_block_validator(block_validator)
 
     def do_connect(self, args):
         """ Parses the arguments to get nodes ip and connects to node
