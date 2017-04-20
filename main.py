@@ -19,7 +19,6 @@ from blockchain.common import *
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
-    print ("test")
     return loaf.get_hash() == hash_calc
 
 def block_validator(block):
