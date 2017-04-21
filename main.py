@@ -19,6 +19,7 @@ from blockchain.common import *
 
 
 
+
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
     return loaf.get_hash() == hash_calc
