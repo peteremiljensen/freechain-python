@@ -273,9 +273,11 @@ class Node():
                     blocks_to_remove -= 1
 
                 while blocks_to_add != 0:
-                    self.add_block(rec_chain.get_block(rec_chain_length -
-                                                       blocks_to_add))
+                    block = rec_chain.get_block(rec_chain_length - blocks_to_add)
+                    self.add_block(block)
                     blocks_to_add -= 1
+
+            Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
