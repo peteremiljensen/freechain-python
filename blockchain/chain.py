@@ -50,27 +50,10 @@ class Chain():
             return self._chain[height]
 
     def get_length(self):
-        """ Locks the chain and returns the height of the chain
+        """ Locks the chain and returns the length of the chain
         """
         with self._chain_lock:
             return len(self._chain)
-
-    def mine_block(self, loaves):
-        """ Creates a block from given loaves. Sets nounce to 0 and generates
-            a hash. If the first 5 digits in the hash are 0, the block is
-            returned. If not, nounce is incremented by one and a new hash is
-            generated
-        """
-        height = self.get_length()
-        previous_block_hash = self._chain[-1].get_hash()
-        timestamp = str(datetime.datetime.now())
-        nounce = 0
-        block = None
-        while True:
-            block = Block(loaves, height, previous_block_hash, timestamp, nounce)
-            if block.get_hash()[:4] == '0000':
-                return block
-            nounce += 1
 
     def json(self):
         """ Serializes chain to a JSON formatted string, encodes to utf-8

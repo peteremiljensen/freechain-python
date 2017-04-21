@@ -8,7 +8,7 @@ class TestChainMethods(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.chain = chain.Chain()
-        cls.b_1 = cls.chain.mine_block([])
+        cls.b_1 = mine([], cls.chain.get_block(0))
         cls.b_2 = block.Block([], 0, "-1", "2012", 512, "test")
 
     def test_add_block(self):
@@ -21,7 +21,9 @@ class TestChainMethods(unittest.TestCase):
         self.assertEqual(height-1, self.chain.get_length())
 
     def test_get_block(self):
-        b = self.chain.mine_block([])
+        length = self.chain.get_length()
+        prev_block = self.chain.get_block(length - 1)
+        b = mine([], prev_block)
         self.chain.add_block(b)
         self.assertEqual(b, self.chain.get_block(self.chain.get_length()-1))
 

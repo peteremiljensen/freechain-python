@@ -24,7 +24,6 @@ class EVENTS_TYPE:
 
 class FUNCTIONS:
     GET_LENGTH = 'get_length'
-    GET_HASH = 'get_hash'
-    GET_BLOCKS = 'get_blocks'
+    GET_CHAIN = 'get_chain'
     BROADCAST_LOAF = 'broadcast_loaf'
     BROADCAST_BLOCK = 'broadcast_block'

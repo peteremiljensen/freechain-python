@@ -17,6 +17,9 @@ from blockchain.common import *
 #
 #
 
+
+
+
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
     return loaf.get_hash() == hash_calc
@@ -25,6 +28,36 @@ def block_validator(block):
     hash_calc = block.calculate_hash()
     return block.get_hash() == hash_calc and \
            hash_calc[:4] == '0000'
+
+def mine(loaves, prev_block):
+    height = prev_block.get_height() + 1
+    previous_block_hash = prev_block.get_hash()
+    timestamp = str(datetime.datetime.now())
+    nounce = 0
+    block = None
+    while True:
+        block = Block(loaves, height, previous_block_hash, timestamp, nounce)
+        if block.get_hash()[:4] == '0000':
+            return block
+        nounce += 1
+
+    if block.validate():
+        return block
+    else:
+        print(fail('block could not be mined'))
+        return None
+
+def consensus_check(local_length, rec_length):
+    if local_length < rec_length:
+        return True
+    else:
+        return False
+
+def consensus(chain1, chain2):
+    if chain1.get_length() < chain2.get_length():
+        return chain2
+    else:
+        return chain1
 
 class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
@@ -38,6 +71,8 @@ class Prompt(Cmd):
 
         self._node.attach_loaf_validator(loaf_validator)
         self._node.attach_block_validator(block_validator)
+        self._node.attach_consensus_check(consensus_check)
+        self._node.attach_consensus(consensus)
 
     def do_connect(self, args):
         """ Parses the arguments to get nodes ip and connects to node
@@ -65,7 +100,10 @@ class Prompt(Cmd):
             print (fail("mine doesnt take any arguments"))
             return
         try:
-            block = self._node.mine()
+            loaves = self._node.get_loaves()
+            chain_length = self._node._chain.get_length()
+            prev_block = self._node._chain.get_block(chain_length-1)
+            block = mine(loaves, prev_block)
             if block is None:
                 print(fail("failed to mine block"))
             else:

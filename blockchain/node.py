@@ -58,6 +58,12 @@ class Node():
     def attach_block_validator(self, function):
         Validator.Instance().attach_block_validator(function)
 
+    def attach_consensus_check(self, function):
+        Validator.Instance().attach_consensus_check(function)
+
+    def attach_consensus(self, function):
+        Validator.Instance().attach_consensus(function)
+
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """
         self._network.connect_node(ip, port)
@@ -88,6 +94,19 @@ class Node():
                 self._mined_loaves[loaf.get_hash()] = height
         return self._chain.add_block(block)
 
+    def get_loaves(self):
+        loaves = []
+        with self._loaf_pool_lock:
+            loaves_total = 0
+            loaves_hash = []
+            loaf_pool_keys = list(self._loaf_pool.keys())
+            loaves_total = min(1000, len(loaf_pool_keys))
+            loaves_hash = loaf_pool_keys[:loaves_total]
+            for h in loaves_hash:
+                loaves.append(self._loaf_pool[h])
+
+        return loaves
+
     def remove_block(self, height):
         for loaf in self._chain.get_block(height).get_loaves():
             with self._mined_loaves_lock:
@@ -114,46 +133,16 @@ class Node():
                         'function': FUNCTIONS.BROADCAST_BLOCK,
                         'block': block}))
 
-    def mine(self):
-        with self._loaf_pool_lock:
-            loaves_total = 0
-            loaves_hash = []
-            loaves = []
-            loaf_pool_keys = list(self._loaf_pool.keys())
-            loaves_total = min(1000, len(loaf_pool_keys))
-            loaves_hash = loaf_pool_keys[:loaves_total]
-            for h in loaves_hash:
-                loaves.append(self._loaf_pool[h])
-
-            block = self._chain.mine_block(loaves)
-
-            if block.validate():
-                return block
-            else:
-                print(fail('block could not be mined'))
-                return None
-
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
-
         self._network.send(websocket, self._json(
             {'type': 'request',
              'function': FUNCTIONS.GET_LENGTH}))
 
-    def _get_hash(self, websocket, height):
-            self._network.send(websocket, self._json(
-                {'type': 'request',
-                 'function': FUNCTIONS.GET_HASH,
-                 'height': height}))
-
-    def _get_blocks(self, websocket, offset, length):
-        """ Requests  missing blocks from a node """
-
+    def _get_chain(self, websocket):
         self._network.send(websocket, self._json(
             {'type': 'request',
-             'function': FUNCTIONS.GET_BLOCKS,
-             'offset': offset,
-             'length': length}))
+             'function': FUNCTIONS.GET_CHAIN}))
 
     def _start_events_thread(self):
         """ Starts an event thread that runs untill completion """
@@ -189,10 +178,8 @@ class Node():
                                                    'type is not supported'}))
                     elif message['function'] == FUNCTIONS.GET_LENGTH:
                         self._handle_get_length(message, websocket)
-                    elif message['function'] == FUNCTIONS.GET_HASH:
-                        self._handle_get_hash(message, websocket)
-                    elif message['function'] == FUNCTIONS.GET_BLOCKS:
-                        self._handle_get_blocks(message, websocket)
+                    elif message['function'] == FUNCTIONS.GET_CHAIN:
+                        self._handle_get_chain(message, websocket)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._handle_broadcast_loaf(message)
                     elif message['function'] == FUNCTIONS.BROADCAST_BLOCK:
@@ -219,6 +206,7 @@ class Node():
         """ Reads a request for the length of the blockchain. If local
             blockchain is shorter, it sends a request for missing blocks
         """
+
         if message['type'] == 'request':
             chain_length = self._chain.get_length()
             response = self._json({'type': 'response',
@@ -227,100 +215,69 @@ class Node():
             self._network.send(websocket, response)
 
         elif message['type'] == 'response':
-            chain_length = self._chain.get_length()
-            response_length = message['length']
+            local_length = self._chain.get_length()
+            rec_length = message['length']
             print(info('Recieved blockchain length is: ' +
-                       str(response_length)))
+                       str(rec_length)))
             print(info('local block length is : ' +
-                       str(chain_length)))
-            if response_length > chain_length:
-                print(info('Requesting hash of block: ' + str(chain_length-1)))
-                self._get_hash(websocket, chain_length-1)
+                       str(local_length)))
+            if Validator.Instance().consensus_check(local_length, rec_length):
+                print(info('Consulting consensus'))
+                self._get_chain(websocket)
             else:
                 print(info('Keeping local blocks'))
 
-    def _handle_get_hash(self, message, websocket):
+    def _handle_get_chain(self, message, websocket):
         if message['type'] == 'request':
-            height = message['height']
-            hash = self._chain.get_block(height).get_hash()
-            length = self._chain.get_length()
+            blocks = []
+            for i in range(self._chain.get_length()):
+                blocks.append(self._chain.get_block(i))
+
             response = self._json({'type': 'response',
-                                   'function': FUNCTIONS.GET_HASH,
-                                   'height': height,
-                                   'hash': hash})
+                                   'function': FUNCTIONS.GET_CHAIN,
+                                   'chain': blocks})
+
             self._network.send(websocket, response)
 
         elif message['type'] == 'response':
-            height = message['height']
-            block_hash = self._chain.get_block(height).get_hash()
-            response_hash = message['hash']
-            if block_hash == response_hash:
-                print(info('Block hashes of height: ' + str(height) +
-                           ' matches'))
-                print(info('Requesting blocks'))
-                self._get_blocks(websocket, height+1, -1)
-            else:
-                print(info('Block hashes of height: ' + str(height) +
-                           ' do not match'))
-                print(info('Requesting block hash of height: ' + str(height-1)))
-                self._get_hash(websocket, height-1)
-
-    def _handle_get_blocks(self, message, websocket):
-        """ Reads a request for missing blocks and sends them if local chain
-            is longer
-        """
-        if message['type'] == 'request':
-            if message['length'] == -1:
-                length = self._chain.get_length() - message['offset']
-            else:
-                length = message['length']
-            if self._chain.get_length() >= \
-               message['offset'] + length:
-                blocks = []
-                for i in range(length):
-                    blocks.append(self._chain.get_block(i + message['offset']))
-                response = self._json({'type': 'response',
-                                       'function': FUNCTIONS.GET_BLOCKS,
-                                       'blocks': blocks})
-                self._network.send(websocket, response)
-            else:
-                self._network.send(
-                    websocket,
-                    self._json({'type': 'error',
-                                'description': 'requested length is ' + \
-                                'longer than chain'}))
-
-        elif message['type'] == 'response':
             blocks = []
-            for block_dict in message['blocks']:
+            for block_dict in message['chain']:
                 blocks.append(Block.create_block_from_dict(block_dict))
-            if blocks[0].get_height()+len(blocks) <= self._chain.get_length():
-                print(fail('Replacing the local blocks with the received ' + \
-                           'ones will result in a shorther blockchain'))
-                return
+
+            rec_chain = Chain()
             for i in range(len(blocks)):
-                if not blocks[i].validate():
-                    print(fail('Failed to validate block: ' + str(blocks[k])))
-                    return
-                if i > 0 and blocks[i-1].get_hash() != \
-                   blocks[i].get_previous_block_hash():
-                    print(fail('Hash of previous block, does not match ' + \
-                               'previous_block_hash'))
-                    return
+                rec_chain.add_block(blocks[i])
 
-            print(info('Replacing blocks from height ' +
-                       str(blocks[0].get_height()) + ' and up'))
+            rec_chain = Validator.Instance().consensus(self._chain,
+                                                       rec_chain)
 
-            for i in reversed(range(blocks[0].get_height(),
-                                    self._chain.get_length())):
-                self.remove_block(i)
-            for block in blocks:
-                if not self.add_block(block):
-                    print(fail('block of height ' + str(block.get_height()) +
-                               ' cannot be added'))
-                    return
-            Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, None)
-            print(info('blocks succesfully added to blockchain'))
+            rec_chain_length = rec_chain.get_length()
+            local_chain_length = self._chain.get_length()
+            blocks_to_remove = 0
+            if rec_chain == self._chain._chain:
+                pass
+            else:
+                for i in list(reversed(range(local_chain_length))):
+                    if self._chain.get_block(i).get_hash() == rec_chain.get_block(i).get_hash():
+                        break
+                    elif i == 0:
+                        print("Blockchains can't be merged")
+                        return
+                    else:
+                        blocks_to_remove += 1
+
+                blocks_to_add = (rec_chain_length - local_chain_length) + \
+                                blocks_to_remove
+                while blocks_to_remove != 0:
+                    self.remove_block(self._chain.get_length()-1)
+                    blocks_to_remove -= 1
+
+                while blocks_to_add != 0:
+                    block = rec_chain.get_block(rec_chain_length - blocks_to_add)
+                    self.add_block(block)
+                    blocks_to_add -= 1
+
+            Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,

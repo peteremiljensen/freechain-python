@@ -1,13 +1,20 @@
 import datetime
-from .. import block
+from ..block import Block
 
-def miner(loaves, height, previous_block_hash):
-    b = None
+def mine(loaves, prev_block):
+    height = prev_block.get_height() + 1
+    previous_block_hash = prev_block.get_hash()
     timestamp = str(datetime.datetime.now())
     nounce = 0
+    block = None
     while True:
-        b = block.Block(loaves, height, previous_block_hash, timestamp, nounce)
-        if b.get_hash()[:4] == '0000':
-            break
+        block = Block(loaves, height, previous_block_hash, timestamp, nounce)
+        if block.get_hash()[:4] == '0000':
+            return block
         nounce += 1
-    return b
+
+    if block.validate():
+        return block
+    else:
+        print(fail('block could not be mined'))
+        return None

@@ -20,7 +20,38 @@ def block_validator(block):
 def attach(node):
     node.attach_loaf_validator(loaf_validator)
     node.attach_block_validator(block_validator)
+    node.attach_consensus_check(consensus_check)
+    node.attach_consensus(consensus)
 
+def mine(loaves, prev_block):
+    height = prev_block.get_height() + 1
+    previous_block_hash = prev_block.get_hash()
+    timestamp = str(datetime.datetime.now())
+    nounce = 0
+    block = None
+    while True:
+        block = Block(loaves, height, previous_block_hash, timestamp, nounce)
+        if block.get_hash()[:4] == '0000':
+            return block
+        nounce += 1
+
+    if block.validate():
+        return block
+    else:
+        print(fail('block could not be mined'))
+        return None
+
+def consensus_check(local_length, rec_length):
+    if local_length < rec_length:
+        return True
+    else:
+        return False
+
+def consensus(chain1, chain2):
+    if chain1.get_length() < chain2.get_length():
+        return chain2
+    else:
+        return chain1
 class TestIntegration1(unittest.TestCase):
 
     @classmethod
@@ -80,7 +111,10 @@ class TestIntegration1(unittest.TestCase):
 
     def test_e_mining(self):
         global block
-        block = self.node_1.mine()
+        loaves = self.node_1.get_loaves()
+        chain_length = self.node_1._chain.get_length()
+        prev_block = self.node_1._chain.get_block(chain_length-1)
+        block = mine(loaves, prev_block)
         self.assertEqual(block.get_loaves()[0].get_hash(),
                          self.loaf.get_hash())
         self.assertTrue(block.validate())
@@ -126,19 +160,34 @@ class TestIntegration1(unittest.TestCase):
                              self.node_3._chain.get_block(i).get_hash())
 
     def test_j_longer_chain(self):
-        block_1 = self.node_4.mine()
+        loaves = self.node_4.get_loaves()
+        chain_length = self.node_4._chain.get_length()
+        prev_block = self.node_4._chain.get_block(chain_length-1)
+        block_1 = mine(loaves, prev_block)
         self.assertTrue(self.node_4.add_block(block_1))
-        block_2 = self.node_4.mine()
+        loaves = self.node_4.get_loaves()
+        chain_length = self.node_4._chain.get_length()
+        prev_block = self.node_4._chain.get_block(chain_length-1)
+        block_2 = mine(loaves, prev_block)
         self.assertTrue(self.node_4.add_block(block_2))
-        block_3 = self.node_4.mine()
+        loaves = self.node_4.get_loaves()
+        chain_length = self.node_4._chain.get_length()
+        prev_block = self.node_4._chain.get_block(chain_length-1)
+        block_3 = mine(loaves, prev_block)
         self.assertTrue(self.node_4.add_block(block_3))
-        block_4 = self.node_4.mine()
+        loaves = self.node_4.get_loaves()
+        chain_length = self.node_4._chain.get_length()
+        prev_block = self.node_4._chain.get_block(chain_length-1)
+        block_4 = mine(loaves, prev_block)
         self.assertTrue(self.node_4.add_block(block_4))
 
         loaf2 = Loaf("test1")
 
         self.assertTrue(self.node_1.add_loaf(loaf2))
-        block_5 = self.node_1.mine()
+        loaves = self.node_1.get_loaves()
+        chain_length = self.node_1._chain.get_length()
+        prev_block = self.node_1._chain.get_block(chain_length-1)
+        block_5 = mine(loaves, prev_block)
         self.assertTrue(self.node_1.add_block(block_5))
 
         self.assertTrue(loaf2.get_hash() in self.node_1._mined_loaves.keys())
