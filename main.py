@@ -29,10 +29,10 @@ parser.add_argument('-f', '--file', nargs='?',
 parser.add_argument('-n', '--name', nargs='?',
                     help='Name of the blockchain, used to ensure that only ' +
                     'blockchains of the same name are synchronized')
-print(parser.parse_args())
 args = parser.parse_args()
 port = args.port
 file = args.file
+name = args.name
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
@@ -80,9 +80,13 @@ class Prompt(Cmd):
         ''' Prompt class constructor
         '''
         super().__init__()
-        self._node = Node(port)
 
-        if file and os.path.exists(file):
+        self._port = port
+        self._file = file
+        self._name = name
+        self._node = Node(self._port)
+
+        if file and os.path.exists(self._file):
             chain_list = self.read_chain()
 
             self._node._chain._chain = \
@@ -210,12 +214,25 @@ class Prompt(Cmd):
         return completions
 
     def read_chain(self):
-        with open(file, 'r') as f:
-            return eval(eval(f.read()).decode())
+        with open(self._file, 'r') as f:
+            file_chain_name = f.readline().rstrip()
+            if file_chain_name == self._name:
+                return eval(eval(f.read()).decode())
+            else:
+                print(fail('The blockchain name given as input, does not ' + \
+                           'match the name in ' + self._file))
+                self._file = None
+                self.do_quit(args)
 
     def save_chain(self):
-        with open(file, 'w') as f:
+        with open(self._file, 'w') as f:
+            print(info('Saving blockchain'))
+            if self._name:
+                f.write(self._name + '\n')
+            else:
+                f.write('\n')
             f.write(str(self._node._chain.json()))
+            f.write('\n')
         f.close()
 
     def do_EOF(self, line):
@@ -226,8 +243,7 @@ class Prompt(Cmd):
     def do_quit(self, args):
         ''' Quits program
         '''
-        print(info('Saving blockchain'))
-        if file:
+        if self._file:
             self.save_chain()
         print(info('Quitting'))
         raise SystemExit
