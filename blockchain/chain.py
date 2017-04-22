@@ -62,3 +62,10 @@ class Chain():
         return json.dumps(self._chain,
                           sort_keys=True,
                           cls=BlockEncoder).encode('utf-8')
+
+    @staticmethod
+    def create_chain_from_list(list):
+        blocks = []
+        for block_raw in list:
+            blocks.append(Block.create_block_from_dict(block_raw))
+        return blocks
