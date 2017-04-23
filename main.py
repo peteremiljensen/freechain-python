@@ -87,10 +87,11 @@ class Prompt(Cmd):
         self._node = Node(self._port)
 
         if file and os.path.exists(self._file):
-            chain_list = self.read_chain()
+            raw_chain_list = self.read_chain()
+            chain = self._node._chain.create_chain_from_list(raw_chain_list)
 
-            self._node._chain._chain = \
-            self._node._chain.create_chain_from_list(chain_list)
+            for block in chain[1:]:
+                self._node.add_block(block)
 
         self._node.start()
 
