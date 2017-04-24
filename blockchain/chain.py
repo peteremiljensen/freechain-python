@@ -58,10 +58,13 @@ class Chain():
     def validate(self):
         with self._chain_lock:
             for i in range(len(self._chain)):
-                if not self._chain[i].validate():
+                if not self.get_block(i).validate():
+                    print (self.get_block(i).get_hash())
+                    print ('Block', i, 'is not valid')
                     return False
-                elif i > 0 and self._chain[i].get_previois_block_hash() != \
-                     self._chain[i-1].get_hash():
+                elif i > 0 and self.get_block(i).get_previous_block_hash() != \
+                     self.get_block(i-1).get_hash():
+                    print ('Block', i, 'does not match hash')
                     return False
             return True
 
