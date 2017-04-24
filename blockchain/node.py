@@ -207,7 +207,6 @@ class Node():
                                            'description': 'Attribute or ' + \
                                            'KeyError. Consider adding "raise"'})
                     self._network.send(websocket, response)
-                    raise
                 except SyncQueueEmpty:
                     pass
                 except:
