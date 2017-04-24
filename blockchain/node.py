@@ -137,12 +137,13 @@ class Node():
 
     def read_chain(self, path):
         with open(path, 'r') as f:
-            return ast.literal_eval(f.read().decode('utf-8'))
+            chain_list = ast.literal_eval(ast.literal_eval(f.read()).decode('utf-8'))
+            return Chain.create_chain_from_list(chain_list)
 
     def save_chain(self, path):
         with open(path, 'w') as f:
             print(info('Saving blockchain'))
-            f.write(str(self._node._chain.json()))
+            f.write(str(self._chain.json()))
 
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
