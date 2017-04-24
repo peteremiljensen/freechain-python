@@ -59,12 +59,12 @@ class Chain():
         with self._chain_lock:
             for i in range(len(self._chain)):
                 if not self.get_block(i).validate():
-                    print (self.get_block(i).get_hash())
-                    print ('Block', i, 'is not valid')
+                    print ('Block', i, 'could not validate')
+                    print ('Hash:', self.get_block(i).get_hash())
+                    print ('Calculated hash:', self.get_block(i).calculate_hash())
                     return False
-                elif i > 0 and self.get_block(i).get_previous_block_hash() != \
+                if i > 0 and self.get_block(i).get_previous_block_hash() != \
                      self.get_block(i-1).get_hash():
-                    print ('Block', i, 'does not match hash')
                     return False
             return True
 
