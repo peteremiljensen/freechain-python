@@ -32,10 +32,14 @@ class TestChainMethods(unittest.TestCase):
         genesis = json.loads(c.json().decode('utf-8'))[0]
         self.assertEqual(genesis, json.loads(c._chain[0].json().decode('utf-8')))
 
-    def test_create_chain_from_list(self):
+    def test_create_chain_from_list_and_validate(self):
         chain_list = [json.loads(self.b_1.json().decode('utf-8'))]
         c = chain.Chain.create_chain_from_list(chain_list)
         self.assertEqual(c.get_block(0).get_hash(), self.b_1.get_hash())
+        self.assertTrue(c.validate())
+        chain_list.append(json.loads(self.b_2.json().decode('utf-8')))
+        c = chain.Chain.create_chain_from_list(chain_list)
+        self.assertFalse(c.validate())
 
 if __name__ == '__main__':
     unittest.main()
