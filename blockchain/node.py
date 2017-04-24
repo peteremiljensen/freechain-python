@@ -232,6 +232,7 @@ class Node():
             blocks = []
             for i in range(self._chain.get_length()):
                 blocks.append(self._chain.get_block(i))
+                print('Block height:' + str(self._chain.get_block(i).get_height()))
 
             response = self._json({'type': 'response',
                                    'function': FUNCTIONS.GET_CHAIN,
@@ -240,25 +241,19 @@ class Node():
             self._network.send(websocket, response)
 
         elif message['type'] == 'response':
-            blocks = []
-            for block_dict in message['chain']:
-                blocks.append(Block.create_block_from_dict(block_dict))
+            rec_chain = rec_chain.create_chain_from_list(message['chain'])
 
-            rec_chain = Chain()
-            for i in range(len(blocks)):
-                rec_chain.add_block(blocks[i])
-
-            rec_chain = Validator.Instance().consensus(self._chain,
+            new_chain = Validator.Instance().consensus(self._chain,
                                                        rec_chain)
 
-            rec_chain_length = rec_chain.get_length()
+            new_chain_length = rec_chain.get_length()
             local_chain_length = self._chain.get_length()
             blocks_to_remove = 0
-            if rec_chain == self._chain._chain:
+            if new_chain == self._chain._chain:
                 pass
             else:
                 for i in list(reversed(range(local_chain_length))):
-                    if self._chain.get_block(i).get_hash() == rec_chain.get_block(i).get_hash():
+                    if self._chain.get_block(i).get_hash() == new_chain.get_block(i).get_hash():
                         break
                     elif i == 0:
                         print("Blockchains can't be merged")
@@ -266,16 +261,23 @@ class Node():
                     else:
                         blocks_to_remove += 1
 
-                blocks_to_add = (rec_chain_length - local_chain_length) + \
+                blocks_to_add = (new_chain_length - local_chain_length) + \
                                 blocks_to_remove
+                print('new length: ' + str(new_chain_length))
+                print('local length: ' + str(local_chain_length))
+                print('Blocks to remove: ' + str(blocks_to_remove))
+                print('Blocks to add: ' + str(blocks_to_add))
                 while blocks_to_remove != 0:
                     self.remove_block(self._chain.get_length()-1)
                     blocks_to_remove -= 1
 
                 while blocks_to_add != 0:
-                    block = rec_chain.get_block(rec_chain_length - blocks_to_add)
-                    self.add_block(block)
-                    blocks_to_add -= 1
+                    block = new_chain.get_block(new_chain_length - blocks_to_add)
+                    if self.add_block(block):
+                        print(info('Added block ' + str(new_chain_length - blocks_to_add)))
+                        blocks_to_add -= 1
+                    else:
+                        print(warning('Failed to add block' + str(rec_chain_length - blocks_to_add)))
 
             Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
 
