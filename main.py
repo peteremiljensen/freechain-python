@@ -2,8 +2,6 @@
 
 import datetime
 import time
-import os.path
-import sys
 import argparse
 from cmd import Cmd
 
@@ -87,8 +85,8 @@ class Prompt(Cmd):
         self._node = Node(self._port)
 
         if file and os.path.exists(self._file):
-            raw_chain_list = self.read_chain()
-            chain = self._node._chain.create_chain_from_list(raw_chain_list)
+            raw_chain_list = self._node.read_chain(self._file)
+            chain = Chain.create_chain_from_list(raw_chain_list)
 
             for i in range(1, chain.get_length()):
                 if not self._node.add_block(chain.get_block(i)):
@@ -217,28 +215,6 @@ class Prompt(Cmd):
                             if f.startswith(text)]
         return completions
 
-    def read_chain(self):
-        with open(self._file, 'r') as f:
-            file_chain_name = f.readline().rstrip()
-            if file_chain_name == self._name:
-                return eval(eval(f.read()).decode())
-            else:
-                print(fail('The blockchain name given as input, does not ' + \
-                           'match the name in ' + self._file))
-                self._file = None
-                self.do_quit(args)
-
-    def save_chain(self):
-        with open(self._file, 'w') as f:
-            print(info('Saving blockchain'))
-            if self._name:
-                f.write(self._name + '\n')
-            else:
-                f.write('\n')
-            f.write(str(self._node._chain.json()))
-            f.write('\n')
-        f.close()
-
     def do_EOF(self, line):
         ''' Calls do_quit if at end of file
         '''
@@ -248,7 +224,7 @@ class Prompt(Cmd):
         ''' Quits program
         '''
         if self._file:
-            self.save_chain()
+            self.save_chain(self._file)
         print(info('Quitting'))
         raise SystemExit
 

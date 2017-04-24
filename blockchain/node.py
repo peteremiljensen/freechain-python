@@ -3,6 +3,8 @@ import asyncio
 import janus
 import time
 import json
+import ast
+import sys, os.path
 
 from blockchain.events import Events
 from blockchain.network import Network
@@ -132,6 +134,27 @@ class Node():
             self._json({'type': 'request',
                         'function': FUNCTIONS.BROADCAST_BLOCK,
                         'block': block}))
+
+    def read_chain(self, path):
+        with open(path, 'r') as f:
+            file_chain_name = f.readline().rstrip()
+            if file_chain_name == self._name:
+                return ast.literal_eval(f.read().decode('utf-8'))
+            else:
+                print(fail('The blockchain name given as input, does not ' + \
+                           'match the name in ' + self._file))
+                self._file = None
+
+    def save_chain(self, path):
+        with open(path, 'w') as f:
+            print(info('Saving blockchain'))
+            if self._name:
+                f.write(self._name + '\n')
+            else:
+                f.write('\n')
+            f.write(str(self._node._chain.json()))
+            f.write('\n')
+        f.close()
 
     def _get_length(self, websocket):
         """ Requests the length of the blockchain from a node """
