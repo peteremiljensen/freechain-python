@@ -266,6 +266,11 @@ class Node():
                 print('local length: ' + str(local_chain_length))
                 print('Blocks to remove: ' + str(blocks_to_remove))
                 print('Blocks to add: ' + str(blocks_to_add))
+
+                if not new_chain.validate():
+                    print(warning('Received chain is not valid'))
+                    return
+
                 while blocks_to_remove != 0:
                     self.remove_block(self._chain.get_length()-1)
                     blocks_to_remove -= 1
@@ -276,7 +281,8 @@ class Node():
                         print(info('Added block ' + str(new_chain_length - blocks_to_add)))
                         blocks_to_add -= 1
                     else:
-                        print(warning('Failed to add block' + str(rec_chain_length - blocks_to_add)))
+                        print(warning('Failed to add block' + str(new_chain_length - blocks_to_add)))
+                        break
 
             Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
 
