@@ -55,6 +55,16 @@ class Chain():
         with self._chain_lock:
             return len(self._chain)
 
+    def validate(self):
+        with self._chain_lock:
+            for i in range(len(self._chain)):
+                if not self._chain[i].validate():
+                    return False
+                elif i > 0 and self._chain[i].get_previois_block_hash() != \
+                     self._chain[i-1].get_hash():
+                    return False
+            return True
+
     def json(self):
         """ Serializes chain to a JSON formatted string, encodes to utf-8
             and returns
