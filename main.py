@@ -80,8 +80,7 @@ class Prompt(Cmd):
         self._node = Node(self._port)
 
         if file and os.path.exists(self._file):
-            raw_chain_list = self._node.read_chain(self._file)
-            chain = Chain.create_chain_from_list(raw_chain_list)
+            chain = self._node.read_chain(self._file)
 
             for i in range(1, chain.get_length()):
                 if not self._node.add_block(chain.get_block(i)):
