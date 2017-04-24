@@ -1,4 +1,5 @@
-import sys
+import sys, os.path
+import ast
 import threading
 
 from blockchain.loaf import *
@@ -83,10 +84,9 @@ class Chain():
             return Chain.create_chain_from_list(chain_list)
 
     @staticmethod
-    def save_chain(path):
+    def save_chain(path, chain):
         with open(path, 'w') as f:
-            print(info('Saving blockchain'))
-            f.write(str(self._chain.json()))
+            f.write(str(chain.json()))
 
     @staticmethod
     def create_chain_from_list(list):

@@ -3,8 +3,6 @@ import asyncio
 import janus
 import time
 import json
-import ast
-import sys, os.path
 
 from blockchain.events import Events
 from blockchain.network import Network
