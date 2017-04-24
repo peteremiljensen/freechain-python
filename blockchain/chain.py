@@ -77,6 +77,18 @@ class Chain():
                           cls=BlockEncoder).encode('utf-8')
 
     @staticmethod
+    def read_chain(path):
+        with open(path, 'r') as f:
+            chain_list = ast.literal_eval(ast.literal_eval(f.read()).decode('utf-8'))
+            return Chain.create_chain_from_list(chain_list)
+
+    @staticmethod
+    def save_chain(path):
+        with open(path, 'w') as f:
+            print(info('Saving blockchain'))
+            f.write(str(self._chain.json()))
+
+    @staticmethod
     def create_chain_from_list(list):
         blocks = []
         for block_raw in list:

@@ -249,8 +249,8 @@ class TestIntegration1(unittest.TestCase):
         self.assertTrue(error_sema.acquire(timeout=20))
 
     def test_n_save_read_chain(self):
-        self.node_1.save_chain('test.bc')
-        chain = self.node_1.read_chain('test.bc')
+        Chain.save_chain('test.bc')
+        chain = Chain.read_chain('test.bc')
         self.assertTrue(self.node_1._chain.validate())
         self.assertTrue(chain.validate())
 
