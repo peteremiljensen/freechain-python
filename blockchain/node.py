@@ -252,7 +252,8 @@ class Node():
                 pass
             else:
                 for i in list(reversed(range(local_chain_length))):
-                    if self._chain.get_block(i).get_hash() == new_chain.get_block(i).get_hash():
+                    if self._chain.get_block(i).get_hash() == \
+                       new_chain.get_block(i).get_hash():
                         break
                     elif i == 0:
                         print("Blockchains can't be merged")
@@ -278,10 +279,12 @@ class Node():
                 while blocks_to_add != 0:
                     block = new_chain.get_block(new_chain_length - blocks_to_add)
                     if self.add_block(block):
-                        print(info('Added block ' + str(new_chain_length - blocks_to_add)))
+                        print(info('Added block ' + str(new_chain_length -
+                                                        blocks_to_add)))
                         blocks_to_add -= 1
                     else:
-                        print(warning('Failed to add block' + str(new_chain_length - blocks_to_add)))
+                        print(warning('Failed to add block' +
+                                      str(new_chain_length - blocks_to_add)))
                         break
 
             Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
