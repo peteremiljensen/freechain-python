@@ -58,7 +58,7 @@ class Chain():
 
     def validate(self):
         with self._chain_lock:
-            for i in range(len(self._chain)):
+            for i in range(self.get_length()):
                 if not self.get_block(i).validate():
                     print ('Block', i, 'could not validate')
                     print ('Hash:', self.get_block(i).get_hash())
