@@ -248,7 +248,7 @@ class Node():
             new_chain_length = new_chain.get_length()
             local_chain_length = self._chain.get_length()
             blocks_to_remove = 0
-            if new_chain == self._chain._chain:
+            if new_chain.json() == self._chain.json():
                 pass
             else:
                 for i in list(reversed(range(local_chain_length))):
@@ -282,12 +282,8 @@ class Node():
                         print(info('Added block ' + str(new_chain_length -
                                                         blocks_to_add)))
                         blocks_to_add -= 1
-                    else:
-                        print(warning('Failed to add block' +
-                                      str(new_chain_length - blocks_to_add)))
-                        break
 
-            Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
+                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
