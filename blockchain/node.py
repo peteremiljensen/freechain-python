@@ -249,24 +249,20 @@ class Node():
             local_chain_length = self._chain.get_length()
             blocks_to_remove = 0
             if new_chain.json() == self._chain.json():
-                pass
+                return
             else:
-                for i in list(reversed(range(local_chain_length))):
-                    if self._chain.get_block(i).get_hash() == \
+                for i in list(reversed(range(-1, local_chain_length))):
+                    if i == -1:
+                        print("Blockchains can't be merged, no blocks in common")
+                        return
+                    elif self._chain.get_block(i).get_hash() == \
                        new_chain.get_block(i).get_hash():
                         break
-                    elif i == 0:
-                        print("Blockchains can't be merged")
-                        return
                     else:
                         blocks_to_remove += 1
 
                 blocks_to_add = (new_chain_length - local_chain_length) + \
                                 blocks_to_remove
-                print('new length: ' + str(new_chain_length))
-                print('local length: ' + str(local_chain_length))
-                print('Blocks to remove: ' + str(blocks_to_remove))
-                print('Blocks to add: ' + str(blocks_to_add))
 
                 if not new_chain.validate():
                     print(warning('Received chain is not valid'))

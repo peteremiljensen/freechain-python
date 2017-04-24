@@ -89,7 +89,7 @@ class Prompt(Cmd):
 
             for i in range(1, chain.get_length()):
                 if not self._node.add_block(chain.get_block(i)):
-                    print(warning('Block of height ' + str(block.get_height())+\
+                    print(warning('Block of height ' + str(chain.get_block(i).get_height())+\
                                   'read from file, could not be added. '))
                     self.do_quit(args)
 
