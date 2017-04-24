@@ -195,6 +195,7 @@ class Node():
                                            'description': 'Attribute or ' + \
                                            'KeyError. Consider adding "raise"'})
                     self._network.send(websocket, response)
+                    raise
                 except SyncQueueEmpty:
                     pass
                 except:
@@ -222,7 +223,6 @@ class Node():
             print(info('local block length is : ' +
                        str(local_length)))
             if Validator.Instance().consensus_check(local_length, rec_length):
-                print(info('Consulting consensus'))
                 self._get_chain(websocket)
             else:
                 print(info('Keeping local blocks'))
@@ -232,7 +232,6 @@ class Node():
             blocks = []
             for i in range(self._chain.get_length()):
                 blocks.append(self._chain.get_block(i))
-                print('Block height:' + str(self._chain.get_block(i).get_height()))
 
             response = self._json({'type': 'response',
                                    'function': FUNCTIONS.GET_CHAIN,
@@ -241,12 +240,13 @@ class Node():
             self._network.send(websocket, response)
 
         elif message['type'] == 'response':
-            rec_chain = rec_chain.create_chain_from_list(message['chain'])
+            new_chain = self._chain.create_chain_from_list(message['chain'])
 
+            print(info('Consulting consensus'))
             new_chain = Validator.Instance().consensus(self._chain,
-                                                       rec_chain)
+                                                       new_chain)
 
-            new_chain_length = rec_chain.get_length()
+            new_chain_length = new_chain.get_length()
             local_chain_length = self._chain.get_length()
             blocks_to_remove = 0
             if new_chain == self._chain._chain:
