@@ -90,10 +90,11 @@ class Prompt(Cmd):
             raw_chain_list = self.read_chain()
             chain = self._node._chain.create_chain_from_list(raw_chain_list)
 
-            for block in chain[1:]:
-                if not self._node.add_block(block):
+            for i in range(1, chain.get_length()):
+                if not self._node.add_block(chain.get_block(i)):
                     print(warning('Block of height ' + str(block.get_height())+\
                                   'read from file, could not be added. '))
+                    self.do_quit(args)
 
         self._node.start()
 
