@@ -13,7 +13,7 @@ from blockchain.block import *
 #
 
 class Chain():
-    def __init__(self):
+    def __init__(self, chain_raw=None):
         """ Chain class constructor
         """
         genesis_block = Block.create_block_from_dict(
@@ -68,4 +68,6 @@ class Chain():
         blocks = []
         for block_raw in list:
             blocks.append(Block.create_block_from_dict(block_raw))
-        return blocks
+        chain = Chain()
+        chain._chain = blocks
+        return chain

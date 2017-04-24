@@ -1,6 +1,6 @@
 import unittest
 import json
-from .. import chain, block
+from .. import chain, block, loaf
 from .miner import *
 
 class TestChainMethods(unittest.TestCase):
@@ -31,6 +31,11 @@ class TestChainMethods(unittest.TestCase):
         c = chain.Chain()
         genesis = json.loads(c.json().decode('utf-8'))[0]
         self.assertEqual(genesis, json.loads(c._chain[0].json().decode('utf-8')))
+
+    def test_create_chain_from_list(self):
+        chain_list = [json.loads(self.b_1.json().decode('utf-8'))]
+        c = chain.Chain.create_chain_from_list(chain_list)
+        self.assertEqual(c.get_block(0).get_hash(), self.b_1.get_hash())
 
 if __name__ == '__main__':
     unittest.main()
