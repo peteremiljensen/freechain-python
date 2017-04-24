@@ -13,7 +13,7 @@ from blockchain.block import *
 #
 
 class Chain():
-    def __init__(self, chain_raw=None):
+    def __init__(self):
         """ Chain class constructor
         """
         genesis_block = Block.create_block_from_dict(
