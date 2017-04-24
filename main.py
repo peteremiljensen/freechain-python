@@ -218,7 +218,7 @@ class Prompt(Cmd):
         ''' Quits program
         '''
         if self._file:
-            self.save_chain(self._file)
+            self._node.save_chain(self._file)
         print(info('Quitting'))
         raise SystemExit
 
