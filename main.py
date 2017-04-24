@@ -24,13 +24,9 @@ parser.add_argument('-p', '--port', nargs='?', default='9000',
 parser.add_argument('-f', '--file', nargs='?',
                     help='Path to file containing a blockchain to load' +
                     'if the file does not eists, one is created')
-parser.add_argument('-n', '--name', nargs='?',
-                    help='Name of the blockchain, used to ensure that only ' +
-                    'blockchains of the same name are synchronized')
 args = parser.parse_args()
 port = args.port
 file = args.file
-name = args.name
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
@@ -81,7 +77,6 @@ class Prompt(Cmd):
 
         self._port = port
         self._file = file
-        self._name = name
         self._node = Node(self._port)
 
         if file and os.path.exists(self._file):
