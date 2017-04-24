@@ -80,7 +80,12 @@ class Prompt(Cmd):
         self._node = Node(self._port)
 
         if file and os.path.exists(self._file):
-            chain = self._node.read_chain(self._file)
+            chain = Chain.read_chain(self._file)
+
+            if not chain.validate():
+                self._file = None
+                print(fail('Loaded blockchain is not valid'))
+                self.do_quit(args)
 
             for i in range(1, chain.get_length()):
                 if not self._node.add_block(chain.get_block(i)):
@@ -218,7 +223,7 @@ class Prompt(Cmd):
         ''' Quits program
         '''
         if self._file:
-            self._node.save_chain(self._file)
+            Chain.save_chain(self._file, self._node._chain)
         print(info('Quitting'))
         raise SystemExit
 
