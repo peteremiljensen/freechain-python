@@ -1,4 +1,5 @@
-import sys
+import sys, os.path
+import ast
 import threading
 
 from blockchain.loaf import *
@@ -13,14 +14,14 @@ from blockchain.block import *
 #
 
 class Chain():
-    def __init__(self):
+    def __init__(self, chain_raw=None):
         """ Chain class constructor
         """
         genesis_block = Block.create_block_from_dict(
-            {'loaves': [], 'nounce': 82743408,
-             'previous_block_hash': '-1', 'height': 0,
-             'timestamp': '2017-03-29 11:46:29.096909',
-             'hash': '00000002a51fcae0911249bcb257f87cf00410d6c98c08ba649ba48a029e6154'})
+            {"hash": "00000ac00538be65f659795fb9a021adf05c2c36f1ebd7c2c0249622edfccee6",
+             "height": 0, "loaves": [], "nounce": 71451,
+             "previous_block_hash": "-1",
+             "timestamp": "2017-04-24 17:17:44.226598"})
         self._chain = [genesis_block]
         self._chain_lock = threading.RLock()
 
@@ -55,6 +56,16 @@ class Chain():
         with self._chain_lock:
             return len(self._chain)
 
+    def validate(self):
+        with self._chain_lock:
+            for i in range(self.get_length()):
+                if not self.get_block(i).validate():
+                    return False
+                if i > 0 and self.get_block(i).get_previous_block_hash() != \
+                     self.get_block(i-1).get_hash():
+                    return False
+            return True
+
     def json(self):
         """ Serializes chain to a JSON formatted string, encodes to utf-8
             and returns
@@ -62,3 +73,23 @@ class Chain():
         return json.dumps(self._chain,
                           sort_keys=True,
                           cls=BlockEncoder).encode('utf-8')
+
+    @staticmethod
+    def read_chain(path):
+        with open(path, 'r') as f:
+            chain_list = ast.literal_eval(ast.literal_eval(f.read()).decode('utf-8'))
+            return Chain.create_chain_from_list(chain_list)
+
+    @staticmethod
+    def save_chain(path, chain):
+        with open(path, 'w') as f:
+            f.write(str(chain.json()))
+
+    @staticmethod
+    def create_chain_from_list(list):
+        blocks = []
+        for block_raw in list:
+            blocks.append(Block.create_block_from_dict(block_raw))
+        chain = Chain()
+        chain._chain = blocks
+        return chain

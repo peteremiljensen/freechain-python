@@ -2,7 +2,7 @@
 
 import datetime
 import time
-import sys
+import argparse
 from cmd import Cmd
 
 from blockchain.node import *
@@ -17,8 +17,16 @@ from blockchain.common import *
 #
 #
 
-
-
+parser = argparse.ArgumentParser(description='program for testing of ' +
+                                             'blockchain framework')
+parser.add_argument('-p', '--port', nargs='?', default='9000',
+                    help='Port for the node to use')
+parser.add_argument('-f', '--file', nargs='?',
+                    help='Path to file containing a blockchain to load' +
+                    'if the file does not eists, one is created')
+args = parser.parse_args()
+port = args.port
+file = args.file
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
@@ -63,10 +71,28 @@ class Prompt(Cmd):
     PRINTS = ['loaf_pool', 'mined_loaves', 'blockchain', 'block_hash']
 
     def __init__(self):
-        """ Prompt class constructor
-        """
+        ''' Prompt class constructor
+        '''
         super().__init__()
-        self._node = Node(port)
+
+        self._port = port
+        self._file = file
+        self._node = Node(self._port)
+
+        if file and os.path.exists(self._file):
+            chain = Chain.read_chain(self._file)
+
+            if not chain.validate():
+                self._file = None
+                print(fail('Loaded blockchain is not valid'))
+                self.do_quit(args)
+
+            for i in range(1, chain.get_length()):
+                if not self._node.add_block(chain.get_block(i)):
+                    print(warning('Block of height ' + str(chain.get_block(i).get_height())+\
+                                  'read from file, could not be added. '))
+                    self.do_quit(args)
+
         self._node.start()
 
         self._node.attach_loaf_validator(loaf_validator)
@@ -75,11 +101,11 @@ class Prompt(Cmd):
         self._node.attach_consensus(consensus)
 
     def do_connect(self, args):
-        """ Parses the arguments to get nodes ip and connects to node
-        """
+        ''' Parses the arguments to get nodes ip and connects to node
+        '''
         l = args.split()
         if len(l) > 2:
-            print(fail("invalid number of arguments"))
+            print(fail('invalid number of arguments'))
             return
         try:
             ip = l[0]
@@ -88,16 +114,16 @@ class Prompt(Cmd):
             else:
                 self._node.connect_node(ip)
         except:
-            print(fail("error connecting to node"))
+            print(fail('error connecting to node'))
             raise
 
     def do_mine(self, args):
-        """ Reads argument and tries to mine block. if block is mined,
+        ''' Reads argument and tries to mine block. if block is mined,
             the block is added to the chain and broadcasted
-        """
+        '''
         l = args.split()
         if len(l) != 0:
-            print (fail("mine doesnt take any arguments"))
+            print (fail('mine doesnt take any arguments'))
             return
         try:
             loaves = self._node.get_loaves()
@@ -105,56 +131,56 @@ class Prompt(Cmd):
             prev_block = self._node._chain.get_block(chain_length-1)
             block = mine(loaves, prev_block)
             if block is None:
-                print(fail("failed to mine block"))
+                print(fail('failed to mine block'))
             else:
                 if self._node.add_block(block):
                     self._node.broadcast_block(block)
                 else:
-                    print(fail("failed to add block"))
+                    print(fail('failed to add block'))
         except:
-            print(fail("error trying to mine"))
+            print(fail('error trying to mine'))
             raise
 
     def do_loaf(self, args):
-        """ Parses the argument to get loaf data, creates a loaf from data,
+        ''' Parses the argument to get loaf data, creates a loaf from data,
             adds loaf to loaf pool and broadcasts the loaf
-        """
+        '''
         l = args.split()
         if len(l) != 1:
-            print(fail("invalid number of arguments"))
+            print(fail('invalid number of arguments'))
             return
         try:
-            loaf = Loaf({"string": l[0]})
+            loaf = Loaf({'string': l[0]})
             if self._node.add_loaf(loaf):
                 self._node.broadcast_loaf(loaf)
             else:
-                print(fail("failed to add loaf to loaf pool"))
+                print(fail('failed to add loaf to loaf pool'))
         except:
-            print(fail("error creating and broadcasting loaf"))
+            print(fail('error creating and broadcasting loaf'))
             raise
 
     def do_loafbomb(self, args):
-        """ Does as do_loaf, but does it a number of times, depending on the
+        ''' Does as do_loaf, but does it a number of times, depending on the
             number given as the second argument
-        """
+        '''
         l = args.split()
         if len(l) != 2:
-            print(fail("invalid number of arguments"))
+            print(fail('invalid number of arguments'))
             return
         try:
             for i in range(int(l[1])):
-                loaf = Loaf({"string": l[0]+str(i)})
+                loaf = Loaf({'string': l[0]+str(i)})
                 if self._node.add_loaf(loaf):
                     self._node.broadcast_loaf(loaf)
                 else:
-                    print(fail("failed to add loaf to loaf pool"))
+                    print(fail('failed to add loaf to loaf pool'))
         except:
-            print(fail("error creating and broadcasting loaf"))
+            print(fail('error creating and broadcasting loaf'))
             raise
 
     def do_print(self, args):
-        """ Prints loaf pool or blockchain
-        """
+        ''' Prints loaf pool or blockchain
+        '''
         l = args.split()
         try:
             if l[0] == self.PRINTS[0]:
@@ -166,18 +192,18 @@ class Prompt(Cmd):
                 print(self._node._chain.json())
             elif l[0] == self.PRINTS[3]:
                 if len(l) != 2:
-                    print(fail("invalid number of arguments"))
+                    print(fail('invalid number of arguments'))
                 else:
                     if self._node._chain.get_length() > int(l[1]):
                         print(self._node._chain.get_block(int(l[1])).get_hash())
                     else:
-                        print(fail("Blockchain doesn't contain a block of height " + 
-                              str(l[1])))
+                        print(fail('Blockchain does not contain a block of ' +
+                                   'height ' + str(l[1])))
             else:
-                print(fail(l[0] + " doesn't exist"))
+                print(fail(l[0] + ' does not exist'))
 
         except:
-            print(fail("error printing"))
+            print(fail('error printing'))
             raise
 
     def complete_print(self, text, line, begidx, endidx):
@@ -189,45 +215,40 @@ class Prompt(Cmd):
         return completions
 
     def do_EOF(self, line):
-        """ Calls do_quit if at end of file
-        """
+        ''' Calls do_quit if at end of file
+        '''
         self.do_quit(line)
 
     def do_quit(self, args):
-        """ Quits program
-        """
-        print(info("Quitting"))
+        ''' Quits program
+        '''
+        if self._file:
+            Chain.save_chain(self._file, self._node._chain)
+        print(info('Quitting'))
         raise SystemExit
 
     def do_q(self, args):
         self.do_quit(args)
 
     def emptyline(self):
-        """ If empty line is sent, does nothing
-        """
+        ''' If empty line is sent, does nothing
+        '''
         return
 
 if __name__ == '__main__':
-    """ Program start. If no port argument is given, sets port to 9000.
+    ''' Program start. If no port argument is given, sets port to 9000.
         Prints error if more than one argument is given, then creates a prompt
         object and waits for user input
-    """
-    if len(sys.argv) == 1:
-        port = 9000
-    elif len(sys.argv) == 2:
-        port = sys.argv[1]
-    else:
-        print(fail("you must supply 0 or 1 argument"))
-        sys.exit()
+    '''
 
     prompt = Prompt()
     prompt.prompt = '(freechain) '
     try:
-        prompt.cmdloop(info('Starting node on port ' + str(port) + "..."))
+        prompt.cmdloop(info('Starting node on port ' + str(port) + '...'))
     except KeyboardInterrupt:
         prompt.do_quit(None)
     except SystemExit:
         pass
     except:
-        print(fail("fatal error"))
+        print(fail('fatal error'))
         raise

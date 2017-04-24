@@ -222,7 +222,6 @@ class Node():
             print(info('local block length is : ' +
                        str(local_length)))
             if Validator.Instance().consensus_check(local_length, rec_length):
-                print(info('Consulting consensus'))
                 self._get_chain(websocket)
             else:
                 print(info('Keeping local blocks'))
@@ -240,44 +239,48 @@ class Node():
             self._network.send(websocket, response)
 
         elif message['type'] == 'response':
-            blocks = []
-            for block_dict in message['chain']:
-                blocks.append(Block.create_block_from_dict(block_dict))
+            new_chain = self._chain.create_chain_from_list(message['chain'])
 
-            rec_chain = Chain()
-            for i in range(len(blocks)):
-                rec_chain.add_block(blocks[i])
+            print(info('Consulting consensus'))
+            new_chain = Validator.Instance().consensus(self._chain,
+                                                       new_chain)
 
-            rec_chain = Validator.Instance().consensus(self._chain,
-                                                       rec_chain)
-
-            rec_chain_length = rec_chain.get_length()
+            new_chain_length = new_chain.get_length()
             local_chain_length = self._chain.get_length()
             blocks_to_remove = 0
-            if rec_chain == self._chain._chain:
-                pass
+            if new_chain.json() == self._chain.json():
+                return
             else:
-                for i in list(reversed(range(local_chain_length))):
-                    if self._chain.get_block(i).get_hash() == rec_chain.get_block(i).get_hash():
-                        break
-                    elif i == 0:
-                        print("Blockchains can't be merged")
+                for i in list(reversed(range(-1, local_chain_length))):
+                    if i == -1:
+                        print("Blockchains can't be merged, no blocks in common")
                         return
+                    elif self._chain.get_block(i).get_hash() == \
+                       new_chain.get_block(i).get_hash():
+                        break
                     else:
                         blocks_to_remove += 1
 
-                blocks_to_add = (rec_chain_length - local_chain_length) + \
+                blocks_to_add = (new_chain_length - local_chain_length) + \
                                 blocks_to_remove
+
+                if not new_chain.validate():
+                    print(warning('Received chain is not valid'))
+                    return
+
                 while blocks_to_remove != 0:
                     self.remove_block(self._chain.get_length()-1)
                     blocks_to_remove -= 1
 
                 while blocks_to_add != 0:
-                    block = rec_chain.get_block(rec_chain_length - blocks_to_add)
+                    block = new_chain.get_block(new_chain_length -
+                                                blocks_to_add)
                     self.add_block(block)
+                    print(info('Added block ' +
+                               str(new_chain_length -  blocks_to_add)))
                     blocks_to_add -= 1
 
-            Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
+                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
