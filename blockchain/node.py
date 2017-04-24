@@ -277,11 +277,12 @@ class Node():
                     blocks_to_remove -= 1
 
                 while blocks_to_add != 0:
-                    block = new_chain.get_block(new_chain_length - blocks_to_add)
-                    if self.add_block(block):
-                        print(info('Added block ' + str(new_chain_length -
-                                                        blocks_to_add)))
-                        blocks_to_add -= 1
+                    block = new_chain.get_block(new_chain_length -
+                                                blocks_to_add)
+                    self.add_block(block)
+                    print(info('Added block ' +
+                               str(new_chain_length -  blocks_to_add)))
+                    blocks_to_add -= 1
 
                 Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
 
