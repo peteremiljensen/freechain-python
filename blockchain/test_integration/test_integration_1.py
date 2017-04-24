@@ -251,8 +251,8 @@ class TestIntegration1(unittest.TestCase):
     def test_n_save_read_chain(self):
         Chain.save_chain('test.bc', self.node_1._chain)
         chain = Chain.read_chain('test.bc')
-        self.assertTrue(self.node_1._chain.validate())
         self.assertTrue(chain.validate())
+        self.assertEqual(chain.json(), self.node_1._chain.json())
 
     def test_z_closed_connection(self):
         self.node_1._network.close_connections()
