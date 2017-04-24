@@ -248,8 +248,11 @@ class TestIntegration1(unittest.TestCase):
 
         self.assertTrue(error_sema.acquire(timeout=20))
 
-    def test_n_remove_block(self):
-        pass
+    def test_n_save_read_chain(self):
+        self.node_1.save_chain('./test.bc')
+        chain = self.node_1.read_chain('./test.bc')
+        print(chain.json())
+        self.assertTrue(chain.validate())
 
     def test_z_closed_connection(self):
         self.node_1._network.close_connections()
