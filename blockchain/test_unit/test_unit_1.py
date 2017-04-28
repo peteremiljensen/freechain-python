@@ -39,9 +39,10 @@ class TestLoafMethods(unittest.TestCase):
         self.assertEqual(self.hashtest, self.l_hash.get_hash())
 
     def test_create_loaf_from_dict(self):
-        dictio = {'data': 'test', 'hash': 'fa7fa7f32d318a962cbb8b52acb52' +
-                  '60c3f5beee4ea5d882bab6459f2376a85fd',
-                  'timestamp': '2017-04-18 14:58:01.696432'}
+        dictio = {'data': {'string':'test'},
+                  'hash': '1821942a611ef2a8e882e7c335ef4d9' +
+                          '66a141038f620bbea09f642a4f99a321e',
+                  'timestamp': '2017-04-28 14:45:36.583997'}
         l = loaf.Loaf.create_loaf_from_dict(dictio)
         self.assertTrue(l.validate())
         dictio['data'] = 'test1'
