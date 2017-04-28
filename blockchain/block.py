@@ -35,7 +35,8 @@ class Block:
         """
         return json.dumps(self._block,
                           sort_keys=True,
-                          cls=LoafEncoder).encode('utf-8')
+                          cls=LoafEncoder,
+                          separators=(',', ':')).encode('utf-8')
 
     def get_loaves(self):
         return self._block['loaves']

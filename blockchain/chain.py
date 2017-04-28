@@ -72,7 +72,8 @@ class Chain():
         """
         return json.dumps(self._chain,
                           sort_keys=True,
-                          cls=BlockEncoder).encode('utf-8')
+                          cls=BlockEncoder,
+                          separators=(',', ':')).encode('utf-8')
 
     @staticmethod
     def read_chain(path):

@@ -316,4 +316,5 @@ class Node():
         """ Serializes object to a JSON formatted string, encodes to utf-8
             and returns
         """
-        return json.dumps(dictio, cls=BlockEncoder).encode('utf-8')
+        return json.dumps(dictio, cls=BlockEncoder,
+            separators=(',', ':')).encode('utf-8')

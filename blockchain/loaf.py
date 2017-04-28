@@ -33,7 +33,8 @@ class Loaf():
         """ Serializes loaf to a JSON formatted string, encodes to utf-8
             and returns
         """
-        return json.dumps(self._loaf, sort_keys=True).encode('utf-8')
+        return json.dumps(self._loaf, sort_keys=True,
+            separators=(',', ':')).encode('utf-8')
 
     def get_hash(self):
         """ Returns hash of loaf """
