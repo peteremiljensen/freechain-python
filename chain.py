@@ -2,8 +2,8 @@ import sys, os.path
 import ast
 import threading
 
-from blockchain.loaf import *
-from blockchain.block import *
+from loaf import *
+from block import *
 
 #   _____ _           _
 #  /  __ \ |         (_)

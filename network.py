@@ -3,8 +3,8 @@ import asyncio
 import janus
 import websockets
 
-from blockchain.events import Events
-from blockchain.common import *
+from events import Events
+from common import *
 
 #   _   _      _                      _
 #  | \ | |    | |                    | |

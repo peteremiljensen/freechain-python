@@ -4,14 +4,14 @@ import janus
 import time
 import json
 
-from blockchain.events import Events
-from blockchain.network import Network
-from blockchain.chain import *
-from blockchain.loaf import Loaf
-from blockchain.block import Block
-from blockchain.validator import Validator
+from events import Events
+from network import Network
+from chain import *
+from loaf import Loaf
+from block import Block
+from validator import Validator
 
-from blockchain.common import *
+from common import *
 
 from queue import Empty as SyncQueueEmpty
 
