@@ -1,10 +1,10 @@
 import unittest
 import threading, time, asyncio
-from ..node import *
-from ..events import *
-from ..common import *
-from .. import loaf
-from .. import block
+from node import *
+from events import *
+from common import *
+import loaf
+import block
 
 block = None
 

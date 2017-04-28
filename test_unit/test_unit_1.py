@@ -1,7 +1,7 @@
 import unittest
 import datetime, json
-from .. import loaf
-from ..validator import Validator
+import loaf
+from validator import Validator
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()

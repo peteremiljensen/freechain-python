@@ -1,5 +1,5 @@
 import unittest
-from .. import singleton
+import singleton
 
 @singleton.Singleton
 class SingletonTest:

@@ -1,6 +1,6 @@
 import unittest
 import json
-from .. import chain, block, loaf
+import chain, block, loaf
 from .miner import *
 
 class TestChainMethods(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 import asyncio
 import threading
-from .. import events
+import events
 
 class TestEventsMethods(unittest.TestCase):
 

@@ -1,8 +1,8 @@
 import unittest
 import datetime, json
-from .. import chain, block, loaf
+import chain, block, loaf
 from .miner import *
-from ..validator import Validator
+from validator import Validator
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
