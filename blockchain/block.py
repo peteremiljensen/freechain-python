@@ -15,7 +15,7 @@ from blockchain.validator import Validator
 
 class Block:
     def __init__(self, loaves, height, previous_block_hash,
-                 timestamp, nounce, hash=None):
+                 timestamp, nounce=None, hash=None):
         """ Block class constructor. If hash is not given, a new hash is created
         """
         self._block = {}
