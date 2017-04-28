@@ -18,10 +18,10 @@ class Chain():
         """ Chain class constructor
         """
         genesis_block = Block.create_block_from_dict(
-            {"hash": "00000ac00538be65f659795fb9a021adf05c2c36f1ebd7c2c0249622edfccee6",
-             "height": 0, "loaves": [], "nounce": 71451,
+            {"hash": "00001167dc800472caeb3e4090e623d32d93bd7e6b446040305a052dd5dde705",
+             "height": 0, "loaves": [], "nounce": 47690,
              "previous_block_hash": "-1",
-             "timestamp": "2017-04-24 17:17:44.226598"})
+             "timestamp": "2017-04-28 14:49:37.492715"})
         self._chain = [genesis_block]
         self._chain_lock = threading.RLock()
 
