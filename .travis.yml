@@ -8,6 +8,6 @@ install:
   - pip install coveralls
   - pip install -r requirements.txt
 script:
-  - coverage run --source=blockchain --omit="blockchain/test_*" -m unittest blockchain.test_unit blockchain.test_integration
+  - coverage run --omit="test_*" -m unittest test_unit test_integration
 after_success:
   coveralls
