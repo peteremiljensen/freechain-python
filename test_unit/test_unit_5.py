@@ -1,7 +1,7 @@
 import unittest
-import singleton
+from ..singleton import *
 
-@singleton.Singleton
+@Singleton
 class SingletonTest:
     def __init__(self):
         pass

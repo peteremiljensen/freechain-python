@@ -1,5 +1,5 @@
 import datetime
-from block import Block
+from ..block import Block
 
 def mine(loaves, prev_block):
     height = prev_block.get_height() + 1

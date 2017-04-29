@@ -1,13 +1,13 @@
 import unittest
 import asyncio
 import threading
-import events
+from ..events import *
 
 class TestEventsMethods(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.e = events.Events.Instance()
+        cls.e = Events.Instance()
         cls.assertion = False
         cls.data = ""
         cls.assertion_2 = False

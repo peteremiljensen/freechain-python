@@ -1,7 +1,7 @@
 import unittest
 import datetime, json
-import loaf
-from validator import Validator
+from ..loaf import *
+from ..validator import *
 
 def loaf_validator(loaf):
     hash_calc = loaf.calculate_hash()
@@ -21,10 +21,10 @@ class TestLoafMethods(unittest.TestCase):
 
         cls.data = 'test'
         cls.timestamp = str(datetime.datetime.now())
-        cls.l = loaf.Loaf(cls.data, cls.timestamp)
+        cls.l = Loaf(cls.data, cls.timestamp)
 
         cls.hashtest = '12525718923'
-        cls.l_hash = loaf.Loaf(cls.data, cls.timestamp, cls.hashtest)
+        cls.l_hash = Loaf(cls.data, cls.timestamp, cls.hashtest)
 
     def test_loaf_validate(self):
         self.assertTrue(self.l.validate())
@@ -43,10 +43,10 @@ class TestLoafMethods(unittest.TestCase):
                   'hash': '1821942a611ef2a8e882e7c335ef4d9' +
                           '66a141038f620bbea09f642a4f99a321e',
                   'timestamp': '2017-04-28 14:45:36.583997'}
-        l = loaf.Loaf.create_loaf_from_dict(dictio)
+        l = Loaf.create_loaf_from_dict(dictio)
         self.assertTrue(l.validate())
         dictio['data'] = 'test1'
-        l = loaf.Loaf.create_loaf_from_dict(dictio)
+        l = Loaf.create_loaf_from_dict(dictio)
         self.assertFalse(l.validate())
 
 if __name__ == '__main__':
