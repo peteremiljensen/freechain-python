@@ -3,8 +3,8 @@ import asyncio
 import janus
 import websockets
 
-from events import Events
-from common import *
+from .events import Events
+from .common import *
 
 #   _   _      _                      _
 #  | \ | |    | |                    | |

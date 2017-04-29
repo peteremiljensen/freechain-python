@@ -2,8 +2,8 @@ import sys, os.path
 import ast
 import threading
 
-from loaf import *
-from block import *
+from .loaf import *
+from .block import *
 
 #   _____ _           _
 #  /  __ \ |         (_)

@@ -4,7 +4,7 @@ import janus
 
 from asyncio import QueueEmpty as AsyncQueueEmpty
 
-from singleton import Singleton
+from .singleton import Singleton
 
 #   _____                _
 #  |  ___|              | |

@@ -1,4 +1,4 @@
-from singleton import Singleton
+from .singleton import Singleton
 
 @Singleton
 class Validator():

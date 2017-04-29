@@ -2,7 +2,7 @@ import hashlib
 import datetime
 import json
 
-from validator import Validator
+from .validator import Validator
 
 #   _                  __
 #  | |                / _|

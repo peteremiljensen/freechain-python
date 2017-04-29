@@ -4,14 +4,14 @@ import janus
 import time
 import json
 
-from events import Events
-from network import Network
-from chain import *
-from loaf import Loaf
-from block import Block
-from validator import Validator
+from .events import Events
+from .network import Network
+from .chain import *
+from .loaf import Loaf
+from .block import Block
+from .validator import Validator
 
-from common import *
+from .common import *
 
 from queue import Empty as SyncQueueEmpty
 

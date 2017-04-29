@@ -2,8 +2,8 @@ import hashlib
 import datetime
 import json
 
-from loaf import *
-from validator import Validator
+from .loaf import *
+from .validator import Validator
 
 #  ______ _            _
 #  | ___ \ |          | |
