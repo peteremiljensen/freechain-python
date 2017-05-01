@@ -10,6 +10,13 @@ class TestChainMethods(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.chain = Chain()
+        genesis_block = Block.create_block_from_dict(
+            {"hash": "00001167dc800472caeb3e4090e623d32d93bd7e6b446040305a052dd5dde705",
+             "height": 0, "loaves": [], "data": {"nounce": 47690},
+             "previous_block_hash": "-1",
+             "timestamp": "2017-04-28 14:49:37.492715"})
+
+        cls.chain._chain = [genesis_block]
         cls.b_1 = mine([], cls.chain.get_block(0))
         cls.b_2 = Block([], 0, "-1", "2012", 512, "test")
 
@@ -31,6 +38,13 @@ class TestChainMethods(unittest.TestCase):
 
     def test_json(self):
         c = Chain()
+        genesis_block = Block.create_block_from_dict(
+            {"hash": "00001167dc800472caeb3e4090e623d32d93bd7e6b446040305a052dd5dde705",
+             "height": 0, "loaves": [], "data": {"nounce": 47690},
+             "previous_block_hash": "-1",
+             "timestamp": "2017-04-28 14:49:37.492715"})
+
+        c._chain = [genesis_block]
         genesis = json.loads(c.json().decode('utf-8'))[0]
         self.assertEqual(genesis, json.loads(c._chain[0].json().decode('utf-8')))
 

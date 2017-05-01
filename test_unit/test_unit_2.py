@@ -27,6 +27,13 @@ class TestBlockMethods(unittest.TestCase):
         cls.l_1 = Loaf('test')
         cls.l_2 = Loaf('test', 'test', 'test')
 
+        genesis_block = Block.create_block_from_dict(
+            {"hash":"000077dbf86e9c0d593ac746a0658d88b966ddd0a132dcf9294c23a929ed4573",
+             "height":0, "loaves":[], "data":{"nounce":27413},
+             "previous_block_hash":"-1",
+             "timestamp":"2017-05-01 15:16:52.579123"})
+
+        cls.chain._chain = [genesis_block]
         cls.b_1 = mine([cls.l_1], cls.chain.get_block(0))
         #cls.b_2 = mine([cls.l_2], cls.chain()
 

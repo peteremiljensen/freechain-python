@@ -17,12 +17,7 @@ class Chain():
     def __init__(self, chain_raw=None):
         """ Chain class constructor
         """
-        genesis_block = Block.create_block_from_dict(
-            {"hash": "00001167dc800472caeb3e4090e623d32d93bd7e6b446040305a052dd5dde705",
-             "height": 0, "loaves": [], "nounce": 47690,
-             "previous_block_hash": "-1",
-             "timestamp": "2017-04-28 14:49:37.492715"})
-        self._chain = [genesis_block]
+        self._chain = []
         self._chain_lock = threading.RLock()
 
     def add_block(self, block):
@@ -32,6 +27,9 @@ class Chain():
         the block is appended to the chain and the function returns True
         """
         with self._chain_lock:
+            if block.get_height() == 0 and self._chain == []:
+                self._chain.append(block)
+                return True
             if block.validate() and \
                self._chain[-1].get_hash() == block.get_previous_block_hash() \
                and len(self._chain) == block.get_height():

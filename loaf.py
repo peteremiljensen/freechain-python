@@ -13,7 +13,7 @@ from .validator import Validator
 #
 
 class Loaf():
-    def __init__(self, data, timestamp=None, hash=None):
+    def __init__(self, data="", timestamp=None, hash=None):
         """ Loaf class constructor. If timestamp and hash are not given,
             sets timestamp to current time and creates a hash.
         """

@@ -63,10 +63,20 @@ class TestIntegration1(unittest.TestCase):
         cls.e.register_callback(EVENTS_TYPE.CONNECTION_READY,
                                  connection_callback)
 
+        genesis_block = Block.create_block_from_dict(
+            {"hash":"000077dbf86e9c0d593ac746a0658d88b966ddd0a132dcf9294c23a929ed4573",
+             "height":0, "loaves":[], "data":{"nounce":27413},
+             "previous_block_hash":"-1",
+             "timestamp":"2017-05-01 15:16:52.579123"})
+
         cls.node_1 = Node(9000)
         cls.node_2 = Node(9001)
         cls.node_3 = Node(9002)
         cls.node_4 = Node(9003)
+        cls.node_1._chain._chain = [genesis_block]
+        cls.node_2._chain._chain = [genesis_block]
+        cls.node_3._chain._chain = [genesis_block]
+        cls.node_4._chain._chain = [genesis_block]
         cls.node_1.start()
         cls.node_2.start()
         cls.node_3.start()

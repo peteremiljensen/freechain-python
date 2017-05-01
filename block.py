@@ -15,7 +15,7 @@ from .validator import Validator
 
 class Block:
     def __init__(self, loaves, height, previous_block_hash,
-                 timestamp, nounce=-1, hash=None):
+                 timestamp, data="", hash=None):
         """ Block class constructor. If hash is not given, a new hash is created
         """
         self._block = {}
@@ -23,7 +23,7 @@ class Block:
         self._block['height'] = height
         self._block['previous_block_hash'] = previous_block_hash
         self._block['timestamp'] = timestamp
-        self._block['nounce'] = nounce
+        self._block['data'] = data
         if hash == None:
             self._block['hash'] = hashlib.sha256(self.json()).hexdigest()
         else:
@@ -81,7 +81,7 @@ class Block:
             loaves.append(Loaf.create_loaf_from_dict(loaf_raw))
         return Block(loaves, dictio['height'],
                      dictio['previous_block_hash'], dictio['timestamp'],
-                     dictio['nounce'], dictio['hash'])
+                     dictio['data'], dictio['hash'])
 
 class BlockEncoder(LoafEncoder):
     def default(self, obj):
