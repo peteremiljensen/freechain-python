@@ -29,6 +29,9 @@ class Loaf():
         else:
             self._loaf['hash'] = hash
 
+    def __getitem__(self, key):
+        self._loaf['data'][key]
+
     def json(self):
         """ Serializes loaf to a JSON formatted string, encodes to utf-8
             and returns
@@ -39,6 +42,9 @@ class Loaf():
     def get_hash(self):
         """ Returns hash of loaf """
         return self._loaf['hash']
+
+    def get_data(self):
+        return self._loaf['data']
 
     def calculate_hash(self):
         """ Calculates the same hash of loaf object """

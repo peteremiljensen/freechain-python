@@ -29,6 +29,9 @@ class Block:
         else:
             self._block['hash'] = hash
 
+    def __getitem__(self, key):
+        self._block['data'][key]
+
     def json(self):
         """ Serializes block to a JSON formatted string, encodes to utf-8
             and returns
@@ -52,6 +55,9 @@ class Block:
     def get_previous_block_hash(self):
         """ Returns hash of previous block """
         return self._block['previous_block_hash']
+
+    def get_data(self):
+        return self._block['data']
 
     def calculate_hash(self):
         """ Removes hash from block, calculates hash, reinserts old hash and

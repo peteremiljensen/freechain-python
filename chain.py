@@ -27,12 +27,10 @@ class Chain():
         the block is appended to the chain and the function returns True
         """
         with self._chain_lock:
-            if block.get_height() == 0 and self._chain == []:
-                self._chain.append(block)
-                return True
             if block.validate() and \
-               self._chain[-1].get_hash() == block.get_previous_block_hash() \
-               and len(self._chain) == block.get_height():
+               (self._chain[-1].get_hash() == block.get_previous_block_hash() \
+                and len(self._chain) == block.get_height() or \
+                block.get_height() == 0 and self._chain == []):
                 self._chain.append(block)
                 return True
             else:
