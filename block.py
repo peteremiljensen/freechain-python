@@ -15,7 +15,7 @@ from .validator import Validator
 
 class Block:
     def __init__(self, loaves, height, previous_block_hash,
-                 timestamp, data="", hash=None):
+                 timestamp, data={}, hash=None):
         """ Block class constructor. If hash is not given, a new hash is created
         """
         self._block = {}
@@ -30,7 +30,7 @@ class Block:
             self._block['hash'] = hash
 
     def __getitem__(self, key):
-        self._block['data'][key]
+        return self._block['data'][key]
 
     def json(self):
         """ Serializes block to a JSON formatted string, encodes to utf-8

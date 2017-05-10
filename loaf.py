@@ -13,7 +13,7 @@ from .validator import Validator
 #
 
 class Loaf():
-    def __init__(self, data="", timestamp=None, hash=None):
+    def __init__(self, data={}, timestamp=None, hash=None):
         """ Loaf class constructor. If timestamp and hash are not given,
             sets timestamp to current time and creates a hash.
         """
@@ -30,7 +30,7 @@ class Loaf():
             self._loaf['hash'] = hash
 
     def __getitem__(self, key):
-        self._loaf['data'][key]
+        return self._loaf['data'][key]
 
     def json(self):
         """ Serializes loaf to a JSON formatted string, encodes to utf-8
