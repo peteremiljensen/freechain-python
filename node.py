@@ -107,6 +107,9 @@ class Node():
 
         return loaves
 
+    def get_chain(self):
+        return self._chain
+
     def remove_block(self, height):
         for loaf in self._chain.get_block(height).get_loaves():
             with self._mined_loaves_lock:
