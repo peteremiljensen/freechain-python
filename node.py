@@ -58,11 +58,11 @@ class Node():
     def attach_block_validator(self, function):
         Validator.Instance().attach_block_validator(function)
 
-    def attach_consensus_check(self, function):
-        Validator.Instance().attach_consensus_check(function)
+    def attach_branching_check(self, function):
+        Validator.Instance().attach_branching_check(function)
 
-    def attach_consensus(self, function):
-        Validator.Instance().attach_consensus(function)
+    def attach_branching(self, function):
+        Validator.Instance().attach_branching(function)
 
     def connect_node(self, ip, port=9000):
         """ Connects to another node through its IP address """
@@ -224,7 +224,7 @@ class Node():
                        str(rec_length)))
             print(info('local block length is : ' +
                        str(local_length)))
-            if Validator.Instance().consensus_check(local_length, rec_length):
+            if Validator.Instance().branching_check(local_length, rec_length):
                 self._get_chain(websocket)
             else:
                 print(info('Keeping local blocks'))
@@ -244,8 +244,8 @@ class Node():
         elif message['type'] == 'response':
             new_chain = self._chain.create_chain_from_list(message['chain'])
 
-            print(info('Consulting consensus'))
-            new_chain = Validator.Instance().consensus(self._chain,
+            print(info('Consulting branching'))
+            new_chain = Validator.Instance().branching(self._chain,
                                                        new_chain)
 
             new_chain_length = new_chain.get_length()
