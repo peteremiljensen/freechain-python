@@ -20,8 +20,8 @@ def block_validator(block):
 def attach(node):
     node.attach_loaf_validator(loaf_validator)
     node.attach_block_validator(block_validator)
-    node.attach_consensus_check(consensus_check)
-    node.attach_consensus(consensus)
+    node.attach_branching_check(branching_check)
+    node.attach_branching(branching)
 
 def mine(loaves, prev_block):
     height = prev_block.get_height() + 1
@@ -41,13 +41,13 @@ def mine(loaves, prev_block):
         print(fail('block could not be mined'))
         return None
 
-def consensus_check(local_length, rec_length):
+def branching_check(local_length, rec_length):
     if local_length < rec_length:
         return True
     else:
         return False
 
-def consensus(chain1, chain2):
+def branching(chain1, chain2):
     if chain1.get_length() < chain2.get_length():
         return chain2
     else:
