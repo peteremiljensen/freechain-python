@@ -15,14 +15,17 @@ from .validator import Validator
 
 class Block:
     def __init__(self, loaves, height, previous_block_hash,
-                 timestamp, data={}, hash=None):
+                 timestamp=None, data={}, hash=None):
         """ Block class constructor. If hash is not given, a new hash is created
         """
         self._block = {}
         self._block['loaves'] = loaves
         self._block['height'] = height
         self._block['previous_block_hash'] = previous_block_hash
-        self._block['timestamp'] = timestamp
+        if timestamp == None:
+            self._block['timestamp'] = str(datetime.datetime.now())
+        else:
+            self._block['timestamp'] = timestamp
         self._block['data'] = data
         if hash == None:
             self._block['hash'] = hashlib.sha256(self.json()).hexdigest()
