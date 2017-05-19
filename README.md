@@ -13,7 +13,7 @@ amount of concurrent connections and deliver a greater throughput.
 Special care is been taken to assure its easy use without compromising
 applicability and throughput. The uncomplicated use of the framework is
 demonstrated by the following simple python script, which starts a minimal
-blockchain node listening on port 9000---ready to receive loaves and
+blockchain node listening on port 9000&mdash;ready to receive loaves and
 blocks.
 
 ```python
