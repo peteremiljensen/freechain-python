@@ -24,3 +24,6 @@ genesis_block = Block([], 0, "-1")
 if node.add_block(genesis_block):
   node.start()
 ```
+
+More elaborate examples can be found in the following repository on github:
+[freechain-python-example](https://www.github.com/peteremiljensen/freechain-python-example)
