@@ -229,6 +229,7 @@ class Node():
                                       'function': FUNCTION.GET_BLOCKS,
                                       'offset': offset,
                                       'length': length})
+                self._network.send(websocket, request)
 
     def _handle_get_blocks(self, message, websocket):
         if message['type'] == 'request':
