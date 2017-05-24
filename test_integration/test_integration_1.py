@@ -40,17 +40,12 @@ def mine(loaves, prev_block):
         print(fail('block could not be mined'))
         return None
 
-def branching_check(local_length, rec_length):
-    if local_length < rec_length:
-        return True
-    else:
-        return False
-
 def branching(chain1, chain2):
     if chain1.get_length() < chain2.get_length():
         return chain2
     else:
         return chain1
+
 class TestIntegration1(unittest.TestCase):
 
     @classmethod
@@ -72,10 +67,10 @@ class TestIntegration1(unittest.TestCase):
         cls.node_2 = Node(9001)
         cls.node_3 = Node(9002)
         cls.node_4 = Node(9003)
-        cls.node_1._chain._chain = [genesis_block]
-        cls.node_2._chain._chain = [genesis_block]
-        cls.node_3._chain._chain = [genesis_block]
-        cls.node_4._chain._chain = [genesis_block]
+        cls.node_1._chain.add_block(genesis_block)
+        cls.node_2._chain.add_block(genesis_block)
+        cls.node_3._chain.add_block(genesis_block)
+        cls.node_4._chain.add_block(genesis_block)
         cls.node_1.start()
         cls.node_2.start()
         cls.node_3.start()
@@ -110,11 +105,11 @@ class TestIntegration1(unittest.TestCase):
         self.assertEqual(pool_keys.count(self.loaf.get_hash()), 1)
 
     def test_d_broadcast_loaf(self):
-        self.node_1.broadcast_loaf(self.loaf)
         loaf_sema = threading.Semaphore(0)
         def loaf_callback(loaf):
             loaf_sema.release()
         self.e.register_callback(EVENTS_TYPE.RECEIVED_LOAF, loaf_callback)
+        self.node_1.broadcast_loaf(self.loaf)
         self.assertTrue(loaf_sema.acquire(timeout=20))
         self.assertTrue(self.loaf.get_hash() in self.node_2._loaf_pool.keys())
 
@@ -139,29 +134,26 @@ class TestIntegration1(unittest.TestCase):
         self.assertFalse(self.loaf.get_hash() in self.node_1._loaf_pool.keys())
 
     def test_h_broadcast_block(self):
-        Loaf("test").validate()
         global block
-        self.node_1.broadcast_block(block)
         block_sema = threading.Semaphore(0)
-        received_block = None
-        def block_callback(block):
+        def block_callback(_):
             block_sema.release()
-            received_block = block
         self.e.register_callback(EVENTS_TYPE.RECEIVED_BLOCK, block_callback)
+
+        self.node_1.broadcast_block(block)
         self.assertTrue(block_sema.acquire(timeout=20))
 
         new_block = self.node_2._chain.get_block(1)
         self.assertEqual(new_block.get_hash(), block.get_hash())
 
     def test_i_replacing_chain(self):
-        self.node_3.connect_node('localhost', 9000)
-
         replaced_sema = threading.Semaphore(0)
-        def replaced_callback(websocket):
+        def replaced_callback(_):
             replaced_sema.release()
         self.e.register_callback(EVENTS_TYPE.BLOCKS_ADDED,
                                  replaced_callback)
 
+        self.node_3.connect_node('localhost', 9000)
         self.assertTrue(replaced_sema.acquire(timeout=20))
 
         for i in range(2):
@@ -169,6 +161,12 @@ class TestIntegration1(unittest.TestCase):
                              self.node_3._chain.get_block(i).get_hash())
 
     def test_j_longer_chain(self):
+        replaced_sema = threading.Semaphore(0)
+        def replaced_callback(data):
+            replaced_sema.release()
+        self.e.register_callback(EVENTS_TYPE.BLOCKS_ADDED,
+                                 replaced_callback)
+
         loaves = self.node_4.get_loaves()
         chain_length = self.node_4._chain.get_length()
         prev_block = self.node_4._chain.get_block(chain_length-1)
@@ -203,12 +201,7 @@ class TestIntegration1(unittest.TestCase):
 
         self.node_1.connect_node('localhost', 9003)
 
-        replaced_sema = threading.Semaphore(0)
-        def replaced_callback(data):
-            replaced_sema.release()
-        self.e.register_callback(EVENTS_TYPE.BLOCKS_ADDED,
-                                 replaced_callback)
-
+        time.sleep(2)
         self.assertTrue(replaced_sema.acquire(timeout=20))
 
         for i in range(5):
