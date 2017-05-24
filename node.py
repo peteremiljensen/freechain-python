@@ -218,7 +218,7 @@ class Node():
             remote_hashes = message['hashes']
             local_hashes = self._chain.get_hashes()
             offset = 0
-            for i in range(len(min(remote_hashes, local_hashes))):
+            for i in range(min(len(remote_hashes), len(local_hashes))):
                 if remote_hashes[i] == local_hashes[i]:
                     offset += 1
                 else:
