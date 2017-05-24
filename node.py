@@ -179,10 +179,10 @@ class Node():
                             websocket, self._json({'type': 'error',
                                                    'description': \
                                                    'type is not supported'}))
-                    elif message['function'] == FUNCTIONS.GET_LENGTH:
-                        self._handle_get_length(message, websocket)
-                    elif message['function'] == FUNCTIONS.GET_CHAIN:
-                        self._handle_get_chain(message, websocket)
+                    elif message['function'] == FUNCTIONS.GET_HASHES:
+                        self._handle_get_hashes(message, websocket)
+                    elif message['function'] == FUNCTIONS.GET_BLOCKS:
+                        self._handle_get_blocks(message, websocket)
                     elif message['function'] == FUNCTIONS.BROADCAST_LOAF:
                         self._handle_broadcast_loaf(message)
                     elif message['function'] == FUNCTIONS.BROADCAST_BLOCK:
@@ -205,85 +205,11 @@ class Node():
                     raise
             time.sleep(0.05)
 
-    def _handle_get_length(self, message, websocket):
-        """ Reads a request for the length of the blockchain. If local
-            blockchain is shorter, it sends a request for missing blocks
-        """
+    def _handle_get_hashes(self, message, websocket):
+        pass
 
-        if message['type'] == 'request':
-            chain_length = self._chain.get_length()
-            response = self._json({'type': 'response',
-                                   'function': FUNCTIONS.GET_LENGTH,
-                                   'length': chain_length})
-            self._network.send(websocket, response)
-
-        elif message['type'] == 'response':
-            local_length = self._chain.get_length()
-            rec_length = message['length']
-            print(info('Recieved blockchain length is: ' +
-                       str(rec_length)))
-            print(info('local block length is : ' +
-                       str(local_length)))
-            if Validator.Instance().branching_check(local_length, rec_length):
-                self._get_chain(websocket)
-            else:
-                print(info('Keeping local blocks'))
-
-    def _handle_get_chain(self, message, websocket):
-        if message['type'] == 'request':
-            blocks = []
-            for i in range(self._chain.get_length()):
-                blocks.append(self._chain.get_block(i))
-
-            response = self._json({'type': 'response',
-                                   'function': FUNCTIONS.GET_CHAIN,
-                                   'chain': blocks})
-
-            self._network.send(websocket, response)
-
-        elif message['type'] == 'response':
-            new_chain = self._chain.create_chain_from_list(message['chain'])
-
-            print(info('Consulting branching'))
-            new_chain = Validator.Instance().branching(self._chain,
-                                                       new_chain)
-
-            new_chain_length = new_chain.get_length()
-            local_chain_length = self._chain.get_length()
-            blocks_to_remove = 0
-            if new_chain.json() == self._chain.json():
-                return
-            else:
-                for i in list(reversed(range(-1, local_chain_length))):
-                    if i == -1:
-                        print("Blockchains can't be merged, no blocks in common")
-                        return
-                    elif self._chain.get_block(i).get_hash() == \
-                       new_chain.get_block(i).get_hash():
-                        break
-                    else:
-                        blocks_to_remove += 1
-
-                blocks_to_add = (new_chain_length - local_chain_length) + \
-                                blocks_to_remove
-
-                if not new_chain.validate():
-                    print(warning('Received chain is not valid'))
-                    return
-
-                while blocks_to_remove != 0:
-                    self.remove_block(self._chain.get_length()-1)
-                    blocks_to_remove -= 1
-
-                while blocks_to_add != 0:
-                    block = new_chain.get_block(new_chain_length -
-                                                blocks_to_add)
-                    self.add_block(block)
-                    print(info('Added block ' +
-                               str(new_chain_length -  blocks_to_add)))
-                    blocks_to_add -= 1
-
-                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
+    def _handle_get_blocks(self, message, websocket):
+        pass
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,

@@ -23,7 +23,7 @@ class EVENTS_TYPE:
     RECEIVED_ERROR = 'received_error'
 
 class FUNCTIONS:
-    GET_LENGTH = 'get_length'
-    GET_CHAIN = 'get_chain'
+    GET_HASHES = 'get_hashes'
+    GET_BLOCKS = 'get_blocks'
     BROADCAST_LOAF = 'broadcast_loaf'
     BROADCAST_BLOCK = 'broadcast_block'
