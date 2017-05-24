@@ -256,6 +256,7 @@ class Node():
                 # Make sure received blocks are valid
                 for block in blocks:
                     if not remote_chain.add_block(block):
+                        print(warning("blocks received are not valid"))
                         return
                 # Test if blocks are directly appendable
                 top_block = self._chain.get_block(chain_length-1)
