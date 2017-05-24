@@ -48,7 +48,7 @@ class Node():
         self._worker_thread.start()
 
         def new_connection_callback(websocket):
-            self._get_length(websocket)
+            self._get_hashes(websocket)
         Events.Instance().register_callback(EVENTS_TYPE.CONNECTION_READY,
                                             new_connection_callback)
 
@@ -136,16 +136,18 @@ class Node():
                         'function': FUNCTIONS.BROADCAST_BLOCK,
                         'block': block}))
 
-    def _get_length(self, websocket):
+    def _get_hashes(self, websocket):
         """ Requests the length of the blockchain from a node """
         self._network.send(websocket, self._json(
             {'type': 'request',
-             'function': FUNCTIONS.GET_LENGTH}))
+             'function': FUNCTIONS.GET_HASHES}))
 
-    def _get_chain(self, websocket):
+    def _get_blocks(self, websocket, offset, length):
         self._network.send(websocket, self._json(
             {'type': 'request',
-             'function': FUNCTIONS.GET_CHAIN}))
+             'function': FUNCTIONS.GET_BLOCKS,
+             'offset': offset,
+             'length': length}))
 
     def _start_events_thread(self):
         """ Starts an event thread that runs untill completion """
@@ -229,7 +231,7 @@ class Node():
         block = Block.create_block_from_dict(message['block'])
         block_height = block.get_height()
 
-        if block.get_height() > self._chain.get_length():
+        '''if block.get_height() > self._chain.get_length():
             self._get_length(websocket)
         elif block.get_height() < self._chain.get_length():
             return
@@ -238,7 +240,7 @@ class Node():
             Events.Instance().notify(EVENTS_TYPE.RECEIVED_BLOCK, block)
             self.broadcast_block(block)
         else:
-            print(fail('block could not be added'))
+            print(fail('block could not be added'))'''
 
     @staticmethod
     def _json(dictio):
