@@ -225,15 +225,12 @@ class Node():
                     break
             if offset < len(remote_hashes):
                 length = len(remote_hashes) - offset
-                request = self._json({'type': 'request',
-                                      'function': FUNCTION.GET_BLOCKS,
-                                      'offset': offset,
-                                      'length': length})
-                self._network.send(websocket, request)
+                self._get_blocks(websocket, offset, length)
 
     def _handle_get_blocks(self, message, websocket):
         if message['type'] == 'request':
-            pass
+            offset = message['offset']
+            offset = message['length']
         elif message['type'] == 'response':
             pass
 
