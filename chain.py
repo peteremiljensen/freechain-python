@@ -52,6 +52,13 @@ class Chain():
         with self._chain_lock:
             return len(self._chain)
 
+    def get_hashes(self):
+        with self._chain_lock:
+            hashes = []
+            for b in self._chain:
+                hashes.append(b.get_hash())
+            return hashes
+
     def validate(self):
         with self._chain_lock:
             for i in range(self.get_length()):

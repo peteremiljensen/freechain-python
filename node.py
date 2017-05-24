@@ -208,10 +208,33 @@ class Node():
             time.sleep(0.05)
 
     def _handle_get_hashes(self, message, websocket):
-        pass
+        if message['type'] == 'request':
+            hashes = self._chain.get_hashes()
+            response = self._json({'type': 'response',
+                                   'function': FUNCTIONS.GET_HASHES,
+                                   'hashes': hashes})
+            self._network.send(websocket, response)
+        elif message['type'] == 'response':
+            remote_hashes = message['hashes']
+            local_hashes = self._chain.get_hashes()
+            offset = 0
+            for i in range(len(min(remote_hashes, local_hashes))):
+                if remote_hashes[i] == local_hashes[i]:
+                    offset += 1
+                else:
+                    break
+            if offset < len(remote_hashes):
+                length = len(remote_hashes) - offset
+                request = self._json({'type': 'request',
+                                      'function': FUNCTION.GET_BLOCKS,
+                                      'offset': offset,
+                                      'length': length})
 
     def _handle_get_blocks(self, message, websocket):
-        pass
+        if message['type'] == 'request':
+            pass
+        elif message['type'] == 'response':
+            pass
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,
