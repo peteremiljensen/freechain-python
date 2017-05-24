@@ -253,14 +253,17 @@ class Node():
                 remote_chain = Chain()
                 mutual = self._chain.get_blocks(0, blocks[0].get_height())
                 remote_chain.replace(mutual)
+                # Make sure received blocks are valid
                 for block in blocks:
                     if not remote_chain.add_block(block):
                         return
+                # Test if blocks are directly appendable
                 top_block = self._chain.get_block(chain_length-1)
                 if blocks[0].get_height() == chain_length and \
                    blocks[0].get_previous_block_hash() == top_block.get_hash():
                     for block in blocks:
                         self.add_block(block)
+                # Branching method has to be consulted
                 else:
                     local_chain.replace(
                         self._chain.get_blocks(0, self._chain.get_length()))
@@ -268,6 +271,8 @@ class Node():
                         local_chain,
                         remote_chain)
                     self.replace_chain(chain)
+                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
+                print(info('Chain has been replaced'))
             else:
                 print(warning("blocks received is invalid"))
 
@@ -289,16 +294,14 @@ class Node():
         block = Block.create_block_from_dict(message['block'])
         block_height = block.get_height()
 
-        '''if block.get_height() > self._chain.get_length():
-            self._get_length(websocket)
-        elif block.get_height() < self._chain.get_length():
-            return
+        if block_height != self._chain.get_length():
+            self._get_hashes(websocket)
         elif self.add_block(block):
             print(info('Block succesfully added'))
             Events.Instance().notify(EVENTS_TYPE.RECEIVED_BLOCK, block)
             self.broadcast_block(block)
         else:
-            print(fail('block could not be added'))'''
+            print(fail('block could not be added'))
 
     @staticmethod
     def _json(dictio):
