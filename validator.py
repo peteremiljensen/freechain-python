@@ -13,9 +13,6 @@ class Validator():
     def attach_block_validator(self, function):
         self._block_validator = function
 
-    def attach_branching_check(self, function):
-        self._branching_check = function
-
     def attach_branching(self, function):
         self._branching = function
 

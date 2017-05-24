@@ -20,7 +20,6 @@ def block_validator(block):
 def attach(node):
     node.attach_loaf_validator(loaf_validator)
     node.attach_block_validator(block_validator)
-    node.attach_branching_check(branching_check)
     node.attach_branching(branching)
 
 def mine(loaves, prev_block):
