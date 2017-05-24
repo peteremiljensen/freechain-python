@@ -5,7 +5,6 @@ class Validator():
     def __init__(self):
         self._loaf_validator  = lambda l:  True
         self._block_validator = lambda b:  True
-        self._branching_check = lambda l, r: False
         self._branching       = lambda c1, c2:  c1
 
     def attach_loaf_validator(self, function):
@@ -25,9 +24,6 @@ class Validator():
 
     def validate_block(self, block):
         return self._block_validator(block)
-
-    def branching_check(self, local_length, rec_length):
-        return self._branching_check(local_length, rec_length)
 
     def branching(self, chain1, chain2):
         return self._branching(chain1, chain2)

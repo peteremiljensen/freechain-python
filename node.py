@@ -110,8 +110,8 @@ class Node():
     def get_chain(self):
         return self._chain
 
-    def remove_block(self, height):
-        for loaf in self._chain.get_block(height).get_loaves():
+    def remove_block(self):
+        for loaf in self._chain.get_block(self._chain.get_length()).get_loaves():
             with self._mined_loaves_lock:
                 try:
                     del self._mined_loaves[loaf.get_hash()]
@@ -119,7 +119,11 @@ class Node():
                     pass
             with self._loaf_pool_lock:
                 self._loaf_pool[loaf.get_hash()] = loaf
-        self._chain.remove_block(height)
+        self._chain.remove_block()
+
+    '''def replace_chain(self, chain):
+        with self._mined_loaves_lock, self._loaf_pool_lock:'''
+            
 
     def broadcast_loaf(self, loaf):
         """ Validates a loaf. If it is validated, it puts the loaves hash in
@@ -230,9 +234,40 @@ class Node():
     def _handle_get_blocks(self, message, websocket):
         if message['type'] == 'request':
             offset = message['offset']
-            offset = message['length']
+            length = message['length']
+            blocks = self._chain.get_blocks(offset, length)
+            response = self._json({'type': 'response',
+                                   'function': FUNCTIONS.GET_BLOCKS,
+                                   'blocks': blocks})
+            self._network.send(websocket, response)
         elif message['type'] == 'response':
-            pass
+            blocks = []
+            for block in message['blocks']:
+                blocks.append(Block.create_block_from_dict(block))
+            chain_length = self._chain.get_length()
+            if len(blocks) > 0 and chain_length > 0 and \
+               blocks[0].get_height() <= chain_length:
+                remote_chain = Chain()
+                mutual = self._chain.get_blocks(0, blocks[0].get_height())
+                remote_chain.replace(mutual)
+                for block in blocks:
+                    if not remote_chain.add_block(block):
+                        return
+                top_block = self._chain.get_block(chain_length-1)
+                if blocks[0].get_height() == chain_length and \
+                   blocks[0].get_previous_block_hash() == top_block.get_hash():
+                    for block in blocks:
+                        self.add_block(block)
+                else:
+                    chain = Validator.Instance().branching(
+                        self._chain.get_blocks(0, self._chain.get_length()),
+                        remote_chain)
+                    for i in reversed(range(self._chain.get_length())):
+                        self.remove_block(i)
+                    for block in blocks:
+                        self.add_block(block)
+            else:
+                print(warning("blocks received is invalid"))
 
     def _handle_broadcast_loaf(self, message):
         """ Receives and validates a loaf. If loaf is not validated,

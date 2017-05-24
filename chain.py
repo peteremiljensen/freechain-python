@@ -36,15 +36,19 @@ class Chain():
             else:
                 return False
 
-    def remove_block(self, height):
+    def remove_block(self):
         with self._chain_lock:
-            self._chain = self._chain[:height]
+            self._chain = self._chain[:-1]
 
     def get_block(self, height):
         """ Locks the chain and returns the height of the chain
         """
         with self._chain_lock:
             return self._chain[height]
+
+    def get_blocks(self, offset, length):
+        with self._chain_lock:
+            return list(self._chain[offset:offset+length])
 
     def get_length(self):
         """ Locks the chain and returns the length of the chain
@@ -65,9 +69,15 @@ class Chain():
                 if not self.get_block(i).validate():
                     return False
                 if i > 0 and self.get_block(i).get_previous_block_hash() != \
-                     self.get_block(i-1).get_hash():
+                   self.get_block(i-1).get_hash():
                     return False
             return True
+
+    def replace(self, chain):
+        """ Only use this for chains that aren't accessed in parallel
+        """
+        with self._chain_lock:
+            self._chain = chain
 
     def json(self):
         """ Serializes chain to a JSON formatted string, encodes to utf-8
