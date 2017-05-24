@@ -48,7 +48,10 @@ class Chain():
 
     def get_blocks(self, offset, length):
         with self._chain_lock:
-            return list(self._chain[offset:offset+length])
+            if length == -1:
+                return list(self._chain[offset:])
+            else:
+                return list(self._chain[offset:offset+length])
 
     def get_length(self):
         """ Locks the chain and returns the length of the chain
