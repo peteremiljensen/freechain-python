@@ -271,7 +271,7 @@ class Node():
                         local_chain,
                         remote_chain)
                     self.replace_chain(chain)
-                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, block)
+                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, blocks)
                 print(info('Chain has been replaced'))
             else:
                 print(warning("blocks received is invalid"))
