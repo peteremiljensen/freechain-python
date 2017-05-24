@@ -74,8 +74,6 @@ class Chain():
             return True
 
     def replace(self, chain):
-        """ Only use this for chains that aren't accessed in parallel
-        """
         with self._chain_lock:
             self._chain = chain
 

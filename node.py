@@ -31,9 +31,8 @@ class Node():
 
         self._chain = Chain()
         self._loaf_pool = {}
-        self._loaf_pool_lock = threading.RLock()
+        self._loaves_lock = threading.RLock()
         self._mined_loaves = {}
-        self._mined_loaves_lock = threading.RLock()
 
         self._events_thread = threading.Thread(target=self._start_events_thread,
                                                daemon=True)
@@ -69,7 +68,7 @@ class Node():
         self._network.connect_node(ip, port)
 
     def add_loaf(self, loaf):
-        with self._loaf_pool_lock:
+        with self._loaves_lock:
             if not loaf.validate():
                 print(fail('Loaf could not validate'))
                 return False
@@ -83,20 +82,18 @@ class Node():
 
     def add_block(self, block):
         height = block.get_height()
-        with self._loaf_pool_lock:
+        with self._loaves_lock:
             for loaf in block.get_loaves():
                 try:
                     del self._loaf_pool[loaf.get_hash()]
                 except KeyError:
                     pass
-        with self._mined_loaves_lock:
-            for loaf in block.get_loaves():
                 self._mined_loaves[loaf.get_hash()] = height
         return self._chain.add_block(block)
 
     def get_loaves(self):
         loaves = []
-        with self._loaf_pool_lock:
+        with self._loaves_lock:
             loaves_total = 0
             loaves_hash = []
             loaf_pool_keys = list(self._loaf_pool.keys())
@@ -110,20 +107,25 @@ class Node():
     def get_chain(self):
         return self._chain
 
-    def remove_block(self):
-        for loaf in self._chain.get_block(self._chain.get_length()).get_loaves():
-            with self._mined_loaves_lock:
-                try:
-                    del self._mined_loaves[loaf.get_hash()]
-                except KeyError:
-                    pass
-            with self._loaf_pool_lock:
-                self._loaf_pool[loaf.get_hash()] = loaf
-        self._chain.remove_block()
-
-    '''def replace_chain(self, chain):
-        with self._mined_loaves_lock, self._loaf_pool_lock:'''
-            
+    def replace_chain(self, chain):
+        with self._loaves_lock:
+            # Put loaves from existing chain to loaf_pool
+            for block in self._chain.get_blocks(0, self._chain.get_length()):
+                for loaf in block.get_loaves():
+                    try:
+                        del self._mined_loaves[loaf.get_hash()]
+                    except KeyError:
+                        pass
+                    self._loaf_pool[loaf.get_hash()] = loaf
+            # Put loaves from new chain into mined_loaves
+            for block in chain.get_blocks(0, chain.get_length()):
+                for loaf in block.get_loaves():
+                    try:
+                        del self._loaf_pool[loaf.get_hash()]
+                    except KeyError:
+                        pass
+                    self._mined_loaves[loaf.get_hash()] = loaf
+            self._chain.replace(chain.get_blocks(0, chain.get_length()))
 
     def broadcast_loaf(self, loaf):
         """ Validates a loaf. If it is validated, it puts the loaves hash in
@@ -247,6 +249,7 @@ class Node():
             chain_length = self._chain.get_length()
             if len(blocks) > 0 and chain_length > 0 and \
                blocks[0].get_height() <= chain_length:
+                local_chain = Chain()
                 remote_chain = Chain()
                 mutual = self._chain.get_blocks(0, blocks[0].get_height())
                 remote_chain.replace(mutual)
@@ -259,13 +262,12 @@ class Node():
                     for block in blocks:
                         self.add_block(block)
                 else:
+                    local_chain.replace(
+                        self._chain.get_blocks(0, self._chain.get_length()))
                     chain = Validator.Instance().branching(
-                        self._chain.get_blocks(0, self._chain.get_length()),
+                        local_chain,
                         remote_chain)
-                    for i in reversed(range(self._chain.get_length())):
-                        self.remove_block(i)
-                    for block in blocks:
-                        self.add_block(block)
+                    self.replace_chain(chain)
             else:
                 print(warning("blocks received is invalid"))
 
@@ -277,7 +279,7 @@ class Node():
             broadcasts the loaf to all connected nodes.
         """
         loaf = Loaf.create_loaf_from_dict(message['loaf'])
-        with self._loaf_pool_lock:
+        with self._loaves_lock:
             if self.add_loaf(loaf):
                 print(info('Received loaf and forwarding it'))
                 Events.Instance().notify(EVENTS_TYPE.RECEIVED_LOAF, loaf)
