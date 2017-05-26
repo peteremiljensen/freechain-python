@@ -272,7 +272,9 @@ class Node():
                         local_chain,
                         remote_chain)
                     self.replace_chain(chain)
-                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, blocks)
+                top_block = self._chain.get_block(self._chain.get_length()-1)
+                self.broadcast_block(top_block)
+                Events.Instance().notify(EVENTS_TYPE.BLOCKS_ADDED, None)
                 print(info('Chain has been replaced'))
             else:
                 print(warning("blocks received is invalid"))
@@ -294,13 +296,20 @@ class Node():
     def _handle_broadcast_block(self, message, websocket):
         block = Block.create_block_from_dict(message['block'])
         block_height = block.get_height()
+        chain_length = self._chain.get_length()
 
-        if block_height != self._chain.get_length():
+        if block_height != chain_length and \
+          not (block_height < chain_length and \
+            block.get_hash() ==
+            self._chain.get_block(block_height).get_hash()):
+
             self._get_hashes(websocket)
+
         elif self.add_block(block):
             print(info('Block succesfully added'))
             Events.Instance().notify(EVENTS_TYPE.RECEIVED_BLOCK, block)
             self.broadcast_block(block)
+
         else:
             print(fail('block could not be added'))
 
