@@ -298,12 +298,10 @@ class Node():
         block_height = block.get_height()
         chain_length = self._chain.get_length()
 
-        if block_height != chain_length and \
-          not (block_height < chain_length and \
-            block.get_hash() ==
-            self._chain.get_block(block_height).get_hash()):
-
-            self._get_hashes(websocket)
+        if block_height != chain_length:
+            if block_height >= chain_length or block.get_hash() != \
+              self._chain.get_block(block_height).get_hash():
+                self._get_hashes(websocket)
 
         elif self.add_block(block):
             print(info('Block succesfully added'))
