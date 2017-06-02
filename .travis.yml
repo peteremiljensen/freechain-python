@@ -9,5 +9,6 @@ install:
   - pip install -r requirements.txt
 script:
   - cd .. && coverage run --source=freechain-python --omit="freechain-python/test_*" -m unittest freechain-python.test_unit freechain-python.test_integration
+  - mv .coverage freechain-python/ && cd freechain-python
 after_success:
   coveralls
