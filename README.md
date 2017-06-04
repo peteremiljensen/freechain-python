@@ -6,7 +6,7 @@ A modular blockchain framework for Python-3, making it easy to create blockchain
 The Python framework is developed as a Python3-module that is easily imported to a new or existing application. The framework makes heavy use of threadding and asynchronous sockets to make it more production-friendly in applications of heavier demands. This means that the framework can potentially handle a high amount of concurrent connections and deliver a greater throughput.
 
 # Usage Example
-Special care is been taken to assure its easy use without compromising applicability and throughput. The uncomplicated use of the framework is demonstrated by the following simple python script, which starts a minimal blockchain node listening on port 9000&mdash;ready to receive loaves and blocks.
+Special care is been taken to assure its easy use without compromising applicability and throughput. The uncomplicated use of the framework is demonstrated by the following simple Python-script, which starts a minimal blockchain node listening on port 9000&mdash;ready to receive loaves and blocks.
 
 ```python
 from freechain.node import *
