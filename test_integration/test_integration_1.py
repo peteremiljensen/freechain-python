@@ -172,16 +172,19 @@ class TestIntegration1(unittest.TestCase):
         prev_block = self.node_4._chain.get_block(chain_length-1)
         block_1 = mine(loaves, prev_block)
         self.assertTrue(self.node_4.add_block(block_1))
+
         loaves = self.node_4.get_loaves()
         chain_length = self.node_4._chain.get_length()
         prev_block = self.node_4._chain.get_block(chain_length-1)
         block_2 = mine(loaves, prev_block)
         self.assertTrue(self.node_4.add_block(block_2))
+
         loaves = self.node_4.get_loaves()
         chain_length = self.node_4._chain.get_length()
         prev_block = self.node_4._chain.get_block(chain_length-1)
         block_3 = mine(loaves, prev_block)
         self.assertTrue(self.node_4.add_block(block_3))
+
         loaves = self.node_4.get_loaves()
         chain_length = self.node_4._chain.get_length()
         prev_block = self.node_4._chain.get_block(chain_length-1)
@@ -189,8 +192,8 @@ class TestIntegration1(unittest.TestCase):
         self.assertTrue(self.node_4.add_block(block_4))
 
         loaf2 = Loaf("test1")
-
         self.assertTrue(self.node_1.add_loaf(loaf2))
+
         loaves = self.node_1.get_loaves()
         chain_length = self.node_1._chain.get_length()
         prev_block = self.node_1._chain.get_block(chain_length-1)
